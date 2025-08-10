@@ -1,0 +1,87 @@
+﻿using System;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+
+namespace PhysicsIllustrated.Library.Managers;
+
+public class Input
+{
+    public Input(int width, int height)
+    {
+        _width = width;
+        _height = height;
+
+        _curMouseState = Mouse.GetState();
+        _curKbState = Keyboard.GetState();
+    }
+
+    private int _width, _height;
+
+    private MouseState _prvMouseState, _curMouseState;
+    private KeyboardState _prvKbState, _curKbState;
+
+    public void Update()
+    {
+        _prvMouseState = _curMouseState;
+        _curMouseState = Mouse.GetState();
+        _prvKbState = _curKbState;
+        _curKbState = Keyboard.GetState();
+    }
+
+    public bool IsKeyDown(Keys key)
+    {
+        return _curKbState.IsKeyDown(key);
+    }
+
+    public bool IsKeyClicked(Keys key)
+    {
+        return _curKbState.IsKeyDown(key) && !_prvKbState.IsKeyDown(key);
+    }
+
+    public Vector2 MousePosition()
+    {
+        return new Vector2(_curMouseState.X, _curMouseState.Y);
+    }
+
+    public bool MouseIsValid(out Vector2 mousePos)
+    {
+        // Monogame will give us mouse coordinates outside the window
+
+        var isValid = MouseIsValid();
+
+        if (isValid)
+        {
+            mousePos.X = _curMouseState.X;
+            mousePos.Y = _curMouseState.Y;
+        }
+        else
+        {
+            mousePos = Vector2.Zero;
+        }
+
+        return isValid;
+    }
+
+    private bool MouseIsValid()
+    {
+        return
+            _curMouseState.X >= 0 && _curMouseState.X < _width &&
+            _curMouseState.Y >= 0 && _curMouseState.Y < _height;
+    }
+
+    public bool ValidMouseLeftButtonClicked()
+    {
+        if (!MouseIsValid()) { return false; }
+
+        return _curMouseState.LeftButton == ButtonState.Pressed && 
+               _prvMouseState.LeftButton == ButtonState.Released;
+    }
+
+    public bool ValidMouseRightButtonClicked()
+    {
+        if (!MouseIsValid()) { return false; }
+
+        return _curMouseState.RightButton == ButtonState.Pressed &&
+               _prvMouseState.RightButton == ButtonState.Released;
+    }
+}
