@@ -1,19 +1,36 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace PhysicsIllustrated.Library.Managers;
 
 public static class Graphics
 {
-    public static void Initialize(GraphicsDevice graphicsDevice)
+    public static void Initialize(Game game, string fontName)
     {
-        _mid = new GraphicsImpl(graphicsDevice, 10_000);
-        _top = new GraphicsImpl(graphicsDevice, 3_000);
+        _game = game;
+        _mid = new GraphicsImpl(game.GraphicsDevice, 10_000);
+        _top = new GraphicsImpl(game.GraphicsDevice, 3_000);
+        _fontName = fontName;
+
+        OnLoadContent();
+
+        game.Window.ClientSizeChanged += (sender, args) => OnViewportChange();
+        
+        //_spriteBatch.Begin();
     }
 
+    public static void Dispose()
+    {
+    }
+
+    private static Game _game;
     private static GraphicsImpl _mid;
     private static GraphicsImpl _top;
+    private static SpriteBatch _spriteBatch;
+    private static SpriteFont _font;
+    private static string _fontName;
+    private static bool _begun = false;
 
     public static GraphicsImpl Mid => _mid;
     public static GraphicsImpl Top => _top;
@@ -22,12 +39,35 @@ public static class Graphics
     {
         _mid.Draw();
         _top.Draw();
+        
+        if (_begun)
+        {
+            _spriteBatch.End();
+            _begun = false;
+        }
     }
 
     public static void OnViewportChange()
     {
         _mid.OnViewportChange();
         _top.OnViewportChange();
+    }
+
+    public static void OnLoadContent()
+    {
+        _spriteBatch = new SpriteBatch(_game.GraphicsDevice);
+        _font = _game.Content.Load<SpriteFont>(_fontName);
+    }
+
+    public static void DrawString(string text, Vector2 position)
+    {
+        if (!_begun)
+        {
+            _spriteBatch.Begin();
+            _begun = true;
+        }
+
+        _spriteBatch.DrawString(_font, text, position, Color.White);
     }
 }
 

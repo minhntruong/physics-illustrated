@@ -4,9 +4,9 @@ using Microsoft.Xna.Framework.Input;
 
 namespace PhysicsIllustrated.Library.Managers;
 
-public class Input
+public class InputMgr
 {
-    public Input(int width, int height)
+    public InputMgr(int width, int height)
     {
         _width = width;
         _height = height;
@@ -27,6 +27,13 @@ public class Input
         _prvKbState = _curKbState;
         _curKbState = Keyboard.GetState();
     }
+
+    public bool IsDefaultExitInput()
+    {
+        var isIt = GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape);
+        return isIt;
+    }
+
 
     public bool IsKeyDown(Keys key)
     {
