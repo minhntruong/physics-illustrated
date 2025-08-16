@@ -65,6 +65,8 @@ public class Game1 : Game
             _circle2.Position = Input.MousePosition();
         }
 
+        IsMouseVisible = !States.IsMouseEngaged;
+
         //=== Check collisions =================================================
 
         _contacts.Clear();
@@ -96,10 +98,12 @@ public class Game1 : Game
         States.Clear(GraphicsDevice);
 
         var s = @"
-'M' to dis/engage the mouse
-'P' to toggle the pointer
+Mouse press to move
+'R' to toggle showing radii
 ";
         Graphics.Text.Position(20, 20).Scale(0.75f).Text(s);
+
+        _illustrator.ShowRadii(States.ShowRadii);
 
         // Draw all bodies
         foreach (var body in _bodies)
@@ -128,8 +132,9 @@ public class Game1 : Game
 
     private void StatesOnInputs()
     {
-        ToggleOnKeyClicked(Keys.M, ref States.IsMouseEngaged);
+        SetByMouseLeftButtonPressed(ref States.IsMouseEngaged);
         ToggleOnKeyClicked(Keys.P, ref States.IsPaused);
+        ToggleOnKeyClicked(Keys.R, ref States.ShowRadii);
         SetByKeyClicked(Keys.S, ref States.IsStepRequested);
     }
 

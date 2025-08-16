@@ -51,4 +51,10 @@ public class GameExt
     {
         state = _input.IsKeyClicked(key);
     }
+
+    public static void SetByMouseLeftButtonPressed(ref bool state)
+    {
+        state = _input.MouseLeftButtonPressed();
+    }
+
 }

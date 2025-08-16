@@ -19,6 +19,7 @@ public class InputMgr
 
     private MouseState _prvMouseState, _curMouseState;
     private KeyboardState _prvKbState, _curKbState;
+    private Vector2 _validMousePos = Vector2.Zero;
 
     public void Update()
     {
@@ -46,6 +47,22 @@ public class InputMgr
     }
 
     public Vector2 MousePosition()
+    {
+        var isValid = MouseIsValid();
+
+        if (isValid)
+        {
+            _validMousePos = new Vector2(_curMouseState.X, _curMouseState.Y);
+            return _validMousePos;
+        }
+        else
+        {
+            return _validMousePos;
+
+        }
+    }
+
+    public Vector2 MousePositionAbs()
     {
         return new Vector2(_curMouseState.X, _curMouseState.Y);
     }
@@ -76,7 +93,7 @@ public class InputMgr
             _curMouseState.Y >= 0 && _curMouseState.Y < _height;
     }
 
-    public bool ValidMouseLeftButtonClicked()
+    public bool MouseLeftButtonClicked()
     {
         if (!MouseIsValid()) { return false; }
 
@@ -84,11 +101,26 @@ public class InputMgr
                _prvMouseState.LeftButton == ButtonState.Released;
     }
 
-    public bool ValidMouseRightButtonClicked()
+    public bool MouseLeftButtonPressed()
+    {
+        if (!MouseIsValid()) { return false; }
+
+        return _curMouseState.LeftButton == ButtonState.Pressed;
+    }
+
+    public bool MouseRightButtonClicked()
     {
         if (!MouseIsValid()) { return false; }
 
         return _curMouseState.RightButton == ButtonState.Pressed &&
                _prvMouseState.RightButton == ButtonState.Released;
     }
+
+    public bool MouseRightButtonPressed()
+    {
+        if (!MouseIsValid()) { return false; }
+
+        return _curMouseState.RightButton == ButtonState.Pressed;
+    }
+
 }

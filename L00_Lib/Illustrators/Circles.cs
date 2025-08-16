@@ -9,6 +9,12 @@ namespace PhysicsIllustrated.Library.Illustrators
     public class Circles
     {
         private List<Body> _bodies = new List<Body>();
+        private bool _showRadii = true;
+
+        public void ShowRadii(bool value)
+        {
+            _showRadii = value;
+        }
 
         public void Add(Body body)
         {
@@ -26,21 +32,54 @@ namespace PhysicsIllustrated.Library.Illustrators
 
                     var aToB = bodyB.Position - bodyA.Position;
                     var aToBNorm = Vector2.Normalize(aToB);
+                    
+                    if (_showRadii)
+                    {
+                        // Radius A
+                        Graphics.Mid.DrawLine(
+                            bodyA.Position,
+                            //bodyA.Position + -aToBNorm * shapeA.Radius,
+                            bodyA.Position + new Vector2(1, 0) * shapeA.Radius,
+                            Color.MediumSlateBlue);
 
+                        Graphics.Text
+                            .Anchor(TextAnchor.Center)
+                            //.Position(bodyA.Position + -aToBNorm * shapeA.Radius * 0.5f)
+                            .Position(bodyA.Position + new Vector2(1, 0) * shapeA.Radius * 0.5f)
+                            .Scale(0.5f)
+                            .Text(shapeA.Radius);
+
+                        // Radius B
+                        Graphics.Mid.DrawLine(
+                            bodyB.Position,
+                            //bodyB.Position + aToBNorm * (bodyB.Shape as CircleShape).Radius,
+                            bodyB.Position + new Vector2(1, 0) * shapeB.Radius,
+                            Color.MediumSlateBlue);
+
+                        Graphics.Text
+                            .Anchor(TextAnchor.Center)
+                            //.Position(bodyB.Position + aToBNorm * shapeB.Radius * 0.5f)
+                            .Position(bodyB.Position + new Vector2(1, 0) * shapeB.Radius * 0.5f)
+                            .Scale(0.5f)
+                            .Text(shapeB.Radius);
+                    }
+
+                    // Distance line
                     Graphics.Mid.DrawLine(
                         bodyA.Position, 
-                        bodyA.Position + aToBNorm * shapeA.Radius,
-                        Color.MediumSlateBlue);
+                        bodyB.Position, 
+                        Color.DarkCyan);
 
-                    Graphics.Text.Anchor(TextAnchor.Center).Position(bodyA.Position + aToBNorm * shapeA.Radius * 0.5f).Scale(0.5f).Text(shapeA.Radius);
+                    var len = aToB.Length();
 
-                    Graphics.Mid.DrawLine(
-                        bodyB.Position,
-                        bodyB.Position + -aToBNorm * (bodyB.Shape as CircleShape).Radius,
-                        Color.MediumSlateBlue);
+                    Graphics.Text
+                        .Anchor(TextAnchor.Center)
+                        .Position(bodyA.Position + aToBNorm * len * 0.5f)
+                        .Scale(0.5f)
+                        .Text(len.ToString("F1"));
 
-                    Graphics.Text.Anchor(TextAnchor.Center).Position(bodyB.Position + -aToBNorm * shapeB.Radius * 0.5f).Scale(0.5f).Text(shapeB.Radius);
-
+                    Graphics.Mid.DrawFillRect(bodyA.Position.X, bodyA.Position.Y, 4, 4, Color.Cyan);
+                    Graphics.Mid.DrawFillRect(bodyB.Position.X, bodyB.Position.Y, 4, 4, Color.Cyan);
                 }
             }
         }

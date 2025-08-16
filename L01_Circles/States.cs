@@ -12,6 +12,8 @@ public class States
 
     public static bool IsMouseEngaged = false;
 
+    public static bool ShowRadii = true;
+
     public static Color _bg = new Color(69, 102, 160);
 
     public static Color _pausedBg = Color.CornflowerBlue;
