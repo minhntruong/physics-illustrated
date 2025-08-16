@@ -13,10 +13,3 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin Proj_Arial_12.spritefont
-/importer:FontDescriptionImporter
-/processor:LocalizedFontProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:Proj_Arial_12.spritefont
-
