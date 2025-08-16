@@ -11,6 +11,4 @@
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4" />
   </ItemGroup>
 
-  <Import Project="..\L00_Lib_Shared\L00_Lib_Shared.projitems" Label="Shared" />
-
 </Project>

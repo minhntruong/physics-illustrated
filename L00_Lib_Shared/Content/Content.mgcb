@@ -13,10 +13,10 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin Lib_Shared_Arial_12.spritefont
+#begin Lib_Shared_Arial_24.spritefont
 /importer:FontDescriptionImporter
 /processor:LocalizedFontProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:Lib_Shared_Arial_12.spritefont
+/build:Lib_Shared_Arial_24.spritefont
 
