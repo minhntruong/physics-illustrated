@@ -6,8 +6,10 @@ namespace PhysicsIllustrated.Library.Managers;
 
 public class InputMgr
 {
-    public InputMgr(int width, int height)
+    public InputMgr(Game game, int width, int height)
     {
+        _game = game;
+
         _width = width;
         _height = height;
 
@@ -15,7 +17,9 @@ public class InputMgr
         _curKbState = Keyboard.GetState();
     }
 
+    private Game _game;
     private int _width, _height;
+    private bool _exitHandler = true;
 
     private MouseState _prvMouseState, _curMouseState;
     private KeyboardState _prvKbState, _curKbState;
@@ -27,14 +31,9 @@ public class InputMgr
         _curMouseState = Mouse.GetState();
         _prvKbState = _curKbState;
         _curKbState = Keyboard.GetState();
-    }
 
-    public bool IsDefaultExitInput()
-    {
-        var isIt = GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape);
-        return isIt;
+        if (_exitHandler && IsDefaultExitInput()) { _game.Exit(); }
     }
-
 
     public bool IsKeyDown(Keys key)
     {
@@ -84,6 +83,14 @@ public class InputMgr
         }
 
         return isValid;
+    }
+
+    //==========================================================================
+
+    private bool IsDefaultExitInput()
+    {
+        var isIt = GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape);
+        return isIt;
     }
 
     private bool MouseIsValid()

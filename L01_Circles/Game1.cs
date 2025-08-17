@@ -1,13 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using PhysicsIllustrated.Library.Illustrators;
 using PhysicsIllustrated.Library.Managers;
 using PhysicsIllustrated.Library.Physics;
-using PhysicsIllustrated.Library.Physics.Constraints;
 using PhysicsIllustrated.Library.Physics.Shapes;
-using System.Collections.Generic;
 using static PhysicsIllustrated.Library.Managers.GameExt;
-using static PhysicsIllustrated.Library.Physics.Constants;
-using I = PhysicsIllustrated.Library.Illustrators;
 
 namespace L01_Circles;
 
@@ -22,26 +19,22 @@ public class Game1 : Game
         IsMouseVisible = true;
     }
 
-    private List<Body> _bodies = new List<Body>();
-    private List<Contact> _contacts = new List<Contact>();
-    private Body _circle1;
-    private Body _circle2;
-    private I.Circles _illustrator = new I.Circles();
+    private Body _movable;
+    private CirclesIllustrator _illustrator;
 
     protected override void Initialize()
     {
         Configure(1600, 900);
 
-        Graphics.Initialize(this, "Lib_Shared_Arial_24"); // "Proj_Arial_12");
+        Graphics.Initialize(this, "Lib_Shared_Arial_24");
 
-        _circle1 = new Body(new CircleShape(150), Width() / 2, Height() / 2, 1.0f);
-        _circle2 = new Body(new CircleShape(100), Width() - 100 - 10, 100 + 10, 1.0f);
+        _illustrator = new CirclesIllustrator(GraphicsDevice);
 
-        _bodies.Add(_circle1);
-        _bodies.Add(_circle2);
+        var circle = new Body(new CircleShape(150), Width() / 2, Height() / 2, 1.0f);
+        _movable = new Body(new CircleShape(100), Width() - 100 - 10, 100 + 10, 1.0f);
 
-        _illustrator.Add(_circle1);
-        _illustrator.Add(_circle2);
+        _illustrator.Bodies.Add(circle);
+        _illustrator.Bodies.Add(_movable);
 
         base.Initialize();
     }
@@ -53,76 +46,35 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
-        if (Input.IsDefaultExitInput()) { Exit(); }
+        //=== UI logic =========================================================
 
         Input.Update();
 
         StatesOnInputs();
-        var dt = ProcessGameTime(gameTime);
 
         if (States.IsMouseEngaged)
         {
-            _circle2.Position = Input.MousePosition();
+            _movable.Position = Input.MousePosition();
         }
 
         IsMouseVisible = !States.IsMouseEngaged;
 
-        //=== Check collisions =================================================
+        //=== Illusatrator logic ===============================================
 
-        _contacts.Clear();
+        _illustrator.Update(gameTime);
 
-        for (var i = 0; i < _bodies.Count; i++)
-        {
-            for (var j = i + 1; j < _bodies.Count; j++)
-            {
-                var a = _bodies[i];
-                var b = _bodies[j];
-
-                a.IsColliding = false;
-                b.IsColliding = false;
-
-                if (CollisionDetection.IsColliding(a, b, _contacts))
-                {
-                    a.IsColliding = true;
-                    b.IsColliding = true;
-                }
-            }
-        }
+        //=== Base logic =======================================================
 
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
-        //GraphicsDevice.Clear(Color.CornflowerBlue);
-        States.Clear(GraphicsDevice);
-
-        var s = @"
-Mouse press to move
-'R' to toggle showing radii
-";
-        Graphics.Text.Position(20, 20).Scale(0.75f).Text(s);
+        Graphics.Text.Position(20, 20).Scale(0.75f).Text(MenuText());
 
         _illustrator.ShowRadii(States.ShowRadii);
 
-        // Draw all bodies
-        foreach (var body in _bodies)
-        {
-            var color = Color.Cyan;
-
-            color = body.IsColliding ? Color.Orange : color;
-
-            //if (body.Shape.Type == ShapeType.Circle)
-            if (body.Shape is CircleShape circleShape)
-            {
-                Graphics.Mid.DrawCircle(body.Position, circleShape.Radius, -1, color);
-            }
-            else if (body.Shape is PolygonShape polygonShape)
-            {
-                Graphics.Mid.DrawPolygon(body.Position, polygonShape.WorldVertices, color);
-            }
-        }
-
+        _illustrator.PreDraw();
         _illustrator.Draw();
 
         Graphics.Draw();
@@ -130,33 +82,17 @@ Mouse press to move
         base.Draw(gameTime);
     }
 
+    private string MenuText()
+    {
+        return @"
+Mouse press to move
+'R' to toggle showing radii
+";
+    }
+
     private void StatesOnInputs()
     {
         SetByMouseLeftButtonPressed(ref States.IsMouseEngaged);
-        ToggleOnKeyClicked(Keys.P, ref States.IsPaused);
         ToggleOnKeyClicked(Keys.R, ref States.ShowRadii);
-        SetByKeyClicked(Keys.S, ref States.IsStepRequested);
-    }
-
-    private float ProcessGameTime(GameTime gameTime)
-    {
-        var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-        if (dt > SECS_PER_FRAME)
-        {
-            dt = SECS_PER_FRAME;
-        }
-
-        if (States.IsPaused && States.IsStepRequested == false)
-        {
-            dt = 0.0f;
-        }
-
-        if (States.IsPaused && States.IsStepRequested)
-        {
-            dt = SECS_PER_FRAME;
-        }
-
-        return dt;
     }
 }

@@ -24,7 +24,7 @@ public class GameExt
         _graphics.PreferredBackBufferHeight = height;
         _graphics.ApplyChanges();
 
-        _input = new InputMgr(Width(), Height());
+        _input = new InputMgr(_game, Width(), Height());
     }
 
     public static InputMgr Input => _input;

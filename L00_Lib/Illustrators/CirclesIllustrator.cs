@@ -1,14 +1,17 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using PhysicsIllustrated.Library.Managers;
-using PhysicsIllustrated.Library.Physics;
 using PhysicsIllustrated.Library.Physics.Shapes;
 
 namespace PhysicsIllustrated.Library.Illustrators
 {
-    public class Circles
+    public class CirclesIllustrator : IllustratorBase
     {
-        private List<Body> _bodies = new List<Body>();
+        public CirclesIllustrator(GraphicsDevice graphicsDevice) : base(graphicsDevice)
+        {
+        }
+
         private bool _showRadii = true;
 
         public void ShowRadii(bool value)
@@ -16,19 +19,19 @@ namespace PhysicsIllustrated.Library.Illustrators
             _showRadii = value;
         }
 
-        public void Add(Body body)
+        public override void Update(GameTime gameTime)
         {
-            _bodies.Add(body);
+            base.Update(gameTime);
         }
 
-        public void Draw()
+        public override void Draw()
         {
-            for (var i = 0; i < _bodies.Count; i++)
+            for (var i = 0; i < Bodies.Count; i++)
             {
-                for (var j = i + 1; j < _bodies.Count; j++)
+                for (var j = i + 1; j < Bodies.Count; j++)
                 {
-                    var bodyA = _bodies[i]; var shapeA = bodyA.Shape as CircleShape;
-                    var bodyB = _bodies[j]; var shapeB = bodyB.Shape as CircleShape;
+                    var bodyA = Bodies[i]; var shapeA = bodyA.Shape as CircleShape;
+                    var bodyB = Bodies[j]; var shapeB = bodyB.Shape as CircleShape;
 
                     var aToB = bodyB.Position - bodyA.Position;
                     var aToBNorm = Vector2.Normalize(aToB);
@@ -82,6 +85,8 @@ namespace PhysicsIllustrated.Library.Illustrators
                     Graphics.Mid.DrawFillRect(bodyB.Position.X, bodyB.Position.Y, 4, 4, Color.Cyan);
                 }
             }
+
+            base.Draw();
         }
     }
 }

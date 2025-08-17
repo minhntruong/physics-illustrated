@@ -169,7 +169,7 @@ public class DrawImpl
         DrawLine(vertices[vertices.Length - 1], vertices[0], color, thickness);
 
         // Draw center
-        DrawFillCircle(center, 2, color, 4);
+        //DrawFillCircle(center, 2, color, 4);
     }
 
     public void DrawCircle(int centerX, int centerY, float radius, float angle, Color color, float thickness = 2, int segments = 32)
