@@ -66,6 +66,11 @@ public class InputMgr
         return new Vector2(_curMouseState.X, _curMouseState.Y);
     }
 
+    public float MouseScrollWheelDelta()
+    {
+        return _curMouseState.ScrollWheelValue - _prvMouseState.ScrollWheelValue;
+    }
+
     public bool MouseIsValid(out Vector2 mousePos)
     {
         // Monogame will give us mouse coordinates outside the window

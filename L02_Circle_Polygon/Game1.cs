@@ -1,6 +1,5 @@
-﻿using Microsoft.VisualBasic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using PhysicsIllustrated.Library.Illustrators;
 using PhysicsIllustrated.Library.Managers;
 using PhysicsIllustrated.Library.Physics;
@@ -22,6 +21,7 @@ namespace L02_Circle_Polygon
 
         private Body _movable;
         private CirclePolyIllustrator _illustrator;
+        private string _menuText = "Mouse press to move\r\nMouse wheel to rotate\r\n'S' to step through the process\r\n'X' to end the process\r\n";
 
         protected override void Initialize()
         {
@@ -60,6 +60,22 @@ namespace L02_Circle_Polygon
 
             IsMouseVisible = !isMouseEngaged;
 
+            _movable.Rotation += Input.MouseScrollWheelDelta() * 0.001f;
+
+            if (Input.IsKeyClicked(Keys.S) || Input.MouseRightButtonClicked())
+            {
+                var s = _illustrator.StepProcess();
+                if (s != null)
+                {
+                    _menuText += "\r\n" + s.Step;
+                }
+            }
+
+            if (Input.IsKeyClicked(Keys.X))
+            {
+                _illustrator.EndProcess();
+            }
+
             //=== Illusatrator logic ===============================================
 
             _illustrator.Update(gameTime);
@@ -71,7 +87,7 @@ namespace L02_Circle_Polygon
 
         protected override void Draw(GameTime gameTime)
         {
-            Graphics.Text.Position(20, 20).Scale(0.75f).Text(MenuText());
+            Graphics.Text.Position(20, 20).Scale(0.75f).Text(_menuText);
 
             _illustrator.PreDraw();
             _illustrator.Draw();
@@ -83,11 +99,5 @@ namespace L02_Circle_Polygon
 
         //======================================================================
 
-        private string MenuText()
-        {
-            return @"
-Mouse press to move
-";
-        }
     }
 }

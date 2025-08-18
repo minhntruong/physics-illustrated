@@ -80,6 +80,7 @@ public class DrawImpl
     {
         _verticesCount = 0;
         _indicesCount = 0;
+        ResetStates();
     }
 
     public void Draw()
@@ -117,6 +118,119 @@ public class DrawImpl
         _graphics.RasterizerState = prevRasterizerState;
 
         Reset();
+    }
+
+
+    //==========================================================================
+
+    class DrawStates
+    {
+        public Color Color { get; set; } = Color.White;
+        public float Thickness { get; set; } = 4f;
+        public bool Filled { get; set; } = false;
+    }
+
+    private DrawStates _defaultStates = new DrawStates();
+    private DrawStates _currentStates = new DrawStates();
+    private Vector2 _p0 = Vector2.Zero;
+    private Vector2 _p1 = Vector2.Zero;
+    private float _width;
+    private float _height;
+
+    private void ResetStates()
+    {
+        _currentStates.Color = _defaultStates.Color;
+        _currentStates.Thickness = _defaultStates.Thickness;
+    }
+
+    public DrawImpl Color(Color value)
+    {
+        _currentStates.Color = value;
+        return this;
+    }
+
+    public DrawImpl Thickness(float value)
+    {
+        _currentStates.Thickness = value;
+        return this;
+    }
+
+    public DrawImpl Filled(bool value = true)
+    {
+        _currentStates.Filled = value;
+        return this;
+    }
+
+    public void Default()
+    {
+        _defaultStates.Color = _currentStates.Color;
+        _defaultStates.Thickness = _currentStates.Thickness;
+    }
+
+    public DrawImpl P0(Vector2 value)
+    {
+        _p0 = value;
+        return this;
+    }
+
+    public DrawImpl P1(Vector2 value)
+    {
+        _p1 = value;
+        return this;
+    }
+
+    public DrawImpl Width(float value)
+    {
+        _width = value;
+        return this;
+    }
+
+    public DrawImpl Height(float value)
+    {
+        _height = value;
+        return this;
+    }
+
+    public void DrawVector()
+    {
+        // Draw the main line
+        DrawLine(_p0, _p1, _currentStates.Color, _currentStates.Thickness);
+
+        // Arrowhead parameters
+        float arrowLength = 16f; // Length of the arrowhead lines
+        float arrowAngle = MathF.PI / 7f; // Angle between the arrowhead lines and the main line
+
+        // Direction from P0 to P1
+        Vector2 direction = _p1 - _p0;
+        if (direction.LengthSquared() < 1e-6f)
+            return; // Avoid zero-length vectors
+
+        direction = Vector2.Normalize(direction);
+
+        // Calculate the two arrowhead points
+        float theta = MathF.Atan2(direction.Y, direction.X);
+
+        float angle1 = theta + MathF.PI - arrowAngle;
+        float angle2 = theta + MathF.PI + arrowAngle;
+
+        Vector2 arrowPoint1 = _p1 + new Vector2(MathF.Cos(angle1), MathF.Sin(angle1)) * arrowLength;
+        Vector2 arrowPoint2 = _p1 + new Vector2(MathF.Cos(angle2), MathF.Sin(angle2)) * arrowLength;
+
+        // Draw the two arrowhead lines
+        DrawLine(_p1, arrowPoint1, _currentStates.Color, _currentStates.Thickness);
+        DrawLine(_p1, arrowPoint2, _currentStates.Color, _currentStates.Thickness);
+    }
+
+    public void DrawSquare()
+    {
+        if (_currentStates.Filled)
+        {
+            DrawFillRect(_p0.X, _p0.Y, _width, _width, _currentStates.Color);
+        }
+        else
+        {
+            throw new NotImplementedException();
+        }
     }
 
     //==========================================================================

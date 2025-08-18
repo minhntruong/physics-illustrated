@@ -32,6 +32,11 @@ public static class Graphics
     public static DrawImpl Top => _top;
     public static TextImpl Text => _text;
 
+    public static void DrawVertex(Vector2 position)
+    {
+        _top.P0(position).Color(Color.White).Width(6).Filled().DrawSquare();
+    }
+
     public static void Draw()
     {
         _mid.Draw();
