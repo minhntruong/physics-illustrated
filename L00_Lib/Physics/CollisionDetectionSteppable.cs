@@ -10,13 +10,25 @@ public class CollisionStepResult
 {
     public string Step { get; set; }
     public bool? IsOutside { get; set; }
-    public Vector2? MinCurrVertex { get; set; }
-    public Vector2? MinNextVertex { get; set; }
+    
+    //public Edge ClosestEdge { get; set; }
+    
+    public Func<Vector2> MinCurrVertex { get; set; }
+    
+    public Func<Vector2> MinNextVertex { get; set; }
+
     public float? DistanceCircleEdge { get; set; }
     public Contact Contact { get; set; }
     public bool? CollisionDetected { get; set; }
 
     public Action Draw;
+}
+
+public class Edge
+{
+    public PolygonShape Shape { get; set; }
+    public int V0 { get; set; }
+    public int V1 { get; set; }
 }
 
 public static class CollisionDetectionSteppable
@@ -35,8 +47,14 @@ public static class CollisionDetectionSteppable
 
         var isOutside = false;
 
-        var minCurrVertex = Vector2.Zero;
-        var minNextVertex = Vector2.Zero;
+        //var selectedEdge = new Edge
+        //{
+        //    V0 = -1,
+        //    V1 = -1
+        //};
+
+        Func<Vector2> minCurrVertex = null;
+        Func<Vector2> minNextVertex = null;
 
         var distanceCircleEdge = float.MinValue;
 
@@ -51,6 +69,8 @@ public static class CollisionDetectionSteppable
             var edge = () => polygonShape.WorldEdgeAt(i);
 
             var v0 = () => polygonShape.WorldVertices[i];
+
+            //=== STEP HIGHLIGHT EDGE ==========================================
 
             var drawEdge = () =>
             {
@@ -73,6 +93,28 @@ public static class CollisionDetectionSteppable
                 Draw = drawEdge
             };
 
+            //=== STEP NORMAL ==================================================
+
+            var normal = () => edge().RightUnitNormal();
+            var drawNormal = () =>
+            {
+                Graphics.Mid.Color(_line).Thickness(2).Default();
+                Graphics.Mid.P0(v0()).P1(v0() + normal() * 2000).DrawLine();
+                Graphics.Mid.P0(v0()).P1(v0() + normal() * 50).DrawVector();
+            };
+            
+            yield return new CollisionStepResult
+            {
+                Step = $"Take the normal of the edge",
+                Draw = () =>
+                {
+                    drawEdge();
+                    drawNormal();
+                }
+            };
+
+            //=== STEP VERTEX TO CIRCLE ========================================
+
             var vertexToCircle = () => circle.Position - v0();
 
             var drawVertexToCircle = () =>
@@ -87,40 +129,14 @@ public static class CollisionDetectionSteppable
                 Draw = () =>
                 {
                     drawEdge();
-                    drawVertexToCircle();
-                }
-            };
-
-            var normal = () => edge().RightUnitNormal();
-            var projection = () => Vector2.Dot(vertexToCircle(), normal());
-
-            var drawNormal = () =>
-            {
-                if (projection() > 0)
-                {
-                    // Draw the normal longer than the projection so it's clear
-                    var nLength = projection() + 50;
-                    if (nLength < 50) nLength = 50;
-
-                    Graphics.Mid.P0(v0()).P1(v0() + normal() * nLength).Color(_line).Thickness(2).DrawVector();
-                }
-                else
-                {
-                    Graphics.Mid.P0(v0()).P1(v0() + normal() * 50).Color(_line).Thickness(2).DrawVector();
-                }
-            };
-
-            yield return new CollisionStepResult
-            {
-                Step = $"Take the normal of the edge",
-                Draw = () =>
-                {
-                    drawEdge();
-                    drawVertexToCircle();
                     drawNormal();
+                    drawVertexToCircle();
                 }
             };
 
+            //=== STEP PROJECTION ==============================================
+
+            var projection = () => Vector2.Dot(vertexToCircle(), normal());
 
             var drawProj = () =>
             {
@@ -142,13 +158,69 @@ public static class CollisionDetectionSteppable
                 }
             };
 
+            //=== DECISION # 1A ================================================
+
             if (projection() > 0)
             {
+                distanceCircleEdge = projection();
 
+                //selectedEdge.Shape = polygonShape;
+                //selectedEdge.V0 = i;
+                //selectedEdge.V1 = polygonShape.NextVertexIndex(i);
+
+                minCurrVertex = () => polygonShape.WorldVertices[i];
+                minNextVertex = () => polygonShape.WorldVertexAfter(i);
+
+                isOutside = true;
+
+                yield return new CollisionStepResult
+                {
+                    Step = $"Positive projection found: {projection():F2}, IsOutside = {isOutside}",
+                    MinCurrVertex = minCurrVertex,
+                    MinNextVertex = minNextVertex,
+                    //ClosestEdge = selectedEdge,
+                    Draw = () =>
+                    {
+                        drawEdge();
+                        drawVertexToCircle();
+                        drawNormal();
+                        drawProj();
+                    }
+                };
+
+                break;
             }
+            //=== DECISION # 1B ================================================
             else
             {
+                if (projection() > distanceCircleEdge)
+                {
+                    var temp = distanceCircleEdge;
 
+                    distanceCircleEdge = projection();
+
+                    //selectedEdge.Shape = polygonShape;
+                    //selectedEdge.V0 = i;
+                    //selectedEdge.V1 = polygonShape.NextVertexIndex(i);
+                    
+                    minCurrVertex = () => polygonShape.WorldVertices[i];
+                    minNextVertex = () => polygonShape.WorldVertexAfter(i);
+
+                    yield return new CollisionStepResult
+                    {
+                        Step = $"Positive projection not found, but value {distanceCircleEdge} is larger than prev {temp}",
+                        //ClosestEdge = selectedEdge,
+                        MinCurrVertex = minCurrVertex,
+                        MinNextVertex = minNextVertex,
+                        Draw = () =>
+                        {
+                            drawEdge();
+                            drawVertexToCircle();
+                            drawNormal();
+                            drawProj();
+                        }
+                    };
+                }
             }
         }
 
@@ -156,19 +228,40 @@ public static class CollisionDetectionSteppable
 
         if (isOutside)
         {
+            //=== DECISION # 2A ================================================
+            yield return new CollisionStepResult
+            {
+                Step = $"IsOutside = {isOutside}, checking for region A"
+            };
+
+            var v1 = () => circle.Position - minCurrVertex();
+            var v2 = () => minNextVertex() - minCurrVertex();
+
+            var drawV1V2 = () =>
+            {
+                Graphics.DrawVectorRel(minCurrVertex(), v1(), _line);
+                Graphics.DrawVectorRel(minCurrVertex(), v2(), _line);
+            };
+
+            yield return new CollisionStepResult
+            {
+                Step = $"Vertex to circle v1, Vertex to next Vertex v2",
+                Draw = () =>
+                {
+                    drawV1V2();
+                }
+            };
         }
         else
         {
+            //=== DECISION # 2D ================================================
+            yield return new CollisionStepResult
+            {
+                Step = $"IsOutside = {isOutside}, calculating contact"
+            };
 
+            yield break;
         }
 
-        // TEST
-        yield return new CollisionStepResult
-        {
-            Step = "TEST method called",
-            CollisionDetected = false
-        };
-
-        yield break;
     }
 }

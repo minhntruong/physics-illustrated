@@ -4,100 +4,145 @@ using PhysicsIllustrated.Library.Illustrators;
 using PhysicsIllustrated.Library.Managers;
 using PhysicsIllustrated.Library.Physics;
 using PhysicsIllustrated.Library.Physics.Shapes;
+using System;
 using static PhysicsIllustrated.Library.Managers.GameExt;
 
-namespace L02_Circle_Polygon
+namespace L02_Circle_Polygon;
+
+public class Game1 : Game
 {
-    public class Game1 : Game
+    public enum Mode { RunAllSteps, EndOnEdgeFound }
+
+    public Game1()
     {
-        public Game1()
-        {
-            // Creation of GraphicsDeviceManager must be done in the constructor
-            GameExt.Initialize(this);
+        // Creation of GraphicsDeviceManager must be done in the constructor
+        GameExt.Initialize(this);
 
-            Content.RootDirectory = "Content";
-            IsMouseVisible = true;
-        }
+        Content.RootDirectory = "Content";
+        IsMouseVisible = true;
+    }
 
-        private Body _movable;
-        private CirclePolyIllustrator _illustrator;
-        private string _menuText = "Mouse press to move\r\nMouse wheel to rotate\r\n'S' to step through the process\r\n'X' to end the process\r\n";
+    private Mode _mode = Mode.RunAllSteps;
+    private Body _box;
+    private Body _movable;
+    private CirclePolyIllustrator _illustrator;
 
-        protected override void Initialize()
-        {
-            Configure(1600, 900);
+    private string _menuText = 
+        "Mouse press to move\r\n" + 
+        "Mouse wheel to rotate\r\n" + 
+        "'S' to step through the process\r\n" + 
+        "'X' to end the process\r\n" + 
+        "'C' to clear text\r\n";
+    private string _consoleText = "";
 
-            Graphics.Initialize(this, "Lib_Shared_Arial_24");
+    protected override void Initialize()
+    {
+        Configure(1600, 900);
 
-            _illustrator = new CirclePolyIllustrator(GraphicsDevice);
-            
-            var circle = new Body(new CircleShape(150), Width() / 2, Height() / 2, 1.0f);
-            _movable = new Body(new BoxShape(150, 150), Width() * 0.8f, 100, 1.0f);
+        Graphics.Initialize(this, "Lib_Shared_Arial_24");
 
-            _illustrator.Bodies.Add(circle);
-            _illustrator.Bodies.Add(_movable);
-
-            base.Initialize();
-        }
-
-        protected override void LoadContent()
-        {
-            Graphics.OnLoadContent();
-        }
-
+        _illustrator = new CirclePolyIllustrator(GraphicsDevice);
         
-        protected override void Update(GameTime gameTime)
+        _box = new Body(new BoxShape(250, 250), Width() / 2, Height() / 2, 1.0f);
+        _box.Rotation = 0.5f;
+        _movable = new Body(new CircleShape(80), Width() * 0.8f, 100, 1.0f);
+
+        _illustrator.Bodies.Add(_box);
+        _illustrator.Bodies.Add(_movable);
+
+        base.Initialize();
+    }
+
+    protected override void LoadContent()
+    {
+        Graphics.OnLoadContent();
+    }
+
+    
+    protected override void Update(GameTime gameTime)
+    {
+        //=== UI logic =========================================================
+
+        Input.Update();
+
+        var isMouseEngaged = Input.MouseLeftButtonPressed();
+        if (isMouseEngaged)
         {
-            //=== UI logic =========================================================
+            _movable.Position = Input.MousePosition();
+        }
 
-            Input.Update();
+        IsMouseVisible = !isMouseEngaged;
 
-            var isMouseEngaged = Input.MouseLeftButtonPressed();
-            if (isMouseEngaged)
-            {
-                _movable.Position = Input.MousePosition();
-            }
+        _box.Rotation -= Input.MouseScrollWheelDelta() * 0.001f;
+        if (_box.Rotation < 0)
+        {
+            _box.Rotation += MathF.PI * 2;
+        }
+        else if (_box.Rotation > MathF.PI * 2)
+        {
+            _box.Rotation -= MathF.PI * 2;
+        }
 
-            IsMouseVisible = !isMouseEngaged;
-
-            _movable.Rotation += Input.MouseScrollWheelDelta() * 0.001f;
-
+        if (_mode == Mode.RunAllSteps)
+        {
             if (Input.IsKeyClicked(Keys.S) || Input.MouseRightButtonClicked())
             {
                 var s = _illustrator.StepProcess();
                 if (s != null)
                 {
-                    _menuText += "\r\n" + s.Step;
+                    _consoleText += "\r\n" + s.Step;
                 }
             }
 
             if (Input.IsKeyClicked(Keys.X))
             {
-                _illustrator.EndProcess();
+                _illustrator.StepProcessEnd();
             }
-
-            //=== Illusatrator logic ===============================================
-
-            _illustrator.Update(gameTime);
-
-            //=== Base logic =======================================================
-
-            base.Update(gameTime);
         }
-
-        protected override void Draw(GameTime gameTime)
+        else if (_mode == Mode.EndOnEdgeFound)
         {
-            Graphics.Text.Position(20, 20).Scale(0.75f).Text(_menuText);
-
-            _illustrator.PreDraw();
-            _illustrator.Draw();
-
-            Graphics.Draw();
-
-            base.Draw(gameTime);
+            _illustrator.EdgeProcess();
         }
 
-        //======================================================================
+        if (Input.IsKeyClicked(Keys.C))
+        {
+            _consoleText = "";
+        }
 
+        if (Input.IsKeyClicked(Keys.M))
+        {
+            // Get all enum values
+            var values = (Mode[])Enum.GetValues(typeof(Mode));
+            // Find the next index, wrapping around
+            int next = (Array.IndexOf(values, _mode) + 1) % values.Length;
+            _mode = values[next];
+        }
+
+
+        //=== Illusatrator logic ===============================================
+
+        _illustrator.Update(gameTime);
+
+        //=== Base logic =======================================================
+
+        base.Update(gameTime);
     }
+
+    protected override void Draw(GameTime gameTime)
+    {
+        Graphics.Text.Position(20, 20).Scale(0.75f).Text(
+            _menuText + 
+            "Mode: " + _mode.ToString() + "\r\n" +
+            _consoleText);
+
+        _illustrator.PreDraw();
+        _illustrator.Draw();
+
+        Graphics.Draw();
+
+        base.Draw(gameTime);
+    }
+
+    //======================================================================
+
 }

@@ -191,6 +191,11 @@ public class DrawImpl
         return this;
     }
 
+    public void DrawLine()
+    {
+        DrawLine(_p0, _p1, _currentStates.Color, _currentStates.Thickness);
+    }
+
     public void DrawVector()
     {
         // Draw the main line
@@ -223,13 +228,15 @@ public class DrawImpl
 
     public void DrawSquare()
     {
+        var coords = GenerateRectCoordinates(_p0, _width, _width);
+
         if (_currentStates.Filled)
         {
             DrawFillRect(_p0.X, _p0.Y, _width, _width, _currentStates.Color);
         }
         else
         {
-            throw new NotImplementedException();
+            DrawPolygon(_p0, coords, _currentStates.Color, _currentStates.Thickness);
         }
     }
 
@@ -387,6 +394,21 @@ public class DrawImpl
         indices[4] = startIndex + 2;
         indices[5] = startIndex + 3;
 
+    }
+
+    private Vector2[] GenerateRectCoordinates(Vector2 center, float width, float height)
+    {
+        var hw = width / 2;
+        var hh = height / 2;
+
+        var coords = new Vector2[4];
+
+        coords[0] = center + new Vector2(-hw, -hh);
+        coords[1] = center + new Vector2(+hw, -hh);
+        coords[2] = center + new Vector2(+hw, +hh);
+        coords[3] = center + new Vector2(-hw, +hh);
+
+        return coords;
     }
 
     //==========================================================================

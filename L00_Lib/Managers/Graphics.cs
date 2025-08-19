@@ -37,6 +37,26 @@ public static class Graphics
         _top.P0(position).Color(Color.White).Width(6).Filled().DrawSquare();
     }
 
+    public static void DrawVertexHighlighted(Vector2 position)
+    {
+        _top.P0(position).Color(Color.White).Width(10).Thickness(2).Filled(false).DrawSquare();
+    }
+
+    public static void DrawVertex(Vector2 position, Color color)
+    {
+        _top.P0(position).Color(color).Width(6).Filled().DrawSquare();
+    }
+
+    public static void DrawVectorAbs(Vector2 p0, Vector2 p1, Color color)
+    {
+        _mid.Color(color).P0(p0).P1(p1).DrawVector();
+    }
+
+    public static void DrawVectorRel(Vector2 position, Vector2 vector, Color color)
+    {
+        _mid.Color(color).P0(position).P1(position + vector).DrawVector();
+    }
+
     public static void Draw()
     {
         _mid.Draw();

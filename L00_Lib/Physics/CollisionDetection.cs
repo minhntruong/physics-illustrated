@@ -93,7 +93,7 @@ public static class CollisionDetection
 
 
         Vector2 v0 = incidentShape.WorldVertices[incidentIndex];
-        Vector2 v1 = incidentShape.WorldVerticeAfter(incidentIndex); // WorldVertices[incidentNextIndex];
+        Vector2 v1 = incidentShape.WorldVertexAfter(incidentIndex); // WorldVertices[incidentNextIndex];
 
         var contactPoints = new List<Vector2>{v0, v1};
         var clippedPoints = new List<Vector2>(contactPoints);
@@ -105,7 +105,7 @@ public static class CollisionDetection
             Vector2 c0 = referenceShape.WorldVertices[i];
 
             //var nextIndex = i + 1 < referenceShape.WorldVertices.Length ? i + 1 : 0;
-            Vector2 c1 = referenceShape.WorldVerticeAfter(i); // s[nextIndex];
+            Vector2 c1 = referenceShape.WorldVertexAfter(i); // s[nextIndex];
 
             int numClipped = referenceShape.ClipSegmentToLine(contactPoints, clippedPoints, c0, c1);
             if (numClipped < 2)
@@ -351,7 +351,7 @@ public static class CollisionDetection
 
                 minCurrVertex = polygonShape.WorldVertices[i];
 
-                minNextVertex = polygonShape.WorldVerticeAfter(i); // s[nextIndex];
+                minNextVertex = polygonShape.WorldVertexAfter(i); // s[nextIndex];
 
 #if false
                 // Debug draws
@@ -369,7 +369,7 @@ public static class CollisionDetection
                 {
                     distanceCircleEdge = projection;
                     minCurrVertex = polygonShape.WorldVertices[i];
-                    minNextVertex = polygonShape.WorldVerticeAfter(i); // s[nextIndex];
+                    minNextVertex = polygonShape.WorldVertexAfter(i); // s[nextIndex];
                 }
             }
         }

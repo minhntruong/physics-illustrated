@@ -37,7 +37,7 @@ public class PolygonShape : Shape
 
     public Vector2[] WorldVertices { get; protected set; } = Array.Empty<Vector2>();
 
-    public Vector2 WorldVerticeAfter(int index)
+    public Vector2 WorldVertexAfter(int index)
     {
         var nextIndex = NextVertexIndex(index);
 
@@ -158,7 +158,7 @@ public class PolygonShape : Shape
         }
     }
 
-    protected int NextVertexIndex(int index)
+    public int NextVertexIndex(int index)
     {
         var nextIndex = index + 1;
         if (nextIndex >= WorldVertices.Length)
