@@ -67,10 +67,12 @@ public class IllustratorBase
             if (body.Shape is CircleShape circleShape)
             {
                 Graphics.Mid.DrawCircle(body.Position, circleShape.Radius, -1, color);
+                Graphics.DrawVertex(body.Position, color);
             }
             else if (body.Shape is PolygonShape polygonShape)
             {
                 Graphics.Mid.DrawPolygon(body.Position, polygonShape.WorldVertices, color);
+                Graphics.DrawVertex(body.Position, color);
             }
         }
 

@@ -1,17 +1,18 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using PhysicsIllustrated.Library.Illustrators;
 using PhysicsIllustrated.Library.Managers;
 using PhysicsIllustrated.Library.Physics;
 using PhysicsIllustrated.Library.Physics.Shapes;
-using System;
 using static PhysicsIllustrated.Library.Managers.GameExt;
+using static PhysicsIllustrated.Library.Illustrators.CirclePolyIllustrator.ModeEnum;
 
 namespace L02_Circle_Polygon;
 
 public class Game1 : Game
 {
-    public enum Mode { RunAllSteps, EndOnEdgeFound }
+    //public enum Mode { RunAllSteps, EndOnEdgeFoundWithDraw, EndOnEdgeOnly }
 
     public Game1()
     {
@@ -22,7 +23,7 @@ public class Game1 : Game
         IsMouseVisible = true;
     }
 
-    private Mode _mode = Mode.RunAllSteps;
+    //private CirclePolyIllustrator.Mode _mode; // = Mode.RunAllSteps;
     private Body _box;
     private Body _movable;
     private CirclePolyIllustrator _illustrator;
@@ -58,7 +59,6 @@ public class Game1 : Game
         Graphics.OnLoadContent();
     }
 
-    
     protected override void Update(GameTime gameTime)
     {
         //=== UI logic =========================================================
@@ -83,7 +83,7 @@ public class Game1 : Game
             _box.Rotation -= MathF.PI * 2;
         }
 
-        if (_mode == Mode.RunAllSteps)
+        if (_illustrator.Mode == RunAllSteps)
         {
             if (Input.IsKeyClicked(Keys.S) || Input.MouseRightButtonClicked())
             {
@@ -99,7 +99,8 @@ public class Game1 : Game
                 _illustrator.StepProcessEnd();
             }
         }
-        else if (_mode == Mode.EndOnEdgeFound)
+        else if (_illustrator.Mode == StopOnEdgeWithDraw ||
+                 _illustrator.Mode == StopOnEdgeOnly)
         {
             _illustrator.EdgeProcess();
         }
@@ -111,11 +112,7 @@ public class Game1 : Game
 
         if (Input.IsKeyClicked(Keys.M))
         {
-            // Get all enum values
-            var values = (Mode[])Enum.GetValues(typeof(Mode));
-            // Find the next index, wrapping around
-            int next = (Array.IndexOf(values, _mode) + 1) % values.Length;
-            _mode = values[next];
+            _illustrator.CycleMode();
         }
 
 
@@ -132,7 +129,7 @@ public class Game1 : Game
     {
         Graphics.Text.Position(20, 20).Scale(0.75f).Text(
             _menuText + 
-            "Mode: " + _mode.ToString() + "\r\n" +
+            "Mode: " + _illustrator.Mode.ToString() + "\r\n" +
             _consoleText);
 
         _illustrator.PreDraw();

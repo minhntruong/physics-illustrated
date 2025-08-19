@@ -152,58 +152,6 @@ public static class CollisionDetection
         return true;
     }
 
-    /*
-    public static bool IsCollidingPolygons___(Body a, Body b, List<Contact> contacts)
-    {
-        var aPolygon = (IPolygon) a.Shape;
-        var bPolygon = (IPolygon) b.Shape;
-
-        var aAxis = Vector2.Zero;
-        var aPoint = Vector2.Zero;
-        var abSeparation = aPolygon.FindMinSeparation(bPolygon, ref aAxis, ref aPoint);
-
-        if (abSeparation >= 0)
-        {
-            return false; // No collision
-        }
-
-        var bAxis = Vector2.Zero;
-        var bPoint = Vector2.Zero;
-        var baSeparation = bPolygon.FindMinSeparation(aPolygon, ref bAxis, ref bPoint);
-
-        if (baSeparation >= 0)
-        {
-            return false; // No collision
-        }
-
-        // If we reach here, there is a collision
-        var contact = new Contact();
-
-        contact.A = a;
-        contact.B = b;
-
-        // Best separation was from "a" to "b"
-        if (abSeparation > baSeparation)
-        {
-            contact.Depth = -abSeparation;
-            contact.Normal = aAxis.RightUnitNormal();
-            contact.Start = aPoint;
-            contact.End = aPoint + contact.Normal * contact.Depth; // Adjust end point based on the depth
-        }
-        else // Best separation was from "b" to "a"
-        {
-            contact.Depth = -baSeparation;
-            contact.Normal = -bAxis.RightUnitNormal();
-            contact.Start = bPoint - contact.Normal * contact.Depth;
-            contact.End = bPoint;
-        }
-
-        contacts.Add(contact);
-
-        return true;
-    }
-    */
-
     public static bool IsCollidingCircles(Body a, Body b, List<Contact> contacts)
     {
         var aCircle = (CircleShape) a.Shape;

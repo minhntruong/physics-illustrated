@@ -4,11 +4,14 @@ using PhysicsIllustrated.Library.Managers;
 using PhysicsIllustrated.Library.Physics;
 using PhysicsIllustrated.Library.Physics.Shapes;
 using System;
+using System.Xml.Linq;
 
 namespace PhysicsIllustrated.Library.Illustrators;
 
 public class CirclePolyIllustrator : IllustratorBase
 {
+    public enum ModeEnum { RunAllSteps, StopOnEdgeWithDraw, StopOnEdgeOnly }
+
     public CirclePolyIllustrator(GraphicsDevice graphicsDevice) : base(graphicsDevice)
     {
     }
@@ -20,6 +23,17 @@ public class CirclePolyIllustrator : IllustratorBase
     private Func<Vector2> _minCurrVertex = null;
     private Func<Vector2> _minNextVertex = null;
 
+    public ModeEnum Mode { get; set; } = ModeEnum.RunAllSteps;
+
+    public void CycleMode()
+    {
+        // Get all enum values
+        var values = (ModeEnum[])Enum.GetValues(typeof(ModeEnum));
+        // Find the next index, wrapping around
+        int next = (Array.IndexOf(values, Mode) + 1) % values.Length;
+        Mode = values[next];
+    }
+
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
@@ -30,13 +44,11 @@ public class CirclePolyIllustrator : IllustratorBase
         // Draw the shapes first
         base.Draw();
 
-        //if (_currentStep == null)
-        //{
-        //    return;
-        //}
+        if (Mode != ModeEnum.StopOnEdgeOnly)
+        {
+            _currentStep?.Draw?.Invoke();
+        }
 
-        _currentStep?.Draw?.Invoke();
-    
         if (_minCurrVertex != null)
             Graphics.DrawVertexHighlighted(_minCurrVertex());
 
