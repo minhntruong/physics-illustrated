@@ -23,6 +23,7 @@ public class CirclePolyIllustrator : IllustratorBase
     private Func<Vector2> _minNextVertex = null;
     private bool _minEdgeFound = false;
     private bool _showRegions = true;
+    private bool _isOutside = false;
 
     public ModeEnum Mode { get; set; } = ModeEnum.RunAllSteps;
 
@@ -50,10 +51,6 @@ public class CirclePolyIllustrator : IllustratorBase
         // Draw the shapes first
         base.Draw();
 
-        if (Mode != ModeEnum.StopOnEdgeOnly)
-        {
-            _currentStep?.Draw?.Invoke();
-        }
 
         if (_minCurrVertex != null && _minNextVertex != null)
         {
@@ -70,7 +67,8 @@ public class CirclePolyIllustrator : IllustratorBase
         if (_showRegions && 
             _minCurrVertex != null && 
             _minNextVertex != null &&
-            _minEdgeFound)
+            _minEdgeFound &&
+            _isOutside)
         {
             // Draw the region between the two vertices
             var minCurr = _minCurrVertex();
@@ -95,6 +93,11 @@ public class CirclePolyIllustrator : IllustratorBase
 
             Graphics.Bot.P0(minNext).P1(minNext + edgeNormal * 1000).DrawLine();
 
+        }
+
+        if (Mode != ModeEnum.StopOnEdgeOnly)
+        {
+            _currentStep?.Draw?.Invoke();
         }
     }
 
@@ -121,6 +124,10 @@ public class CirclePolyIllustrator : IllustratorBase
                 _minNextVertex = _currentStep.MinNextVertex;
             }
 
+            if (_currentStep.IsOutside.HasValue)
+            {
+                _isOutside = _currentStep.IsOutside.Value;
+            }
         }
         else
         {

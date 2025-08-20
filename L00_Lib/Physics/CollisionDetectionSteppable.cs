@@ -31,6 +31,34 @@ public static class CollisionDetectionSteppable
     //private static Color _line = Color.CornflowerBlue;
     //private static Color _proj = Color.Pink;
 
+    private static Action CreateDrawV1V2Proj(
+        Func<Vector2> circlePos,
+        Func<Vector2> vertexFrom,
+        Func<Vector2> vertexTo,
+        out Func<Vector2> v1,
+        out Func<float> v1Proj)
+    {
+        v1 = () => circlePos() - vertexFrom();        
+        var v2 = () => vertexTo() - vertexFrom();
+
+        var v1Copy = v1; // We can't use v1 directly in the lambda below, so we copy it
+
+        var v2Norm = () => Vector2.Normalize(v2());
+        v1Proj = () => Vector2.Dot(v1Copy(), v2Norm());
+
+        var v1ProjCopy = v1Proj;
+
+        return () =>
+        {
+            var v1Val = v1Copy();
+            var v2Val = v2();
+
+            Graphics.DrawVectorRel(vertexFrom(), v1Val, Theme.ShapeLolite);
+            Graphics.DrawVectorRel(vertexFrom(), v2Val, Theme.ShapeLolite);
+            Graphics.DrawVectorRel(vertexFrom(), v2Norm() * v1ProjCopy(), Theme.ShapeStandout);
+        };
+    }
+
     public static IEnumerable<CollisionStepResult> IsCollidingPolygonCircle(
         Body polygon,
         Body circle,
@@ -157,17 +185,17 @@ public static class CollisionDetectionSteppable
 
                 yield return new CollisionStepResult
                 {
-                    Step = $"Positive projection found: {projection():F2}, circle center is outside of polygon",
+                    Step = $"Positive projection found: {projection():F1}, circle center is outside of polygon",
                     MinCurrVertex = minCurrVertex,
                     MinNextVertex = minNextVertex,
                     MinEdgeFound = true,
-                    Draw = () =>
-                    {
-                        drawEdge();
-                        drawVertexToCircleCenter();
-                        drawNormal();
-                        drawProj();
-                    }
+                    //Draw = () =>
+                    //{
+                    //    drawEdge();
+                    //    drawVertexToCircleCenter();
+                    //    drawNormal();
+                    //    drawProj();
+                    //}
                 };
 
                 break;
@@ -188,7 +216,7 @@ public static class CollisionDetectionSteppable
 
                     yield return new CollisionStepResult
                     {
-                        Step = $"Positive projection not found, but value {distanceCircleEdge} is larger than prev {temp}",
+                        Step = $"Positive projection not found, but value {distanceCircleEdge:F1} is larger than prev {temp}",
                         MinCurrVertex = minCurrVertex,
                         MinNextVertex = minNextVertex,
                         Draw = () =>
@@ -212,25 +240,35 @@ public static class CollisionDetectionSteppable
 
             yield return new CollisionStepResult
             {
-                Step = $"IsOutside = {circleCenterIsOutside}, checking for region A"
+                Step = $"IsOutside = {circleCenterIsOutside}, checking for region A",
+                IsOutside = circleCenterIsOutside,
             };
 
             var cirPos = () => circle.Position;
-            var v1 = () => cirPos() - minCurrVertex();
-            var v2 = () => minNextVertex() - minCurrVertex();
 
-            var v2Norm = () => Vector2.Normalize(v2());
-            var v1Proj = () => Vector2.Dot(v1(), v2Norm());
+            var drawV1V2Proj = CreateDrawV1V2Proj(
+                cirPos,
+                minCurrVertex,
+                minNextVertex,
+                out var v1,
+                out var v1Proj);
 
-            var drawV1V2Proj = () =>
-            {
-                var v1Val = v1();
-                var v2Val = v2();
+            //var cirPos = () => circle.Position;
+            //var v1 = () => cirPos() - minCurrVertex();
+            //var v2 = () => minNextVertex() - minCurrVertex();
 
-                Graphics.DrawVectorRel(minCurrVertex(), v1(), Theme.ShapeLolite);
-                Graphics.DrawVectorRel(minCurrVertex(), v2(), Theme.ShapeLolite);
-                Graphics.DrawVectorRel(minCurrVertex(), v2Norm() * v1Proj(), Theme.ShapeStandout);
-            };
+            //var v2Norm = () => Vector2.Normalize(v2());
+            //var v1Proj = () => Vector2.Dot(v1(), v2Norm());
+
+            //var drawV1V2Proj = () =>
+            //{
+            //    var v1Val = v1();
+            //    var v2Val = v2();
+
+            //    Graphics.DrawVectorRel(minCurrVertex(), v1(), Theme.ShapeLolite);
+            //    Graphics.DrawVectorRel(minCurrVertex(), v2(), Theme.ShapeLolite);
+            //    Graphics.DrawVectorRel(minCurrVertex(), v2Norm() * v1Proj(), Theme.ShapeStandout);
+            //};
 
             yield return new CollisionStepResult
             {
@@ -243,10 +281,11 @@ public static class CollisionDetectionSteppable
 
             if (v1Proj() < 0)
             {
+                //===  REGION A CONFIRMED ======================================
+
                 yield return new CollisionStepResult
                 {
-                    Step = $"Circle center is in region A",
-                    IsOutside = circleCenterIsOutside,
+                    Step = $"Circle center is in region A"
                 };
 
                 var drawDistance = () =>
@@ -265,6 +304,8 @@ public static class CollisionDetectionSteppable
 
                 if (v1().Length() > circleShape.Radius)
                 {
+                    //=== DISTANCE TOO FAR, NO COLLISION =======================
+
                     yield return new CollisionStepResult
                     {
                         Step = $"Circle center is in region A, but distance to edge is {v1().Length():F2} > circle radius {circleShape.Radius:F2}",
@@ -277,14 +318,67 @@ public static class CollisionDetectionSteppable
 
                     yield break;
                 }
+
+                //=== DISTANCE WITHIN RADIUS, COLLISION ========================
+
+                // TODO: Calculate Contact
+            } // Region A check
+
+            //=== DECISION # 2B ================================================
+            // Check for region B
+
+            drawV1V2Proj = CreateDrawV1V2Proj(
+                cirPos,
+                minNextVertex,
+                minCurrVertex,
+                out v1,
+                out v1Proj);
+
+            //v1 = () => cirPos() - minNextVertex();
+            //v2 = () => minCurrVertex() - minNextVertex();
+
+            //v2Norm = () => Vector2.Normalize(v2());
+            //v1Proj = () => Vector2.Dot(v1(), v2Norm());
+
+            yield return new CollisionStepResult
+            {
+                Step = $"Circle center not in region A, checking for region B",
+                Draw = () =>
+                {
+                    drawV1V2Proj();
+                }
+            };
+
+            if (v1Proj() < 0)
+            {
+                //===  REGION B CONFIRMED ======================================
+
+                yield return new CollisionStepResult
+                {
+                    Step = $"Circle center is in region B"
+                };
             }
+
+            //=== REGION C CONFIGRMED ==========================================
+
+            yield return new CollisionStepResult
+            {
+                Step = $"Circle center is not in region B, so it must be in region C"
+            };
+
+            //
         }
         else
         {
             //=== DECISION # 2D ================================================
             yield return new CollisionStepResult
             {
-                Step = $"No positive projection found, meaning circle center is inside of polygon"
+                Step = $"No positive projection found, circle center is inside of polygon"
+            };
+
+            yield return new CollisionStepResult
+            {
+                Step = $"Closest edge will be used to calculate contact info"
             };
 
             yield break;
