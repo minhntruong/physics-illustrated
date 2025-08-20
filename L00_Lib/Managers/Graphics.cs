@@ -9,6 +9,7 @@ public static class Graphics
     public static void Initialize(Game game, string fontName)
     {
         _game = game;
+        _bot = new DrawImpl(game.GraphicsDevice, 3_000);
         _mid = new DrawImpl(game.GraphicsDevice, 10_000);
         _top = new DrawImpl(game.GraphicsDevice, 3_000);
         _fontName = fontName;
@@ -23,11 +24,13 @@ public static class Graphics
     }
 
     private static Game _game;
+    private static DrawImpl _bot;
     private static DrawImpl _mid;
     private static DrawImpl _top;
     private static TextImpl _text;
     private static string _fontName;
 
+    public static DrawImpl Bot => _bot;
     public static DrawImpl Mid => _mid;
     public static DrawImpl Top => _top;
     public static TextImpl Text => _text;
@@ -59,6 +62,7 @@ public static class Graphics
 
     public static void Draw()
     {
+        _bot.Draw();
         _mid.Draw();
         _top.Draw();
         _text.Draw();

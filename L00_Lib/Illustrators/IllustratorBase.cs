@@ -52,7 +52,7 @@ public class IllustratorBase
 
     public virtual void PreDraw()
     {
-        GraphicsDevice.Clear(new Color(69, 102, 160));
+        GraphicsDevice.Clear(Theme.Bg);
     }
 
     public virtual void Draw()
@@ -62,7 +62,7 @@ public class IllustratorBase
         {
             var color = Color.Cyan;
 
-            color = body.IsColliding ? Color.Orange : color;
+            //color = body.IsColliding ? Color.Orange : color;
 
             if (body.Shape is CircleShape circleShape)
             {
@@ -77,4 +77,19 @@ public class IllustratorBase
         }
 
     }
+}
+
+public static class Theme
+{
+    public static Color Bg { get; } = new Color(69, 102, 160);
+
+    public static Color BgSubtle { get; } = new Color(80, 118, 183);
+
+    public static Color Shape { get; } = Color.Cyan;
+
+    public static Color ShapeHilite { get; } = Color.HotPink;
+
+    public static Color ShapeStandout { get; } = Color.Pink;
+
+    public static Color ShapeLolite { get; } = Color.CornflowerBlue;
 }

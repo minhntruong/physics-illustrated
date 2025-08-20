@@ -2,9 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using PhysicsIllustrated.Library.Managers;
 using PhysicsIllustrated.Library.Physics;
+using PhysicsIllustrated.Library.Physics.Mathematics;
 using PhysicsIllustrated.Library.Physics.Shapes;
-using System;
-using System.Xml.Linq;
 
 namespace PhysicsIllustrated.Library.Illustrators;
 
@@ -22,6 +21,8 @@ public class CirclePolyIllustrator : IllustratorBase
 
     private Func<Vector2> _minCurrVertex = null;
     private Func<Vector2> _minNextVertex = null;
+    private bool _minEdgeFound = false;
+    private bool _showRegions = true;
 
     public ModeEnum Mode { get; set; } = ModeEnum.RunAllSteps;
 
@@ -32,6 +33,11 @@ public class CirclePolyIllustrator : IllustratorBase
         // Find the next index, wrapping around
         int next = (Array.IndexOf(values, Mode) + 1) % values.Length;
         Mode = values[next];
+    }
+
+    public void CycleRegion()
+    {
+        _showRegions = !_showRegions;
     }
 
     public override void Update(GameTime gameTime)
@@ -49,11 +55,47 @@ public class CirclePolyIllustrator : IllustratorBase
             _currentStep?.Draw?.Invoke();
         }
 
-        if (_minCurrVertex != null)
-            Graphics.DrawVertexHighlighted(_minCurrVertex());
+        if (_minCurrVertex != null && _minNextVertex != null)
+        {
+            if (_minEdgeFound)
+            {
+                Graphics.Mid.P0(_minNextVertex()).P1(_minCurrVertex()).Color(Theme.ShapeHilite).Width(2).DrawLine();
+            }
 
-        if (_minNextVertex != null)
+            Graphics.DrawVertexHighlighted(_minCurrVertex());
             Graphics.DrawVertexHighlighted(_minNextVertex());
+        }
+        
+
+        if (_showRegions && 
+            _minCurrVertex != null && 
+            _minNextVertex != null &&
+            _minEdgeFound)
+        {
+            // Draw the region between the two vertices
+            var minCurr = _minCurrVertex();
+            var minNext = _minNextVertex();
+
+            var edge = minNext - minCurr;
+            var edgeNormal = edge.RightUnitNormal();
+
+            Graphics.Bot.Color(Theme.BgSubtle).Width(2).Default();
+
+            Graphics.Bot
+                .P0(minCurr)
+                .P1((minCurr - minNext) * 1000)
+                .DrawLine();
+
+            Graphics.Bot.P0(minCurr).P1(minCurr + edgeNormal * 1000).DrawLine();
+
+            Graphics.Bot
+                .P0(minNext)
+                .P1((minNext - minCurr) * 1000)
+                .DrawLine();
+
+            Graphics.Bot.P0(minNext).P1(minNext + edgeNormal * 1000).DrawLine();
+
+        }
     }
 
     public CollisionStepResult StepProcess()
@@ -71,12 +113,14 @@ public class CirclePolyIllustrator : IllustratorBase
             if (_currentStep.MinCurrVertex != null)
             {
                 _minCurrVertex = _currentStep.MinCurrVertex;
+                _minEdgeFound = _currentStep.MinEdgeFound;
             }
 
             if (_currentStep.MinNextVertex != null)
             {
                 _minNextVertex = _currentStep.MinNextVertex;
             }
+
         }
         else
         {
@@ -95,6 +139,10 @@ public class CirclePolyIllustrator : IllustratorBase
             _steps.Dispose();
             _steps = null;
             _started = false;
+
+            _minCurrVertex = null;
+            _minNextVertex = null;
+            _minEdgeFound = false;
         }
     }
 
