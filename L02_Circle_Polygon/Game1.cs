@@ -173,7 +173,7 @@ public class Game1 : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        Graphics.Text.Position(20, 20).Scale(0.75f).Text(
+        Graphics.UI.Position(20, 20).Text(
             _menuText + 
             "Mode: " + _illustrator.Mode.ToString() + "\r\n" +
             _consoleText);

@@ -367,10 +367,10 @@ public static class CollisionDetectionSteppable
 
             Graphics.DrawVectorRel(vertexFrom(), v1Val, Theme.ShapeLolite);
 
-            Graphics.Mid.P0(vertexFrom()).P1(vertexTo()).Color(Theme.ShapeLolite).DrawLine();
+            Graphics.Mid.P0(vertexFrom()).P1(vertexTo()).Color(Theme.ShapeHilite).DrawLine();
 
             
-            Graphics.DrawVectorRel(vertexFrom(), v2Norm() * 50, Theme.ShapeLolite);
+            Graphics.DrawVectorRel(vertexFrom(), v2Norm() * 50, Theme.ShapeHilite);
 
             Graphics.DrawVectorRel(vertexFrom(), v2Norm() * v1ProjCopy(), Theme.ShapeStandout);
         };

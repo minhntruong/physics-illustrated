@@ -46,6 +46,58 @@ public class CirclePolyIllustrator : IllustratorBase
         base.Update(gameTime);
     }
 
+    private void DrawRegions()
+    {
+        if (_showRegions &&
+         _minCurrVertex != null &&
+         _minNextVertex != null &&
+         _minEdgeFound &&
+         _isOutside)
+        {
+            // Draw the region between the two vertices
+            var minCurr = _minCurrVertex();
+            var minNext = _minNextVertex();
+
+            var edge = minNext - minCurr;
+            var edgeUnit = Vector2.Normalize(edge);
+            var edgeNormal = edge.RightUnitNormal();
+
+            Graphics.Bot.Color(Theme.BgSubtle).Width(2).Default();
+
+            // A base
+            Graphics.Bot
+                .P0(minCurr)
+                .P1((minCurr - minNext) * 1000)
+                .DrawLine();
+
+            Graphics.Text.Color(Theme.ShapeLolite).RotationOf(minCurr, minNext).Default();
+
+            Graphics.Text
+                .Position(minCurr - edgeUnit * 100 + edgeNormal * 40)
+                .Text("A");
+
+            // A vertical
+            Graphics.Bot.P0(minCurr).P1(minCurr + edgeNormal * 1000).DrawLine();
+
+            // B base
+            Graphics.Bot
+                .P0(minNext)
+                .P1((minNext - minCurr) * 1000)
+                .DrawLine();
+
+            Graphics.Text
+                .Position(minNext + edgeUnit * 100 + edgeNormal * 40)
+                .Text("B");
+
+            // B vertical
+            Graphics.Bot.P0(minNext).P1(minNext + edgeNormal * 1000).DrawLine();
+
+            Graphics.Text
+                .Position(minCurr + edge * 0.5f + edgeNormal * 40)
+                .Text("C");
+        }
+    }
+
     public override void Draw()
     {
         // Draw the shapes first
@@ -62,38 +114,8 @@ public class CirclePolyIllustrator : IllustratorBase
             Graphics.DrawVertexHighlighted(_minCurrVertex());
             Graphics.DrawVertexHighlighted(_minNextVertex());
         }
-        
 
-        if (_showRegions && 
-            _minCurrVertex != null && 
-            _minNextVertex != null &&
-            _minEdgeFound &&
-            _isOutside)
-        {
-            // Draw the region between the two vertices
-            var minCurr = _minCurrVertex();
-            var minNext = _minNextVertex();
-
-            var edge = minNext - minCurr;
-            var edgeNormal = edge.RightUnitNormal();
-
-            Graphics.Bot.Color(Theme.BgSubtle).Width(2).Default();
-
-            Graphics.Bot
-                .P0(minCurr)
-                .P1((minCurr - minNext) * 1000)
-                .DrawLine();
-
-            Graphics.Bot.P0(minCurr).P1(minCurr + edgeNormal * 1000).DrawLine();
-
-            Graphics.Bot
-                .P0(minNext)
-                .P1((minNext - minCurr) * 1000)
-                .DrawLine();
-
-            Graphics.Bot.P0(minNext).P1(minNext + edgeNormal * 1000).DrawLine();
-
-        }
+        DrawRegions();     
 
         if (Mode != ModeEnum.StopOnEdgeOnly)
         {

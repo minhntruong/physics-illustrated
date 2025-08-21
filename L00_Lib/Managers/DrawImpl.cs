@@ -127,17 +127,6 @@ public class DrawImpl
 
     //==========================================================================
 
-    class DrawStates
-    {
-        public Color Color { get; set; } = Color.White;
-        public float Thickness { get; set; } = 4f;
-        public bool Filled { get; set; } = false;
-
-        public int Segments { get; set; } = 32; // For circles, number of segments to draw
-
-        public float Angle { get; set; } = -1f; // For circles, angle line to draw, -1 = none
-    }
-
     private DrawStates _defaultStates = new DrawStates();
     private DrawStates _currentStates = new DrawStates();
     private Vector2 _p0 = Vector2.Zero;
@@ -145,12 +134,6 @@ public class DrawImpl
     private float _width;
     private float _height;
     private float _radius;
-
-    private void ResetStates()
-    {
-        _currentStates.Color = _defaultStates.Color;
-        _currentStates.Thickness = _defaultStates.Thickness;
-    }
 
     public DrawImpl Color(Color value)
     {
@@ -327,6 +310,12 @@ public class DrawImpl
     }
 
     //==========================================================================
+
+    private void ResetStates()
+    {
+        _currentStates.Color = _defaultStates.Color;
+        _currentStates.Thickness = _defaultStates.Thickness;
+    }
 
     private void DrawLine(int x0, int y0, int x1, int y1, Color color, float thickness = 4)
     {
@@ -526,6 +515,29 @@ public class DrawImpl
             var y = center.Y + MathF.Sin(angle) * radius;
 
             vectors[v] = new Vector2(x, y);
+        }
+    }
+
+    //=== SUB CLASSES ==========================================================
+    class DrawStates
+    {
+        public Color Color { get; set; } = Color.White;
+        public float Thickness { get; set; } = 4f;
+        public bool Filled { get; set; } = false;
+        public int Segments { get; set; } = 32; // For circles, number of segments to draw
+        public float Angle { get; set; } = -1f; // For circles, angle line to draw, -1 = none
+
+        public void CopyFrom(DrawStates other)
+        {
+            if (other == null) throw new ArgumentNullException(nameof(other));
+            var type = typeof(DrawStates);
+            foreach (var prop in type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+            {
+                if (prop.CanWrite)
+                {
+                    prop.SetValue(this, prop.GetValue(other));
+                }
+            }
         }
     }
 }

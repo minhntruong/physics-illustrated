@@ -44,6 +44,7 @@ public static class Graphics
             _bot.Zoom = value;
             _mid.Zoom = value;
             _top.Zoom = value;
+            _text.Zoom = value;
         }
     }
 
@@ -57,6 +58,7 @@ public static class Graphics
             _bot.Origin = value;
             _mid.Origin = value;
             _top.Origin = value;
+            _text.Origin = value;
         }
     }
 
@@ -68,13 +70,17 @@ public static class Graphics
     private static DrawImpl _bot;
     private static DrawImpl _mid;
     private static DrawImpl _top;
+
     private static TextImpl _text;
+    private static TextImpl _ui;
+
     private static string _fontName;
 
     public static DrawImpl Bot => _bot;
     public static DrawImpl Mid => _mid;
     public static DrawImpl Top => _top;
     public static TextImpl Text => _text;
+    public static TextImpl UI => _ui;
 
     public static void DrawVertex(Vector2 position)
     {
@@ -107,6 +113,7 @@ public static class Graphics
         _mid.Draw();
         _top.Draw();
         _text.Draw();
+        _ui.Draw();
     }
 
     public static void OnViewportChange()
@@ -117,9 +124,15 @@ public static class Graphics
 
     public static void OnLoadContent()
     {
-        var spriteBatch = new SpriteBatch(_game.GraphicsDevice);
+        var spriteBatch1 = new SpriteBatch(_game.GraphicsDevice);
         var font = _game.Content.Load<SpriteFont>(_fontName);
 
-        _text = new TextImpl(spriteBatch, font);
+        _text = new TextImpl(spriteBatch1, font);
+        _text.Anchor(TextAnchor.Center).Default();
+
+        var spriteBatch2 = new SpriteBatch(_game.GraphicsDevice);
+
+        _ui = new TextImpl(spriteBatch2, font);
+        _ui.Anchor(TextAnchor.TopLeft).Scale(0.5f).Default();
     }
 }

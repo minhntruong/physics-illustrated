@@ -9,57 +9,84 @@ public enum TextAnchor { TopLeft, Center };
 
 public class TextImpl
 {
-
     public TextImpl(SpriteBatch spriteBatch, SpriteFont font)
     {
         _spriteBatch = spriteBatch;
         _font = font;
     }
 
-    private TextAnchor _anchor = TextAnchor.TopLeft;
+    //==========================================================================
+
+    private TextStates _defaultStates = new TextStates();
+    private TextStates _currentStates = new TextStates();
+
+    //private TextAnchor _anchor = TextAnchor.TopLeft;
     private Vector2 _position = Vector2.Zero;
-    private Color _color = F.Color.White;
-    private float _scale = 1.0f;
-    private float _rotation = 0.0f;
+    //private Color _color = F.Color.White;
+    //private float _scale = 1.0f;
+    //private float _rotation = 0.0f;
+
 
     private bool _begun = false;
     private SpriteBatch _spriteBatch;
     private SpriteFont _font;
 
+    //==========================================================================
+    public float Zoom { get; set; } = 1.0f;
+
+    public Vector2 Origin { get; set; } = Vector2.Zero;
+
     public TextImpl Anchor(TextAnchor value)
     {
-        _anchor = value;
+        _currentStates.Anchor = value;
         return this;
     }
 
     public TextImpl Position(Vector2 value)
     {
-        _position = value;
+        // Graphics.DrawVertex(value); // Draw here to not use TextImpl Scale & Origin
+        _position = value * Zoom - Origin;
         return this;
     }
 
     public TextImpl Position(float x, float y)
     {
-        _position = new Vector2(x, y);
-        return this;
+        return Position(new Vector2(x, y));
     }
 
     public TextImpl Color(Color value)
     {
-        _color = value;
+        _currentStates.Color = value;
         return this;
     }
 
     public TextImpl Scale(float value)
     {
-        _scale = value;
+        _currentStates.Scale = value;
         return this;
     }
 
     public TextImpl Rotation(float value)
     {
-        _rotation = value;
+        _currentStates.Rotation = value;
         return this;
+    }
+
+    public TextImpl RotationOf(Vector2 fromPt, Vector2 toPt)
+    {
+        // Calculate the angle of the 2 points
+
+        var vector = toPt - fromPt;
+
+        float angle = MathF.Atan2(vector.Y, vector.X);
+        _currentStates.Rotation = angle;
+
+        return this;
+    }
+
+    public void Default()
+    {
+        _defaultStates.CopyFrom(_currentStates);
     }
 
     public void Text(object text)
@@ -74,29 +101,42 @@ public class TextImpl
 
         var textStr = text.ToString();
 
-        if (_anchor == TextAnchor.Center)
+        var textSize = Vector2.Zero;
+
+        if (_currentStates.Anchor == TextAnchor.Center)
         {
-            var size = _font.MeasureString(textStr);
-            position -= size * 0.5f * _scale;
+            textSize = _font.MeasureString(textStr);
+            //position -= textSize * 0.5f * _currentStates.Scale;
         }
 
-        if (_scale == 1.0f && _rotation == 0.0f)
+
+        if (_currentStates.Scale == 1.0f && _currentStates.Rotation == 0.0f)
         {
-            _spriteBatch.DrawString(_font, textStr, position, _color);
+            _spriteBatch.DrawString(_font, textStr, position, _currentStates.Color);
             return;
         }
         else
         {
-            _spriteBatch.DrawString(_font, textStr, position, _color, _rotation, Vector2.Zero, _scale, SpriteEffects.None, 0f);
+            _spriteBatch.DrawString(
+                _font, 
+                textStr, 
+                position, 
+                _currentStates.Color, 
+                _currentStates.Rotation, 
+                textSize * 0.5f, 
+                _currentStates.Scale, 
+                SpriteEffects.None, 
+                0f);
         }
     }
 
     public void Reset()
     {
-        _anchor = TextAnchor.TopLeft;
-        _color = F.Color.White;
-        _scale = 1.0f;
-        _rotation = 0.0f;
+        ResetStates();
+        //_anchor = TextAnchor.TopLeft;
+        //_color = F.Color.White;
+        //_scale = 1.0f;
+        //_rotation = 0.0f;
     }
 
     public void Draw()
@@ -106,6 +146,38 @@ public class TextImpl
             _spriteBatch.End();
             Reset();
             _begun = false;
+        }
+    }
+
+    //==========================================================================
+
+    private void ResetStates()
+    {
+        _currentStates.Color = _defaultStates.Color;
+        _currentStates.Anchor = _defaultStates.Anchor;
+        _currentStates.Scale = _defaultStates.Scale;
+        _currentStates.Rotation = _defaultStates.Rotation;
+    }
+
+    //=== SUB CLASSES ==========================================================
+    class TextStates
+    {
+        public TextAnchor Anchor { get; set; } = TextAnchor.TopLeft;
+        public Color Color { get; set; } = Color.White;
+        public float Scale { get; set; } = 1;
+        public float Rotation { get; set; } = 0;
+
+        public void CopyFrom(TextStates other)
+        {
+            if (other == null) throw new ArgumentNullException(nameof(other));
+            var type = typeof(TextStates);
+            foreach (var prop in type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+            {
+                if (prop.CanWrite)
+                {
+                    prop.SetValue(this, prop.GetValue(other));
+                }
+            }
         }
     }
 }
