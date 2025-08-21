@@ -66,7 +66,7 @@ public class InputMgr
         return new Vector2(_curMouseState.X, _curMouseState.Y);
     }
 
-    public float MouseScrollWheelDelta()
+    public int MouseScrollWheelDelta()
     {
         return _curMouseState.ScrollWheelValue - _prvMouseState.ScrollWheelValue;
     }

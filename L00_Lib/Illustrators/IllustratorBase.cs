@@ -58,20 +58,33 @@ public class IllustratorBase
     public virtual void Draw()
     {
         // Draw all bodies
+
+        Graphics.Mid.Thickness(2).Default();
+
         foreach (var body in Bodies)
         {
-            var color = Color.Cyan;
+            var color = Theme.Shape;
 
             //color = body.IsColliding ? Color.Orange : color;
 
             if (body.Shape is CircleShape circleShape)
             {
-                Graphics.Mid.DrawCircle(body.Position, circleShape.Radius, -1, color);
+                Graphics.Mid
+                    .P0(body.Position)
+                    .Color(color)
+                    .Radius(circleShape.Radius)
+                    .DrawCircle();
+
                 Graphics.DrawVertex(body.Position, color);
             }
             else if (body.Shape is PolygonShape polygonShape)
             {
-                Graphics.Mid.DrawPolygon(body.Position, polygonShape.WorldVertices, color);
+                //Graphics.Mid.DrawPolygon(body.Position, polygonShape.WorldVertices, color);
+                Graphics.Mid
+                    .P0(body.Position)
+                    .Color(color)
+                    .DrawPolygon(polygonShape.WorldVertices);
+
                 Graphics.DrawVertex(body.Position, color);
             }
         }

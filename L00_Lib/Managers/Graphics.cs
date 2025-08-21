@@ -19,6 +19,47 @@ public static class Graphics
         game.Window.ClientSizeChanged += (sender, args) => OnViewportChange();
     }
 
+    private static float _zoom = 1.0f;
+    private static Vector2 _origin = Vector2.Zero;
+
+    public static void SetZoom(float zoomInc, Vector2 screenPos)
+    {
+        var unzoomedWorldPos = (screenPos + Origin) / Zoom;
+
+        Zoom += zoomInc;
+
+        // Adjust Origin so the world position under the cursor stays fixed
+        Origin = (unzoomedWorldPos * Zoom) - screenPos;
+    }
+
+    public static float Zoom
+    {
+        get { return _zoom; }
+        set
+        {
+            _zoom = value;
+
+            _zoom = Math.Clamp(_zoom, 0.1f, 5.0f);
+
+            _bot.Zoom = value;
+            _mid.Zoom = value;
+            _top.Zoom = value;
+        }
+    }
+
+    // Origin already has zoom applied
+    public static Vector2 Origin
+    {
+        get { return _origin; }
+        set
+        {
+            _origin = value;
+            _bot.Origin = value;
+            _mid.Origin = value;
+            _top.Origin = value;
+        }
+    }
+
     public static void Dispose()
     {
     }

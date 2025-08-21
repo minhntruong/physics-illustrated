@@ -27,38 +27,6 @@ public class CollisionStepResult
 
 public static class CollisionDetectionSteppable
 {
-    //private static Color _highlite = Color.HotPink;
-    //private static Color _line = Color.CornflowerBlue;
-    //private static Color _proj = Color.Pink;
-
-    private static Action CreateDrawV1V2Proj(
-        Func<Vector2> circlePos,
-        Func<Vector2> vertexFrom,
-        Func<Vector2> vertexTo,
-        out Func<Vector2> v1,
-        out Func<float> v1Proj)
-    {
-        v1 = () => circlePos() - vertexFrom();        
-        var v2 = () => vertexTo() - vertexFrom();
-
-        var v1Copy = v1; // We can't use v1 directly in the lambda below, so we copy it
-
-        var v2Norm = () => Vector2.Normalize(v2());
-        v1Proj = () => Vector2.Dot(v1Copy(), v2Norm());
-
-        var v1ProjCopy = v1Proj;
-
-        return () =>
-        {
-            var v1Val = v1Copy();
-            var v2Val = v2();
-
-            Graphics.DrawVectorRel(vertexFrom(), v1Val, Theme.ShapeLolite);
-            Graphics.DrawVectorRel(vertexFrom(), v2Val, Theme.ShapeLolite);
-            Graphics.DrawVectorRel(vertexFrom(), v2Norm() * v1ProjCopy(), Theme.ShapeStandout);
-        };
-    }
-
     public static IEnumerable<CollisionStepResult> IsCollidingPolygonCircle(
         Body polygon,
         Body circle,
@@ -93,7 +61,12 @@ public static class CollisionDetectionSteppable
             {
                 var p2 = v0() + edge();
 
-            Graphics.Top.P0(v0()).P1(p2).Color(Theme.ShapeHilite).Thickness(2).DrawLine();
+                Graphics.Top
+                    .P0(v0())
+                    .P1(p2)
+                    .Color(Theme.ShapeHilite)
+                    .Thickness(2)
+                    .DrawLine();
 
                 Graphics.DrawVertex(v0());
                 Graphics.DrawVertex(p2);
@@ -240,7 +213,7 @@ public static class CollisionDetectionSteppable
 
             yield return new CollisionStepResult
             {
-                Step = $"IsOutside = {circleCenterIsOutside}, checking for region A",
+                Step = $"Circle center is outside of polygon, checking for region A",
                 IsOutside = circleCenterIsOutside,
             };
 
@@ -252,23 +225,6 @@ public static class CollisionDetectionSteppable
                 minNextVertex,
                 out var v1,
                 out var v1Proj);
-
-            //var cirPos = () => circle.Position;
-            //var v1 = () => cirPos() - minCurrVertex();
-            //var v2 = () => minNextVertex() - minCurrVertex();
-
-            //var v2Norm = () => Vector2.Normalize(v2());
-            //var v1Proj = () => Vector2.Dot(v1(), v2Norm());
-
-            //var drawV1V2Proj = () =>
-            //{
-            //    var v1Val = v1();
-            //    var v2Val = v2();
-
-            //    Graphics.DrawVectorRel(minCurrVertex(), v1(), Theme.ShapeLolite);
-            //    Graphics.DrawVectorRel(minCurrVertex(), v2(), Theme.ShapeLolite);
-            //    Graphics.DrawVectorRel(minCurrVertex(), v2Norm() * v1Proj(), Theme.ShapeStandout);
-            //};
 
             yield return new CollisionStepResult
             {
@@ -383,6 +339,35 @@ public static class CollisionDetectionSteppable
 
             yield break;
         }
+    }
 
+    //==========================================================================
+
+    private static Action CreateDrawV1V2Proj(
+        Func<Vector2> circlePos,
+        Func<Vector2> vertexFrom,
+        Func<Vector2> vertexTo,
+        out Func<Vector2> v1,
+        out Func<float> v1Proj)
+    {
+        v1 = () => circlePos() - vertexFrom();
+        var v2 = () => vertexTo() - vertexFrom();
+
+        var v1Copy = v1; // We can't use v1 directly in the lambda below, so we copy it
+
+        var v2Norm = () => Vector2.Normalize(v2());
+        v1Proj = () => Vector2.Dot(v1Copy(), v2Norm());
+
+        var v1ProjCopy = v1Proj;
+
+        return () =>
+        {
+            var v1Val = v1Copy();
+            var v2Val = v2();
+
+            Graphics.DrawVectorRel(vertexFrom(), v1Val, Theme.ShapeLolite);
+            Graphics.DrawVectorRel(vertexFrom(), v2Val, Theme.ShapeLolite);
+            Graphics.DrawVectorRel(vertexFrom(), v2Norm() * v1ProjCopy(), Theme.ShapeStandout);
+        };
     }
 }

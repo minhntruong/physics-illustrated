@@ -227,18 +227,32 @@ public static class CollisionDetection
                 #region DRAW DEBUGS
 
                 // Draw the normal line
-                Graphics.Top.DrawLine(
-                    polygonShape.WorldVertices[i] + edge * 0.0f,
-                    polygonShape.WorldVertices[i] + edge * 0.0f + normal * 45,
-                    projection > 0 ? defaultColor : missedColor,
-                    2);
+                Graphics.Top
+                    .P0(polygonShape.WorldVertices[i] + edge * 0.0f)
+                    .P1(polygonShape.WorldVertices[i] + edge * 0.0f + normal * 45)
+                    .Color(projection > 0 ? defaultColor : missedColor)
+                    .Thickness(2)
+                    .DrawLine();
+
+                //Graphics.Top.DrawLine(
+                //    polygonShape.WorldVertices[i] + edge * 0.0f,
+                //    polygonShape.WorldVertices[i] + edge * 0.0f + normal * 45,
+                //    projection > 0 ? defaultColor : missedColor,
+                //    2);
 
                 // Draw the line from vertex to the circle center
-                Graphics.Top.DrawLine(
-                    polygonShape.WorldVertices[i],
-                    polygonShape.WorldVertices[i] + circleCenter,
-                    projection > 0 ? defaultColor : missedColor,
-                    2);
+                Graphics.Top
+                    .P0(polygonShape.WorldVertices[i])
+                    .P1(polygonShape.WorldVertices[i] + circleCenter)
+                    .Color(projection > 0 ? defaultColor : missedColor)
+                    .Thickness(2)
+                    .DrawLine();
+
+                //Graphics.Top.DrawLine(
+                //    polygonShape.WorldVertices[i],
+                //    polygonShape.WorldVertices[i] + circleCenter,
+                //    projection > 0 ? defaultColor : missedColor,
+                //    2);
 
                 //=== Draw refs
                 var refPoint = new Vector2(400, 400);
@@ -248,42 +262,77 @@ public static class CollisionDetection
                     // Circle center is found outside of one of polygon's edges
 
                     //=== DEBUG Positive Projection
-                    Graphics.Top.DrawLine(
-                        refPoint,
-                        refPoint + normal * projection,
-                        Color.Red,
-                        6);
+                    Graphics.Top
+                        .P0(refPoint)
+                        .P1(refPoint + normal * projection)
+                        .Color(Color.Red)
+                        .Thickness(6)
+                        .DrawLine();
+
+                    //Graphics.Top.DrawLine(
+                    //    refPoint,
+                    //    refPoint + normal * projection,
+                    //    Color.Red,
+                    //    6);
 
                     // Positive Normal
-                    Graphics.Top.DrawLine(
-                        refPoint,
-                        refPoint + circleCenter,
-                        defaultColor,
-                        2);
+                    Graphics.Top
+                        .P0(refPoint)
+                        .P1(refPoint + circleCenter)
+                        .Color(defaultColor)
+                        .Thickness(2)
+                        .DrawLine();
+
+                    //Graphics.Top.DrawLine(
+                    //    refPoint,
+                    //    refPoint + circleCenter,
+                    //    defaultColor,
+                    //    2);
                 }
                 else
                 {
                     // Negative Projection
-                    Graphics.Top.DrawLine(
-                        refPoint,
-                        refPoint + normal * projection,
-                        Color.DarkRed,
-                        4);
+                    Graphics.Top
+                        .P0(refPoint)
+                        .P1(refPoint + normal * projection)
+                        .Color(Color.DarkRed)
+                        .Thickness(4)
+                        .DrawLine();
+
+                    //Graphics.Top.DrawLine(
+                    //    refPoint,
+                    //    refPoint + normal * projection,
+                    //    Color.DarkRed,
+                    //    4);
 
                     // Negative Normal
-                    Graphics.Top.DrawLine(
-                        refPoint,
-                        refPoint + circleCenter,
-                        missedColor,
-                        2);
+                    Graphics.Top
+                        .P0(refPoint)
+                        .P1(refPoint + circleCenter)
+                        .Color(missedColor)
+                        .Thickness(2)
+                        .DrawLine();
+
+                    //Graphics.Top.DrawLine(
+                    //    refPoint,
+                    //    refPoint + circleCenter,
+                    //    missedColor,
+                    //    2);
                 }
 
                 // Draw normal line
-                Graphics.Top.DrawLine(
-                    refPoint,
-                    refPoint + normal * 150,
-                    projection > 0 ? defaultColor : missedColor,
-                    2);
+                Graphics.Top
+                    .P0(refPoint)
+                    .P1(refPoint + normal * 150)
+                    .Color(projection > 0 ? defaultColor : missedColor)
+                    .Thickness(2)
+                    .DrawLine();
+
+                //Graphics.Top.DrawLine(
+                //    refPoint,
+                //    refPoint + normal * 150,
+                //    projection > 0 ? defaultColor : missedColor,
+                //    2);
 
                 //=== End draw refs
                 #endregion

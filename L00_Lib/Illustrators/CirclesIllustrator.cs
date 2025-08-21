@@ -38,12 +38,19 @@ namespace PhysicsIllustrated.Library.Illustrators
                     
                     if (_showRadii)
                     {
+                        Graphics.Mid.Color(Color.MediumSlateBlue).Width(4).Default();
+
                         // Radius A
-                        Graphics.Mid.DrawLine(
-                            bodyA.Position,
-                            //bodyA.Position + -aToBNorm * shapeA.Radius,
-                            bodyA.Position + new Vector2(1, 0) * shapeA.Radius,
-                            Color.MediumSlateBlue);
+                        Graphics.Mid
+                            .P0(bodyA.Position)
+                            .P1(bodyA.Position + new Vector2(1, 0) * shapeA.Radius)
+                            .DrawLine();
+
+                        //Graphics.Mid.DrawLine(
+                        //    bodyA.Position,
+                        //    //bodyA.Position + -aToBNorm * shapeA.Radius,
+                        //    bodyA.Position + new Vector2(1, 0) * shapeA.Radius,
+                        //    Color.MediumSlateBlue);
 
                         Graphics.Text
                             .Anchor(TextAnchor.Center)
@@ -53,11 +60,16 @@ namespace PhysicsIllustrated.Library.Illustrators
                             .Text(shapeA.Radius);
 
                         // Radius B
-                        Graphics.Mid.DrawLine(
-                            bodyB.Position,
-                            //bodyB.Position + aToBNorm * (bodyB.Shape as CircleShape).Radius,
-                            bodyB.Position + new Vector2(1, 0) * shapeB.Radius,
-                            Color.MediumSlateBlue);
+                        Graphics.Mid
+                            .P0(bodyB.Position)
+                            .P1(bodyB.Position + new Vector2(1, 0) * shapeB.Radius)
+                            .DrawLine();
+
+                        //Graphics.Mid.DrawLine(
+                        //    bodyB.Position,
+                        //    //bodyB.Position + aToBNorm * (bodyB.Shape as CircleShape).Radius,
+                        //    bodyB.Position + new Vector2(1, 0) * shapeB.Radius,
+                        //    Color.MediumSlateBlue);
 
                         Graphics.Text
                             .Anchor(TextAnchor.Center)
@@ -68,10 +80,12 @@ namespace PhysicsIllustrated.Library.Illustrators
                     }
 
                     // Distance line
-                    Graphics.Mid.DrawLine(
-                        bodyA.Position, 
-                        bodyB.Position, 
-                        Color.DarkCyan);
+                    Graphics.Mid.P0(bodyA.Position).P1(bodyB.Position).Color(Color.DarkCyan).DrawLine();
+
+                    //Graphics.Mid.DrawLine(
+                    //    bodyA.Position, 
+                    //    bodyB.Position, 
+                    //    Color.DarkCyan);
 
                     var len = aToB.Length();
 
@@ -81,8 +95,11 @@ namespace PhysicsIllustrated.Library.Illustrators
                         .Scale(0.5f)
                         .Text(len.ToString("F1"));
 
-                    Graphics.Mid.DrawFillRect(bodyA.Position.X, bodyA.Position.Y, 4, 4, Color.Cyan);
-                    Graphics.Mid.DrawFillRect(bodyB.Position.X, bodyB.Position.Y, 4, 4, Color.Cyan);
+                    Graphics.DrawVertex(bodyA.Position, Color.Cyan);
+                    Graphics.DrawVertex(bodyB.Position, Color.Cyan);
+
+                    //Graphics.Mid.DrawFillRect(bodyA.Position.X, bodyA.Position.Y, 4, 4, Color.Cyan);
+                    //Graphics.Mid.DrawFillRect(bodyB.Position.X, bodyB.Position.Y, 4, 4, Color.Cyan);
                 }
             }
 

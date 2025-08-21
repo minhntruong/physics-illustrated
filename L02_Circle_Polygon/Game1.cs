@@ -7,6 +7,7 @@ using PhysicsIllustrated.Library.Physics;
 using PhysicsIllustrated.Library.Physics.Shapes;
 using static PhysicsIllustrated.Library.Managers.GameExt;
 using static PhysicsIllustrated.Library.Illustrators.CirclePolyIllustrator.ModeEnum;
+using System.Diagnostics;
 
 namespace L02_Circle_Polygon;
 
@@ -27,6 +28,11 @@ public class Game1 : Game
     private Body _box;
     private Body _movable;
     private CirclePolyIllustrator _illustrator;
+
+    // Add to Game1 class fields:
+    private bool _isPanning = false;
+    private Vector2 _panStartMouse;
+    private Vector2 _panStartOrigin;
 
     private string _menuText = 
         "Mouse press to move\r\n" + 
@@ -65,23 +71,63 @@ public class Game1 : Game
 
         Input.Update();
 
-        var isMouseEngaged = Input.MouseLeftButtonPressed();
+        bool isCtrlDown = Input.IsKeyDown(Keys.LeftControl) || Input.IsKeyDown(Keys.RightControl);
+        var mousePos = Input.MousePosition();
+
+        // --- Panning logic start ---
+        if (isCtrlDown && Input.MouseLeftButtonPressed())
+        {
+            if (!_isPanning)
+            {
+                _isPanning = true;
+                _panStartMouse = mousePos;
+                _panStartOrigin = Graphics.Origin;
+            }
+            else
+            {
+                var delta = mousePos - _panStartMouse;
+                Graphics.Origin = _panStartOrigin - delta;
+            }
+        }
+        else
+        {
+            _isPanning = false;
+        }
+
+        var isMouseEngaged = !isCtrlDown && Input.MouseLeftButtonPressed();
         if (isMouseEngaged)
         {
-            _movable.Position = Input.MousePosition();
+            _movable.Position = (mousePos +  Graphics.Origin) / Graphics.Zoom;
         }
 
         IsMouseVisible = !isMouseEngaged;
 
-        _box.Rotation -= Input.MouseScrollWheelDelta() * 0.001f;
-        if (_box.Rotation < 0)
+        var wheelDelta = Input.MouseScrollWheelDelta();
+
+        if (wheelDelta != 0)
         {
-            _box.Rotation += MathF.PI * 2;
+            if (isCtrlDown)
+            {
+                // Wheel rotation with Ctrl
+                Graphics.SetZoom(wheelDelta * 0.001f, Input.MousePosition());
+
+                Debug.WriteLine("Zoom: " + Graphics.Zoom);
+            }
+            else
+            {
+                // Free wheel rotation
+                _box.Rotation -= Input.MouseScrollWheelDelta() * 0.001f;
+                if (_box.Rotation < 0)
+                {
+                    _box.Rotation += MathF.PI * 2;
+                }
+                else if (_box.Rotation > MathF.PI * 2)
+                {
+                    _box.Rotation -= MathF.PI * 2;
+                }
+            }
         }
-        else if (_box.Rotation > MathF.PI * 2)
-        {
-            _box.Rotation -= MathF.PI * 2;
-        }
+
 
         if (_illustrator.Mode == RunAllSteps)
         {

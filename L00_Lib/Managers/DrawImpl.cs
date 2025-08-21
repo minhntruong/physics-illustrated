@@ -65,6 +65,10 @@ public class DrawImpl
 
     //==========================================================================
 
+    public float Zoom { get; set; } = 1.0f;
+
+    public Vector2 Origin { get; set; } = Vector2.Zero;
+
     public void OnViewportChange()
     {
         _projection = Matrix.CreateOrthographicOffCenter(
@@ -128,6 +132,10 @@ public class DrawImpl
         public Color Color { get; set; } = Color.White;
         public float Thickness { get; set; } = 4f;
         public bool Filled { get; set; } = false;
+
+        public int Segments { get; set; } = 32; // For circles, number of segments to draw
+
+        public float Angle { get; set; } = -1f; // For circles, angle line to draw, -1 = none
     }
 
     private DrawStates _defaultStates = new DrawStates();
@@ -136,6 +144,7 @@ public class DrawImpl
     private Vector2 _p1 = Vector2.Zero;
     private float _width;
     private float _height;
+    private float _radius;
 
     private void ResetStates()
     {
@@ -169,25 +178,37 @@ public class DrawImpl
 
     public DrawImpl P0(Vector2 value)
     {
-        _p0 = value;
+        _p0 = value * Zoom - Origin;
         return this;
     }
 
     public DrawImpl P1(Vector2 value)
     {
-        _p1 = value;
+        _p1 = value * Zoom - Origin;
         return this;
     }
 
     public DrawImpl Width(float value)
     {
-        _width = value;
+        _width = value * Zoom;
         return this;
     }
 
     public DrawImpl Height(float value)
     {
-        _height = value;
+        _height = value * Zoom;
+        return this;
+    }
+
+    public DrawImpl Radius(float value)
+    {
+        _radius = value * Zoom;
+        return this;
+    }
+
+    public DrawImpl Angle(float value)
+    {
+        _currentStates.Angle = value;
         return this;
     }
 
@@ -240,9 +261,74 @@ public class DrawImpl
         }
     }
 
+    public void DrawRect()
+    {
+        var coords = GenerateRectCoordinates(_p0, _width, _height);
+
+        if (_currentStates.Filled)
+        {
+            DrawFillRect(_p0.X, _p0.Y, _width, _height, _currentStates.Color);
+        }
+        else
+        {
+            DrawPolygon(_p0, coords, _currentStates.Color, _currentStates.Thickness);
+        }
+    }
+
+    public void DrawCircle()
+    {
+        var vectors = _vectors.AsSpan(0, _currentStates.Segments);
+
+        GenerateCircleCoordinates(_p0, _radius, vectors);
+
+        if (_currentStates.Filled)
+        {
+            throw new Exception("Filled circles are not implemented yet.");
+        }
+        else
+        {
+            // Draw line segments between the generated points
+            for (var i = 0; i < vectors.Length - 1; i++)
+            {
+                var start = vectors[i];
+                var end = vectors[i + 1];
+
+                DrawLine(start, end, _currentStates.Color, _currentStates.Thickness);
+            }
+
+            // Connect the last point to the first to close the circle
+            DrawLine(vectors[vectors.Length - 1], vectors[0], _currentStates.Color, _currentStates.Thickness);
+
+            // Draw the angle line
+            if (_currentStates.Angle >= 0)
+            {
+                DrawLine(
+                    _p0,
+                    new Vector2(_p0.X + MathF.Cos(_currentStates.Angle) * _radius,
+                                _p0.Y + MathF.Sin(_currentStates.Angle) * _radius),
+                    _currentStates.Color,
+                    _currentStates.Thickness);
+            }
+        }
+    }
+
+    public void DrawPolygon(Vector2[] vertices)
+    {
+        var xformedVertices = new Vector2[vertices.Length];
+
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            // Scale + offset vertices
+            xformedVertices[i] = vertices[i] * Zoom - Origin;
+        }
+
+        // Stroke only for now
+        DrawPolygon(_p0, xformedVertices, _currentStates.Color, _currentStates.Thickness);
+    }
+
     //==========================================================================
 
-    public void DrawLine(int x0, int y0, int x1, int y1, Color color, float thickness = 4)
+    private void DrawLine(int x0, int y0, int x1, int y1, Color color, float thickness = 4)
     {
         var start = new Vector2(x0, y0);
         var end = new Vector2(x1, y1);
@@ -250,7 +336,7 @@ public class DrawImpl
         DrawLine(start, end, color, thickness);
     }
 
-    public void DrawLine(Vector2 start, Vector2 end, Color color, float thickness = 4)
+    private void DrawLine(Vector2 start, Vector2 end, Color color, float thickness = 4)
     {
         var direction = end - start;
         var perpendicular = Vector2.Normalize(new Vector2(-direction.Y, direction.X)) * thickness * 0.5f;
@@ -277,7 +363,7 @@ public class DrawImpl
         indices[5] = startIndex + 3;
     }
 
-    public void DrawPolygon(Vector2 center, Vector2[] vertices, Color color, float thickness = 2)
+    private void DrawPolygon(Vector2 center, Vector2[] vertices, Color color, float thickness = 2)
     {
         for (int i = 0; i < vertices.Length - 1; i++)
         {
@@ -293,12 +379,12 @@ public class DrawImpl
         //DrawFillCircle(center, 2, color, 4);
     }
 
-    public void DrawCircle(int centerX, int centerY, float radius, float angle, Color color, float thickness = 2, int segments = 32)
+    private void DrawCircle(int centerX, int centerY, float radius, float angle, Color color, float thickness = 2, int segments = 32)
     {
         DrawCircle(new Vector2(centerX, centerY), radius, angle, color, thickness, segments);
     }
 
-    public void DrawCircle(Vector2 center, float radius, float angle, Color color, float thickness = 2, int segments = 32)
+    private void DrawCircle(Vector2 center, float radius, float angle, Color color, float thickness = 2, int segments = 32)
     {
         var vectors = _vectors.AsSpan(0, segments);
 
@@ -328,12 +414,12 @@ public class DrawImpl
         }
     }
 
-    public void DrawFillCircle(Vector2 center, float radius, Color color, int segments = 16)
+    private void DrawFillCircle(Vector2 center, float radius, Color color, int segments = 16)
     {
         DrawFillCircle(center.X, center.Y, radius, color, segments);
     }
 
-    public void DrawFillCircle(float centerX, float centerY, float radius, Color color, int segments = 16)
+    private void DrawFillCircle(float centerX, float centerY, float radius, Color color, int segments = 16)
     {
         // Vertices, indices for a triangle list
 
@@ -364,7 +450,7 @@ public class DrawImpl
         }
     }
 
-    public void DrawFillRect(float centerX, float centerY, float width, float height, Color color)
+    private void DrawFillRect(float centerX, float centerY, float width, float height, Color color)
     {
         // Vertices, indices for a triangle list
 
