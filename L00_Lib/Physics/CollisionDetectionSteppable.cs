@@ -22,6 +22,8 @@ public class CollisionStepResult
     public Contact Contact { get; set; }
     public bool? CollisionDetected { get; set; }
 
+    public bool ProcessEnded { get; set; }
+
     public Action Draw;
 }
 
@@ -223,8 +225,8 @@ public static class CollisionDetectionSteppable
                 cirPos,
                 minCurrVertex,
                 minNextVertex,
-                out var v1,
-                out var v1Proj);
+                out var vertexToCirc,
+                out var vertexToCircProj);
 
             yield return new CollisionStepResult
             {
@@ -235,7 +237,7 @@ public static class CollisionDetectionSteppable
                 }
             };
 
-            if (v1Proj() < 0)
+            if (vertexToCircProj() < 0)
             {
                 //===  REGION A CONFIRMED ======================================
 
@@ -258,17 +260,18 @@ public static class CollisionDetectionSteppable
                     }
                 };
 
-                if (v1().Length() > circleShape.Radius)
+                if (vertexToCirc().Length() > circleShape.Radius)
                 {
                     //=== DISTANCE TOO FAR, NO COLLISION =======================
 
                     yield return new CollisionStepResult
                     {
-                        Step = $"Circle center is in region A, but distance to edge is {v1().Length():F2} > circle radius {circleShape.Radius:F2}",
+                        Step = $"Circle center is in region A, but distance to vertex is {vertexToCirc().Length():F2} > circle radius {circleShape.Radius:F2}",
                         CollisionDetected = false,
+                        ProcessEnded = true,
                         Draw = () =>
                         {
-                            drawV1V2Proj();
+                            drawDistance();
                         }
                     };
 
@@ -277,7 +280,47 @@ public static class CollisionDetectionSteppable
 
                 //=== DISTANCE WITHIN RADIUS, COLLISION ========================
 
+                yield return new CollisionStepResult
+                {
+                    Step = $"Distance to vertex is less than circle radius",
+                    CollisionDetected = true,
+                    Draw = () =>
+                    {
+                        drawDistance();
+                    }
+                };
+
                 // TODO: Calculate Contact
+                contact = new Contact();
+                contacts.Add(contact);
+
+                contact.A = polygon;
+                contact.B = circle;
+                contact.Depth = circleShape.Radius - vertexToCirc().Length();
+                contact.Normal = Vector2.Normalize(vertexToCirc());
+                contact.Start = circle.Position + (contact.Normal * -circleShape.Radius);
+                contact.End = contact.Start + contact.Normal * contact.Depth;
+
+                yield return new CollisionStepResult
+                {
+                    Step = $"Start of contact",
+                    Draw = () =>
+                    {
+                        Graphics.DrawVertex(contact.Start, Color.GreenYellow);
+                    }
+                };
+
+                yield return new CollisionStepResult
+                {
+                    Step = $"End of contact",
+                    Draw = () =>
+                    {
+                        Graphics.DrawVertex(contact.Start, Color.GreenYellow);
+                        Graphics.DrawVertex(contact.End, Color.MonoGameOrange);
+                    }
+                };
+
+
             } // Region A check
 
             //=== DECISION # 2B ================================================
@@ -287,8 +330,8 @@ public static class CollisionDetectionSteppable
                 cirPos,
                 minNextVertex,
                 minCurrVertex,
-                out v1,
-                out v1Proj);
+                out vertexToCirc,
+                out vertexToCircProj);
 
             //v1 = () => cirPos() - minNextVertex();
             //v2 = () => minCurrVertex() - minNextVertex();
@@ -305,7 +348,7 @@ public static class CollisionDetectionSteppable
                 }
             };
 
-            if (v1Proj() < 0)
+            if (vertexToCircProj() < 0)
             {
                 //===  REGION B CONFIRMED ======================================
 
@@ -347,32 +390,32 @@ public static class CollisionDetectionSteppable
         Func<Vector2> circlePos,
         Func<Vector2> vertexFrom,
         Func<Vector2> vertexTo,
-        out Func<Vector2> v1,
-        out Func<float> v1Proj)
+        out Func<Vector2> vertexToCirc,
+        out Func<float> vertexToCircProj)
     {
-        v1 = () => circlePos() - vertexFrom();
-        var v2 = () => vertexTo() - vertexFrom();
+        vertexToCirc = () => circlePos() - vertexFrom();
+        var edgeVertex0To1 = () => vertexTo() - vertexFrom();
 
-        var v1Copy = v1; // We can't use v1 directly in the lambda below, so we copy it
+        var vertexToCircCopy = vertexToCirc; // We can't use v1 directly in the lambda below, so we copy it
 
-        var v2Norm = () => Vector2.Normalize(v2());
-        v1Proj = () => Vector2.Dot(v1Copy(), v2Norm());
+        var edgeVertex0To1Norm = () => Vector2.Normalize(edgeVertex0To1());
+        vertexToCircProj = () => Vector2.Dot(vertexToCircCopy(), edgeVertex0To1Norm());
 
-        var v1ProjCopy = v1Proj;
+        var vertexToCircProjCopy = vertexToCircProj;
 
         return () =>
         {
-            var v1Val = v1Copy();
-            var v2Val = v2();
+            var vertexToCircCopyVal = vertexToCircCopy();
+            var edgeVertex0To1Val = edgeVertex0To1();
 
-            Graphics.DrawVectorRel(vertexFrom(), v1Val, Theme.ShapeLolite);
+            Graphics.DrawVectorRel(vertexFrom(), vertexToCircCopyVal, Theme.ShapeLolite);
 
             Graphics.Mid.P0(vertexFrom()).P1(vertexTo()).Color(Theme.ShapeHilite).DrawLine();
 
             
-            Graphics.DrawVectorRel(vertexFrom(), v2Norm() * 50, Theme.ShapeHilite);
+            Graphics.DrawVectorRel(vertexFrom(), edgeVertex0To1Norm() * 50, Theme.ShapeHilite);
 
-            Graphics.DrawVectorRel(vertexFrom(), v2Norm() * v1ProjCopy(), Theme.ShapeStandout);
+            Graphics.DrawVectorRel(vertexFrom(), edgeVertex0To1Norm() * vertexToCircProjCopy(), Theme.ShapeStandout);
         };
     }
 }

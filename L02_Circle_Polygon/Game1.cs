@@ -29,7 +29,7 @@ public class Game1 : Game
     private Body _movable;
     private CirclePolyIllustrator _illustrator;
 
-    // Add to Game1 class fields:
+    private bool _showMenu = true;
     private bool _isPanning = false;
     private Vector2 _panStartMouse;
     private Vector2 _panStartOrigin;
@@ -37,9 +37,12 @@ public class Game1 : Game
     private string _menuText = 
         "Mouse press to move\r\n" + 
         "Mouse wheel to rotate\r\n" + 
+        "'.' to toggle menu\r\n" +
+        "'M' to cycle the modes\r\n" +
         "'S' to step through the process\r\n" + 
         "'X' to end the process\r\n" + 
         "'C' to clear text\r\n";
+
     private string _consoleText = "";
 
     protected override void Initialize()
@@ -128,7 +131,6 @@ public class Game1 : Game
             }
         }
 
-
         if (_illustrator.Mode == RunAllSteps)
         {
             if (Input.IsKeyClicked(Keys.S) || Input.MouseRightButtonClicked())
@@ -137,6 +139,18 @@ public class Game1 : Game
                 if (s != null)
                 {
                     _consoleText += "\r\n" + s.Step;
+
+                    if (s.CollisionDetected.HasValue)
+                    {
+                        _consoleText +=
+                            "\r\n" +
+                            "Collision result: " + s.CollisionDetected.Value;
+                    }
+
+                    if (s.ProcessEnded)
+                    {
+                        _illustrator.StepProcessEnd();
+                    }
                 }
             }
 
@@ -161,6 +175,10 @@ public class Game1 : Game
             _illustrator.CycleMode();
         }
 
+        if (Input.IsKeyClicked(Keys.OemPeriod))
+        {
+            _showMenu = !_showMenu;
+        }
 
         //=== Illusatrator logic ===============================================
 
@@ -174,8 +192,9 @@ public class Game1 : Game
     protected override void Draw(GameTime gameTime)
     {
         Graphics.UI.Position(20, 20).Text(
-            _menuText + 
-            "Mode: " + _illustrator.Mode.ToString() + "\r\n" +
+            (_showMenu ? _menuText +
+            "Mode: " + _illustrator.Mode.ToString() + "\r\n"
+            : "") +
             _consoleText);
 
         _illustrator.PreDraw();
