@@ -11,6 +11,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "L00_Lib_Shared", "L00_Lib_S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L02_Circle_Polygon", "L02_Circle_Polygon\L02_Circle_Polygon.csproj", "{3D6587BF-9E76-46B5-90F8-7E2536AF9B21}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib01", "Lib01\Lib01.csproj", "{E5432611-9032-4C32-AB49-F36404B49E5B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{3D6587BF-9E76-46B5-90F8-7E2536AF9B21}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D6587BF-9E76-46B5-90F8-7E2536AF9B21}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D6587BF-9E76-46B5-90F8-7E2536AF9B21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5432611-9032-4C32-AB49-F36404B49E5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5432611-9032-4C32-AB49-F36404B49E5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5432611-9032-4C32-AB49-F36404B49E5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5432611-9032-4C32-AB49-F36404B49E5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

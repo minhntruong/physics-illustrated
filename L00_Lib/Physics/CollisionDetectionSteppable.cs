@@ -290,6 +290,26 @@ public static class CollisionDetectionSteppable
                     }
                 };
 
+                var contactNormal = () => Vector2.Normalize(vertexToCirc());
+                var contactStart = () => circle.Position + (contactNormal() * -circleShape.Radius);
+
+                var drawDepth = () =>
+                {
+                    var depth = circleShape.Radius - vertexToCirc().Length();
+                    Graphics.Mid.P0(minCurrVertex()).P1(contactStart()).Color(Theme.ShapeLolite).DrawLine();
+                };
+
+                yield return new CollisionStepResult
+                {
+                    Step = $"Depth is the remainder of the circle radius and distance",
+                    CollisionDetected = true,
+                    Draw = () =>
+                    {
+                        drawDistance();
+                        drawDepth();
+                    }
+                };
+
                 // TODO: Calculate Contact
                 contact = new Contact();
                 contacts.Add(contact);

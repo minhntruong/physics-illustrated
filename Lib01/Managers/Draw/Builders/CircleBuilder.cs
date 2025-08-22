@@ -1,0 +1,77 @@
+﻿using System;
+using Microsoft.Xna.Framework;
+
+namespace ShowPhysics.Library.Managers.Draw.Builders;
+
+public class CircleBuilder : ShapeBuilder<RectangleBuilder>
+{
+    public CircleBuilder(DrawImpl drawImpl) : base(drawImpl)
+    {
+    }
+
+    private float _radius;
+    private int _segments = 32; // Default number of segments for the circle
+    private float? _rotation = null; 
+
+    public CircleBuilder Radius(float value)
+    {
+        _radius = value;
+        return this;
+    }
+
+    public CircleBuilder Segments(int value)
+    {
+        _segments = value;
+        return this;
+    }
+
+    public CircleBuilder Rotation(float value)
+    {
+        _rotation = value;
+        return this;
+    }
+
+    private Span<Vector2> GetCoordinates()
+    {
+        var data = _drawImpl.GetCoordinatesStorage(_segments);
+        Coordinates.Circle(_center, _radius, _segments, data);
+        return data;
+    }
+
+    public CircleBuilder Stroke()
+    {
+        var coords = GetCoordinates();
+
+        // Draw line segments between the generated points
+        for (var i = 0; i < coords.Length - 1; i++)
+        {
+            var start = coords[i];
+            var end = coords[i + 1];
+
+            _drawImpl.CreateLine(start, end, _states.Color, _states.Thickness);
+        }
+
+        // Connect the last point to the first to close the circle
+        _drawImpl.CreateLine(coords[coords.Length - 1], coords[0], _states.Color, _states.Thickness);
+
+        // Draw the angle line
+        if (_rotation.HasValue)
+        {
+            _drawImpl.CreateLine(
+                _center,
+                new Vector2(_center.X + MathF.Cos(_rotation.Value) * _radius,
+                            _center.Y + MathF.Sin(_rotation.Value) * _radius),
+                _states.Color,
+                _states.Thickness);
+        }
+
+        return this;
+    }
+
+    public CircleBuilder Fill()
+    {
+        var coords = GetCoordinates();
+
+        throw new NotImplementedException();
+    }
+}
