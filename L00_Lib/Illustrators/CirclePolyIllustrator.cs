@@ -115,19 +115,18 @@ public class CirclePolyIllustrator : IllustratorBase
         return _currentStep;
     }
 
-    public void StepProcessEnd()
-    {
-        if (_started)
-        {
-            _currentStep = null;
-            _steps.Dispose();
-            _steps = null;
-            _started = false;
 
-            _minCurrVertex = null;
-            _minNextVertex = null;
-            _minEdgeFound = false;
-        }
+    public void ProcessReset()
+    {
+        _currentStep = null;
+
+        _steps?.Dispose();
+        _steps = null;
+        _started = false;
+
+        _minCurrVertex = null;
+        _minNextVertex = null;
+        _minEdgeFound = false;
     }
 
     public CollisionStepResult EdgeProcess()
@@ -146,6 +145,7 @@ public class CirclePolyIllustrator : IllustratorBase
                 {
                     _minCurrVertex = currentStep.MinCurrVertex;
                     _minNextVertex = currentStep.MinNextVertex;
+                    _minEdgeFound = currentStep.MinEdgeFound;
 
                     _currentStep = currentStep;
                 }

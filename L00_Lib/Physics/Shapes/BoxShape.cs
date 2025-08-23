@@ -7,11 +7,20 @@ public class BoxShape : PolygonShape
 {
     public BoxShape(float width, float height)
         : base(
+            // Clock-wise winding
+            // These algorithms need clockwise winding to work correctly
             (-width / 2, -height / 2), // TL
             (+width / 2, -height / 2), // TR
             (+width / 2, +height / 2), // BR
             (-width / 2, +height / 2)  // BL
-)
+
+            // The below won't work with the current algorithms
+            // Count-clock-wise winding
+            //(+width / 2, -height / 2), // TR
+            //(-width / 2, -height / 2), // TL
+            //(-width / 2, +height / 2),  // BL
+            //(+width / 2, +height / 2) // BR
+        )
     {
         if (width <= 0 || height <= 0)
         {

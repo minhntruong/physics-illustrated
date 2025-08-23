@@ -109,23 +109,37 @@ public class TextImpl
             //position -= textSize * 0.5f * _currentStates.Scale;
         }
 
-
-        if (_currentStates.Scale == 1.0f && _currentStates.Rotation == 0.0f)
+        if (_currentStates.Anchor == TextAnchor.Center)
         {
+            // Always use rotational draw for center anchor because monogame provides
+            // us with the centering functionality
+            _spriteBatch.DrawString(
+                _font,
+                textStr,
+                position,
+                _currentStates.Color,
+                _currentStates.Rotation,
+                textSize * 0.5f,
+                _currentStates.Scale,
+                SpriteEffects.None,
+                0f);
+        }
+        else if (_currentStates.Scale == 1.0f && _currentStates.Rotation == 0.0f)
+        {
+            // Presumably LeftTop anchor
             _spriteBatch.DrawString(_font, textStr, position, _currentStates.Color);
-            return;
         }
         else
         {
             _spriteBatch.DrawString(
-                _font, 
-                textStr, 
-                position, 
-                _currentStates.Color, 
-                _currentStates.Rotation, 
-                textSize * 0.5f, 
-                _currentStates.Scale, 
-                SpriteEffects.None, 
+                _font,
+                textStr,
+                position,
+                _currentStates.Color,
+                _currentStates.Rotation,
+                Vector2.Zero,               // Rotation around top-left corner -- weird but ok
+                _currentStates.Scale,
+                SpriteEffects.None,
                 0f);
         }
     }

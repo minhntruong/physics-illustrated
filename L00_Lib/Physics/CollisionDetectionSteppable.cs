@@ -163,20 +163,15 @@ public static class CollisionDetectionSteppable
                     Step = $"Positive projection found: {projection():F1}, circle center is outside of polygon",
                     MinCurrVertex = minCurrVertex,
                     MinNextVertex = minNextVertex,
-                    MinEdgeFound = true,
-                    //Draw = () =>
-                    //{
-                    //    drawEdge();
-                    //    drawVertexToCircleCenter();
-                    //    drawNormal();
-                    //    drawProj();
-                    //}
+                    MinEdgeFound = true
                 };
 
                 break;
             }
             //=== DECISION # 1B ================================================
-            // No positive projection found, but we keep the largest negative value
+            // No positive projection found, so the center of the circle is inside
+            // the polygon, but we are tracking the "closest" edge by tracking
+            // the largest distance value (that is negativex)
             else
             {
                 if (projection() > distanceCircleEdge)
@@ -221,10 +216,13 @@ public static class CollisionDetectionSteppable
 
             var cirPos = () => circle.Position;
 
+            var edgeVertex0 = minCurrVertex;
+            var edgeVertex1 = minNextVertex;
+
             var drawV1V2Proj = CreateDrawV1V2Proj(
                 cirPos,
-                minCurrVertex,
-                minNextVertex,
+                edgeVertex0,
+                edgeVertex1,
                 out var vertexToCirc,
                 out var vertexToCircProj);
 
@@ -248,7 +246,7 @@ public static class CollisionDetectionSteppable
 
                 var drawDistance = () =>
                 {
-                    Graphics.Mid.P0(minCurrVertex()).P1(cirPos()).Color(Theme.ShapeStandout).Thickness(2).DrawLine();
+                    Graphics.Mid.P0(edgeVertex0()).P1(cirPos()).Color(Theme.ShapeStandout).Thickness(2).DrawLine();
                 };
 
                 yield return new CollisionStepResult
@@ -292,11 +290,36 @@ public static class CollisionDetectionSteppable
 
                 var contactNormal = () => Vector2.Normalize(vertexToCirc());
                 var contactStart = () => circle.Position + (contactNormal() * -circleShape.Radius);
+                var contactEnd = () => contactStart() + contactNormal() * (circleShape.Radius - vertexToCirc().Length());
 
                 var drawDepth = () =>
                 {
                     var depth = circleShape.Radius - vertexToCirc().Length();
-                    Graphics.Mid.P0(minCurrVertex()).P1(contactStart()).Color(Theme.ShapeLolite).DrawLine();
+                    Graphics.Mid.P0(edgeVertex0()).P1(contactStart()).Color(Theme.ShapeLolite).DrawLine();
+
+                    var centerDepth = edgeVertex0() - contactNormal() * depth * 0.5f;
+
+                    Graphics.Text
+                        .Position(centerDepth)
+                        .Rotation(0)
+                        .Scale(0.75f)
+                        .Color(Color.White)
+                        .Anchor(TextAnchor.Center)
+                        .Text($"depth = {depth:F1}");
+
+                    var centerDist = edgeVertex0() + vertexToCirc() * 0.5f;
+                    var centerDistLen = centerDist.Length();
+
+                    Graphics.Text
+                        .Position(centerDist)
+                        .Rotation(0)
+                        .Scale(0.75f)
+                        .Color(Color.White)
+                        .Anchor(TextAnchor.Center)
+                        .Text($"distance = {vertexToCirc().Length():F1}");
+
+                    //Graphics.DrawVertex(minCurrVertex());
+                    //Graphics.DrawVertex(centerDepth);
                 };
 
                 yield return new CollisionStepResult
@@ -326,7 +349,9 @@ public static class CollisionDetectionSteppable
                     Step = $"Start of contact",
                     Draw = () =>
                     {
-                        Graphics.DrawVertex(contact.Start, Color.GreenYellow);
+                        drawDistance();
+                        drawDepth();
+                        Graphics.DrawVertex(contactStart(), Color.GreenYellow);
                     }
                 };
 
@@ -335,11 +360,32 @@ public static class CollisionDetectionSteppable
                     Step = $"End of contact",
                     Draw = () =>
                     {
-                        Graphics.DrawVertex(contact.Start, Color.GreenYellow);
-                        Graphics.DrawVertex(contact.End, Color.MonoGameOrange);
+                        drawDistance();
+                        drawDepth();
+                        Graphics.DrawVertex(contactStart(), Color.GreenYellow);
+                        Graphics.DrawVertex(contactEnd(), Color.MonoGameOrange);
                     }
                 };
 
+                yield return new CollisionStepResult
+                {
+                    Step = $"Check results",
+                    Draw = () =>
+                    {
+                        Graphics.DrawVertex(contactStart(), Color.GreenYellow);
+                        Graphics.DrawVertex(contactEnd(), Color.MonoGameOrange);
+                    }
+                };
+
+                yield return new CollisionStepResult
+                {
+                    Step = $"Check ended",
+                    Contact = contact,
+                    CollisionDetected = true,
+                    ProcessEnded = true,
+                };
+
+                yield break;
 
             } // Region A check
 
@@ -352,12 +398,6 @@ public static class CollisionDetectionSteppable
                 minCurrVertex,
                 out vertexToCirc,
                 out vertexToCircProj);
-
-            //v1 = () => cirPos() - minNextVertex();
-            //v2 = () => minCurrVertex() - minNextVertex();
-
-            //v2Norm = () => Vector2.Normalize(v2());
-            //v1Proj = () => Vector2.Dot(v1(), v2Norm());
 
             yield return new CollisionStepResult
             {
@@ -385,6 +425,7 @@ public static class CollisionDetectionSteppable
                 Step = $"Circle center is not in region B, so it must be in region C"
             };
 
+            
             //
         }
         else

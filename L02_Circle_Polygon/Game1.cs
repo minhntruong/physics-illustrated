@@ -13,8 +13,6 @@ namespace L02_Circle_Polygon;
 
 public class Game1 : Game
 {
-    //public enum Mode { RunAllSteps, EndOnEdgeFoundWithDraw, EndOnEdgeOnly }
-
     public Game1()
     {
         // Creation of GraphicsDeviceManager must be done in the constructor
@@ -24,7 +22,6 @@ public class Game1 : Game
         IsMouseVisible = true;
     }
 
-    //private CirclePolyIllustrator.Mode _mode; // = Mode.RunAllSteps;
     private Body _box;
     private Body _movable;
     private CirclePolyIllustrator _illustrator;
@@ -34,13 +31,17 @@ public class Game1 : Game
     private Vector2 _panStartMouse;
     private Vector2 _panStartOrigin;
 
+    private bool _isDragging;
+    private Vector2 _dragStartMouse;
+    private Vector2 _dragStartOrigin;
+
     private string _menuText = 
         "Mouse press to move\r\n" + 
         "Mouse wheel to rotate\r\n" + 
         "'.' to toggle menu\r\n" +
         "'M' to cycle the modes\r\n" +
         "'S' to step through the process\r\n" + 
-        "'X' to end the process\r\n" + 
+        "'X' to reset the process\r\n" + 
         "'C' to clear text\r\n";
 
     private string _consoleText = "";
@@ -97,13 +98,27 @@ public class Game1 : Game
             _isPanning = false;
         }
 
-        var isMouseEngaged = !isCtrlDown && Input.MouseLeftButtonPressed();
-        if (isMouseEngaged)
+        //--- Dragging object logic start ---
+        if (!isCtrlDown && Input.MouseLeftButtonPressed())
         {
-            _movable.Position = (mousePos +  Graphics.Origin) / Graphics.Zoom;
+            if (!_isDragging)
+            {
+                _isDragging = true;
+                _dragStartMouse = mousePos;
+                _dragStartOrigin = _movable.Position;
+            }
+            else
+            {
+                var delta = mousePos - _dragStartMouse;
+                _movable.Position = _dragStartOrigin + delta / Graphics.Zoom;
+            }
+        }
+        else
+        {
+            _isDragging = false;
         }
 
-        IsMouseVisible = !isMouseEngaged;
+        IsMouseVisible = !_isDragging;
 
         var wheelDelta = Input.MouseScrollWheelDelta();
 
@@ -149,20 +164,21 @@ public class Game1 : Game
 
                     if (s.ProcessEnded)
                     {
-                        _illustrator.StepProcessEnd();
+                        _illustrator.ProcessReset();
                     }
                 }
-            }
-
-            if (Input.IsKeyClicked(Keys.X))
-            {
-                _illustrator.StepProcessEnd();
             }
         }
         else if (_illustrator.Mode == StopOnEdgeWithDraw ||
                  _illustrator.Mode == StopOnEdgeOnly)
         {
             _illustrator.EdgeProcess();
+        }
+
+        if (Input.IsKeyClicked(Keys.X))
+        {
+            _illustrator.Mode = RunAllSteps;
+            _illustrator.ProcessReset();
         }
 
         if (Input.IsKeyClicked(Keys.C))
