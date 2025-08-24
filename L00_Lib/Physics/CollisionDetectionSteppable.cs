@@ -49,11 +49,18 @@ public static class CollisionDetectionSteppable
             Step = "Finding closest facing edge",
         };
 
+        // Set outside for region C use
+        Func<Vector2> edge = null;
+        Func<Vector2> normal = null;
+        Action drawNormal = null;
+        Action drawVertexToCircleCenter = null;
+        Action drawProj = null;
+
         // Loop through all the edges of the polygon/box
         for (var i = 0; i < polygonShape.WorldVertices.Length; i++)
         {
             var iSaved = i;
-            var edge = () => polygonShape.WorldEdgeAt(iSaved);
+            edge = () => polygonShape.WorldEdgeAt(iSaved);
 
             var v0 = () => polygonShape.WorldVertices[iSaved];
 
@@ -82,8 +89,8 @@ public static class CollisionDetectionSteppable
 
             //=== STEP NORMAL ==================================================
 
-            var normal = () => edge().RightUnitNormal();
-            var drawNormal = () =>
+            normal = () => edge().RightUnitNormal();
+            drawNormal = () =>
             {
                 Graphics.Mid.Color(Theme.ShapeLolite).Thickness(2).Default();
                 Graphics.Mid.P0(v0()).P1(v0() + normal() * 2000).DrawLine();
@@ -104,7 +111,7 @@ public static class CollisionDetectionSteppable
 
             var vertexToCircle = () => circle.Position - v0();
 
-            var drawVertexToCircleCenter = () =>
+            drawVertexToCircleCenter = () =>
             {
                 Graphics.Mid.P0(v0()).P1(circle.Position).Color(Theme.ShapeLolite).Thickness(2).DrawVector();
                 Graphics.DrawVertex(circle.Position);
@@ -125,7 +132,7 @@ public static class CollisionDetectionSteppable
 
             var projection = () => Vector2.Dot(vertexToCircle(), normal());
 
-            var drawProj = () =>
+            drawProj = () =>
             {
                 var p2 = v0() + normal() * projection();
 
@@ -235,6 +242,13 @@ public static class CollisionDetectionSteppable
                 }
             };
 
+            var drawDistance = () =>
+            {
+                Graphics.Mid.P0(edgeVertex0()).P1(cirPos()).Color(Theme.ShapeStandout).Thickness(2).DrawLine();
+            };
+
+            #region Region A check =============================================
+
             if (vertexToCircProj() < 0)
             {
                 //===  REGION A CONFIRMED ======================================
@@ -242,11 +256,6 @@ public static class CollisionDetectionSteppable
                 yield return new CollisionStepResult
                 {
                     Step = $"Circle center is in region A"
-                };
-
-                var drawDistance = () =>
-                {
-                    Graphics.Mid.P0(edgeVertex0()).P1(cirPos()).Color(Theme.ShapeStandout).Thickness(2).DrawLine();
                 };
 
                 yield return new CollisionStepResult
@@ -288,39 +297,44 @@ public static class CollisionDetectionSteppable
                     }
                 };
 
-                var contactNormal = () => Vector2.Normalize(vertexToCirc());
-                var contactStart = () => circle.Position + (contactNormal() * -circleShape.Radius);
-                var contactEnd = () => contactStart() + contactNormal() * (circleShape.Radius - vertexToCirc().Length());
+                var drawDepth = CreateDrawDepth(
+                    vertexToCirc,
+                    circle,
+                    circleShape,
+                    edgeVertex0,
+                    out var contactStart,
+                    out var contactEnd);
 
-                var drawDepth = () =>
-                {
-                    var depth = circleShape.Radius - vertexToCirc().Length();
-                    Graphics.Mid.P0(edgeVertex0()).P1(contactStart()).Color(Theme.ShapeLolite).DrawLine();
+                //var contactNormal = () => Vector2.Normalize(vertexToCirc());
+                //var contactStart = () => circle.Position + (contactNormal() * -circleShape.Radius);
+                //var contactEnd = () => contactStart() + contactNormal() * (circleShape.Radius - vertexToCirc().Length());
 
-                    var centerDepth = edgeVertex0() - contactNormal() * depth * 0.5f;
+                //var drawDepth = () =>
+                //{
+                //    var depth = circleShape.Radius - vertexToCirc().Length();
+                //    Graphics.Mid.P0(edgeVertex0()).P1(contactStart()).Color(Theme.ShapeLolite).DrawLine();
 
-                    Graphics.Text
-                        .Position(centerDepth)
-                        .Rotation(0)
-                        .Scale(0.75f)
-                        .Color(Color.White)
-                        .Anchor(TextAnchor.Center)
-                        .Text($"depth = {depth:F1}");
+                //    var centerDepth = edgeVertex0() - contactNormal() * depth * 0.5f;
 
-                    var centerDist = edgeVertex0() + vertexToCirc() * 0.5f;
-                    var centerDistLen = centerDist.Length();
+                //    Graphics.Text
+                //        .Position(centerDepth)
+                //        .Rotation(0)
+                //        .Scale(0.75f)
+                //        .Color(Color.White)
+                //        .Anchor(TextAnchor.Center)
+                //        .Text($"depth = {depth:F1}");
 
-                    Graphics.Text
-                        .Position(centerDist)
-                        .Rotation(0)
-                        .Scale(0.75f)
-                        .Color(Color.White)
-                        .Anchor(TextAnchor.Center)
-                        .Text($"distance = {vertexToCirc().Length():F1}");
+                //    var centerDist = edgeVertex0() + vertexToCirc() * 0.5f;
+                //    var centerDistLen = centerDist.Length();
 
-                    //Graphics.DrawVertex(minCurrVertex());
-                    //Graphics.DrawVertex(centerDepth);
-                };
+                //    Graphics.Text
+                //        .Position(centerDist)
+                //        .Rotation(0)
+                //        .Scale(0.75f)
+                //        .Color(Color.White)
+                //        .Anchor(TextAnchor.Center)
+                //        .Text($"distance = {vertexToCirc().Length():F1}");
+                //};
 
                 yield return new CollisionStepResult
                 {
@@ -333,7 +347,6 @@ public static class CollisionDetectionSteppable
                     }
                 };
 
-                // TODO: Calculate Contact
                 contact = new Contact();
                 contacts.Add(contact);
 
@@ -388,14 +401,18 @@ public static class CollisionDetectionSteppable
                 yield break;
 
             } // Region A check
+            #endregion
 
             //=== DECISION # 2B ================================================
             // Check for region B
 
+            edgeVertex0 = minNextVertex;
+            edgeVertex1 = minCurrVertex;
+
             drawV1V2Proj = CreateDrawV1V2Proj(
                 cirPos,
-                minNextVertex,
-                minCurrVertex,
+                edgeVertex0,
+                edgeVertex1,
                 out vertexToCirc,
                 out vertexToCircProj);
 
@@ -408,6 +425,8 @@ public static class CollisionDetectionSteppable
                 }
             };
 
+            #region Region B Check
+
             if (vertexToCircProj() < 0)
             {
                 //===  REGION B CONFIRMED ======================================
@@ -416,7 +435,120 @@ public static class CollisionDetectionSteppable
                 {
                     Step = $"Circle center is in region B"
                 };
+
+                yield return new CollisionStepResult
+                {
+                    Step = $"Comparing distance from vertex to circle center",
+                    Draw = () =>
+                    {
+                        drawDistance();
+                    }
+                };
+
+                if (vertexToCirc().Length() > circleShape.Radius)
+                {
+                    //=== DISTANCE TOO FAR, NO COLLISION =======================
+
+                    yield return new CollisionStepResult
+                    {
+                        Step = $"Circle center is in region B, but distance to vertex is {vertexToCirc().Length():F2} > circle radius {circleShape.Radius:F2}",
+                        CollisionDetected = false,
+                        ProcessEnded = true,
+                        Draw = () =>
+                        {
+                            drawDistance();
+                        }
+                    };
+
+                    yield break;
+                }
+
+                //=== DISTANCE WITHIN RADIUS, COLLISION ========================
+
+                yield return new CollisionStepResult
+                {
+                    Step = $"Distance to vertex is less than circle radius",
+                    CollisionDetected = true,
+                    Draw = () =>
+                    {
+                        drawDistance();
+                    }
+                };
+
+                var drawDepth = CreateDrawDepth(
+                    vertexToCirc,
+                    circle,
+                    circleShape,
+                    edgeVertex0,
+                    out var contactStart,
+                    out var contactEnd);
+
+                yield return new CollisionStepResult
+                {
+                    Step = $"Depth is the remainder of the circle radius and distance",
+                    CollisionDetected = true,
+                    Draw = () =>
+                    {
+                        drawDistance();
+                        drawDepth();
+                    }
+                };
+
+                contact = new Contact();
+                contacts.Add(contact);
+
+                contact.A = polygon;
+                contact.B = circle;
+                contact.Depth = circleShape.Radius - vertexToCirc().Length();
+                contact.Normal = Vector2.Normalize(vertexToCirc());
+                contact.Start = circle.Position + (contact.Normal * -circleShape.Radius);
+                contact.End = contact.Start + contact.Normal * contact.Depth;
+
+                yield return new CollisionStepResult
+                {
+                    Step = $"Start of contact",
+                    Draw = () =>
+                    {
+                        drawDistance();
+                        drawDepth();
+                        Graphics.DrawVertex(contactStart(), Color.GreenYellow);
+                    }
+                };
+
+                yield return new CollisionStepResult
+                {
+                    Step = $"End of contact",
+                    Draw = () =>
+                    {
+                        drawDistance();
+                        drawDepth();
+                        Graphics.DrawVertex(contactStart(), Color.GreenYellow);
+                        Graphics.DrawVertex(contactEnd(), Color.MonoGameOrange);
+                    }
+                };
+
+                yield return new CollisionStepResult
+                {
+                    Step = $"Check results",
+                    Draw = () =>
+                    {
+                        Graphics.DrawVertex(contactStart(), Color.GreenYellow);
+                        Graphics.DrawVertex(contactEnd(), Color.MonoGameOrange);
+                    }
+                };
+
+                yield return new CollisionStepResult
+                {
+                    Step = $"Check ended",
+                    Contact = contact,
+                    CollisionDetected = true,
+                    ProcessEnded = true,
+                };
+
+                yield break;
             }
+
+            #endregion
 
             //=== REGION C CONFIGRMED ==========================================
 
@@ -425,7 +557,17 @@ public static class CollisionDetectionSteppable
                 Step = $"Circle center is not in region B, so it must be in region C"
             };
 
-            
+            yield return new CollisionStepResult
+            {
+                Step = $"Region C uses the method for finding the right edge",
+                Draw = () =>
+                {
+                    drawNormal();
+                    drawVertexToCircleCenter();
+                    drawProj();
+                }
+            };
+
             //
         }
         else
@@ -478,5 +620,51 @@ public static class CollisionDetectionSteppable
 
             Graphics.DrawVectorRel(vertexFrom(), edgeVertex0To1Norm() * vertexToCircProjCopy(), Theme.ShapeStandout);
         };
+    }
+
+    private static Action CreateDrawDepth(
+        Func<Vector2> vertexToCirc,
+        Body circle,
+        CircleShape circleShape,
+        Func<Vector2> edgeVertex0,
+        out Func<Vector2> contactStartCopy,
+        out Func<Vector2> contactEndCopy)
+    {
+        var contactNormal = () => Vector2.Normalize(vertexToCirc());
+        
+        var contactStart = () => circle.Position + (contactNormal() * -circleShape.Radius);
+        var contactEnd = () => contactStart() + contactNormal() * (circleShape.Radius - vertexToCirc().Length());
+
+        contactStartCopy = contactStart;
+        contactEndCopy = contactEnd;
+
+        var drawDepth = () =>
+        {
+            var depth = circleShape.Radius - vertexToCirc().Length();
+            Graphics.Mid.P0(edgeVertex0()).P1(contactStart()).Color(Theme.ShapeLolite).DrawLine();
+
+            var centerDepth = edgeVertex0() - contactNormal() * depth * 0.5f;
+
+            Graphics.Text
+                .Position(centerDepth)
+                .Rotation(0)
+                .Scale(0.75f)
+                .Color(Color.White)
+                .Anchor(TextAnchor.Center)
+                .Text($"depth = {depth:F1}");
+
+            var centerDist = edgeVertex0() + vertexToCirc() * 0.5f;
+            var centerDistLen = centerDist.Length();
+
+            Graphics.Text
+                .Position(centerDist)
+                .Rotation(0)
+                .Scale(0.75f)
+                .Color(Color.White)
+                .Anchor(TextAnchor.Center)
+                .Text($"distance = {vertexToCirc().Length():F1}");
+        };
+
+        return drawDepth;
     }
 }
