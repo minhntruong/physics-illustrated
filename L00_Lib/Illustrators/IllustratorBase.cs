@@ -79,7 +79,6 @@ public class IllustratorBase
             }
             else if (body.Shape is PolygonShape polygonShape)
             {
-                //Graphics.Mid.DrawPolygon(body.Position, polygonShape.WorldVertices, color);
                 Graphics.Mid
                     .P0(body.Position)
                     .Color(color)
@@ -96,13 +95,13 @@ public static class Theme
 {
     public static Color Bg { get; } = new Color(69, 102, 160);
 
-    public static Color BgSubtle { get; } = new Color(80, 118, 183);
+    public static Color BgAnnotations { get; } = new Color(80, 118, 183);
 
     public static Color Shape { get; } = Color.Cyan;
 
-    public static Color ShapeHilite { get; } = Color.HotPink;
+    public static Color EdgeSelected { get; } = Color.HotPink;
 
-    public static Color ShapeStandout { get; } = Color.Pink;
+    public static Color Projection { get; } = Color.Orange;
 
-    public static Color ShapeLolite { get; } = Color.CornflowerBlue;
+    public static Color Normals { get; } = Color.CornflowerBlue;
 }

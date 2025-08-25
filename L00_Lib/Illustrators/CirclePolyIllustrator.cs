@@ -56,7 +56,7 @@ public class CirclePolyIllustrator : IllustratorBase
         {
             if (_minEdgeFound)
             {
-                Graphics.Mid.P0(_minNextVertex()).P1(_minCurrVertex()).Color(Theme.ShapeHilite).Width(2).DrawLine();
+                Graphics.Mid.P0(_minNextVertex()).P1(_minCurrVertex()).Color(Theme.EdgeSelected).Width(2).DrawLine();
             }
 
             Graphics.DrawVertexHighlighted(_minCurrVertex());
@@ -203,7 +203,7 @@ public class CirclePolyIllustrator : IllustratorBase
             var edgeUnit = Vector2.Normalize(edge);
             var edgeNormal = edge.RightUnitNormal();
 
-            Graphics.Bot.Color(Theme.BgSubtle).Width(2).Default();
+            Graphics.Bot.Color(Theme.BgAnnotations).Width(2).Default();
 
             // A base
             Graphics.Bot
@@ -211,7 +211,7 @@ public class CirclePolyIllustrator : IllustratorBase
                 .P1((minCurr - minNext) * 1000)
                 .DrawLine();
 
-            Graphics.Text.Color(Theme.ShapeLolite).RotationOf(minCurr, minNext).Default();
+            Graphics.Text.Color(Theme.Normals).RotationOf(minCurr, minNext).Default();
 
             Graphics.Text
                 .Position(minCurr - edgeUnit * 100 + edgeNormal * 40)

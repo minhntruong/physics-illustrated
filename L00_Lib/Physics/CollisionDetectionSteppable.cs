@@ -73,7 +73,7 @@ public static class CollisionDetectionSteppable
                 Graphics.Top
                     .P0(v0())
                     .P1(p2)
-                    .Color(Theme.ShapeHilite)
+                    .Color(Theme.EdgeSelected)
                     .Thickness(2)
                     .DrawLine();
 
@@ -92,7 +92,7 @@ public static class CollisionDetectionSteppable
             normal = () => edge().RightUnitNormal();
             drawNormal = () =>
             {
-                Graphics.Mid.Color(Theme.ShapeLolite).Thickness(2).Default();
+                Graphics.Mid.Color(Theme.Normals).Thickness(2).Default();
                 Graphics.Mid.P0(v0()).P1(v0() + normal() * 2000).DrawLine();
                 Graphics.Mid.P0(v0()).P1(v0() + normal() * 50).DrawVector();
             };
@@ -113,7 +113,7 @@ public static class CollisionDetectionSteppable
 
             drawVertexToCircleCenter = () =>
             {
-                Graphics.Mid.P0(v0()).P1(circle.Position).Color(Theme.ShapeLolite).Thickness(2).DrawVector();
+                Graphics.Mid.P0(v0()).P1(circle.Position).Color(Theme.Normals).Thickness(2).DrawVector();
                 Graphics.DrawVertex(circle.Position);
             };
 
@@ -136,7 +136,7 @@ public static class CollisionDetectionSteppable
             {
                 var p2 = v0() + normal() * projection();
 
-                Graphics.Mid.P0(v0()).P1(p2).Color(Theme.ShapeStandout).Thickness(2).DrawVector();
+                Graphics.Mid.P0(v0()).P1(p2).Color(Theme.Projection).Thickness(2).DrawVector();
             };
 
             yield return new CollisionStepResult
@@ -244,7 +244,7 @@ public static class CollisionDetectionSteppable
 
             var drawDistance = () =>
             {
-                Graphics.Mid.P0(edgeVertex0()).P1(cirPos()).Color(Theme.ShapeStandout).Thickness(2).DrawLine();
+                Graphics.Mid.P0(edgeVertex0()).P1(cirPos()).Color(Theme.Projection).Thickness(2).DrawLine();
             };
 
             #region Region A check =============================================
@@ -304,37 +304,6 @@ public static class CollisionDetectionSteppable
                     edgeVertex0,
                     out var contactStart,
                     out var contactEnd);
-
-                //var contactNormal = () => Vector2.Normalize(vertexToCirc());
-                //var contactStart = () => circle.Position + (contactNormal() * -circleShape.Radius);
-                //var contactEnd = () => contactStart() + contactNormal() * (circleShape.Radius - vertexToCirc().Length());
-
-                //var drawDepth = () =>
-                //{
-                //    var depth = circleShape.Radius - vertexToCirc().Length();
-                //    Graphics.Mid.P0(edgeVertex0()).P1(contactStart()).Color(Theme.ShapeLolite).DrawLine();
-
-                //    var centerDepth = edgeVertex0() - contactNormal() * depth * 0.5f;
-
-                //    Graphics.Text
-                //        .Position(centerDepth)
-                //        .Rotation(0)
-                //        .Scale(0.75f)
-                //        .Color(Color.White)
-                //        .Anchor(TextAnchor.Center)
-                //        .Text($"depth = {depth:F1}");
-
-                //    var centerDist = edgeVertex0() + vertexToCirc() * 0.5f;
-                //    var centerDistLen = centerDist.Length();
-
-                //    Graphics.Text
-                //        .Position(centerDist)
-                //        .Rotation(0)
-                //        .Scale(0.75f)
-                //        .Color(Color.White)
-                //        .Anchor(TextAnchor.Center)
-                //        .Text($"distance = {vertexToCirc().Length():F1}");
-                //};
 
                 yield return new CollisionStepResult
                 {
@@ -568,7 +537,39 @@ public static class CollisionDetectionSteppable
                 }
             };
 
-            //
+            if (distanceCircleEdge > circleShape.Radius)
+            {
+                //=== DISTANCE TOO FAR, NO COLLISION ===========================
+                yield return new CollisionStepResult
+                {
+                    Step = $"Projection is greater than circle radius / Projection = {distanceCircleEdge:F1} > circle radius {circleShape.Radius:F0}",
+                    CollisionDetected = false,
+                    ProcessEnded = true
+                };
+                yield break;
+            }
+
+            //=== DISTANCE WITHIN RADIUS, COLLISION ============================
+            
+            var vertexToCircle = () => circle.Position - minCurrVertex();
+            var normalC = () => (minNextVertex() - minCurrVertex()).RightUnitNormal();
+            var projection = () => Vector2.Dot(vertexToCircle(), normalC());
+
+
+            var depthC = () => circleShape.Radius - projection();
+            var contactStartC = () => cirPos() - normalC() * circleShape.Radius;
+            var contactEndC = () => contactStartC() + normalC() * depthC();
+
+            yield return new CollisionStepResult
+            {
+                Step = $"Contact start",
+                Draw = () =>
+                {
+                    Graphics.Mid.P0(cirPos()).P1(contactEndC()).Color(Color.Aqua).DrawLine();
+                    Graphics.DrawVertex(contactStartC(), Color.GreenYellow);
+                    Graphics.DrawVertex(contactEndC(), Color.MonoGameOrange);
+                }
+            };
         }
         else
         {
@@ -611,14 +612,14 @@ public static class CollisionDetectionSteppable
             var vertexToCircCopyVal = vertexToCircCopy();
             var edgeVertex0To1Val = edgeVertex0To1();
 
-            Graphics.DrawVectorRel(vertexFrom(), vertexToCircCopyVal, Theme.ShapeLolite);
+            Graphics.DrawVectorRel(vertexFrom(), vertexToCircCopyVal, Theme.Normals);
 
-            Graphics.Mid.P0(vertexFrom()).P1(vertexTo()).Color(Theme.ShapeHilite).DrawLine();
+            Graphics.Mid.P0(vertexFrom()).P1(vertexTo()).Color(Theme.EdgeSelected).DrawLine();
 
             
-            Graphics.DrawVectorRel(vertexFrom(), edgeVertex0To1Norm() * 50, Theme.ShapeHilite);
+            Graphics.DrawVectorRel(vertexFrom(), edgeVertex0To1Norm() * 50, Theme.EdgeSelected);
 
-            Graphics.DrawVectorRel(vertexFrom(), edgeVertex0To1Norm() * vertexToCircProjCopy(), Theme.ShapeStandout);
+            Graphics.DrawVectorRel(vertexFrom(), edgeVertex0To1Norm() * vertexToCircProjCopy(), Theme.Projection);
         };
     }
 
@@ -641,7 +642,7 @@ public static class CollisionDetectionSteppable
         var drawDepth = () =>
         {
             var depth = circleShape.Radius - vertexToCirc().Length();
-            Graphics.Mid.P0(edgeVertex0()).P1(contactStart()).Color(Theme.ShapeLolite).DrawLine();
+            Graphics.Mid.P0(edgeVertex0()).P1(contactStart()).Color(Theme.Normals).DrawLine();
 
             var centerDepth = edgeVertex0() - contactNormal() * depth * 0.5f;
 
