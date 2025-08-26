@@ -104,4 +104,12 @@ public static class Theme
     public static Color Projection { get; } = Color.Orange;
 
     public static Color Normals { get; } = Color.CornflowerBlue;
+
+    public static Color ContactStart { get; } = Color.GreenYellow;
+
+    public static Color ContactEnd { get; } = Color.MonoGameOrange;
+
+    public static Color ContactDepth { get; } = Color.CornflowerBlue;
+
+    public static Color ContactDistance { get; } = Color.Orange;
 }

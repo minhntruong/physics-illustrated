@@ -244,7 +244,7 @@ public static class CollisionDetectionSteppable
 
             var drawDistance = () =>
             {
-                Graphics.Mid.P0(edgeVertex0()).P1(cirPos()).Color(Theme.Projection).Thickness(2).DrawLine();
+                Graphics.Mid.P0(edgeVertex0()).P1(cirPos()).Color(Theme.ContactDistance).Thickness(2).DrawLine();
             };
 
             #region Region A check =============================================
@@ -297,7 +297,7 @@ public static class CollisionDetectionSteppable
                     }
                 };
 
-                var drawDepth = CreateDrawDepth(
+                var drawDepth = CreateDrawDepthToVertex(
                     vertexToCirc,
                     circle,
                     circleShape,
@@ -444,7 +444,7 @@ public static class CollisionDetectionSteppable
                     }
                 };
 
-                var drawDepth = CreateDrawDepth(
+                var drawDepth = CreateDrawDepthToVertex(
                     vertexToCirc,
                     circle,
                     circleShape,
@@ -480,7 +480,7 @@ public static class CollisionDetectionSteppable
                     {
                         drawDistance();
                         drawDepth();
-                        Graphics.DrawVertex(contactStart(), Color.GreenYellow);
+                        Graphics.DrawVertex(contactStart(), Theme.ContactStart);
                     }
                 };
 
@@ -491,8 +491,8 @@ public static class CollisionDetectionSteppable
                     {
                         drawDistance();
                         drawDepth();
-                        Graphics.DrawVertex(contactStart(), Color.GreenYellow);
-                        Graphics.DrawVertex(contactEnd(), Color.MonoGameOrange);
+                        Graphics.DrawVertex(contactStart(), Theme.ContactStart);
+                        Graphics.DrawVertex(contactEnd(), Theme.ContactEnd);
                     }
                 };
 
@@ -501,8 +501,8 @@ public static class CollisionDetectionSteppable
                     Step = $"Check results",
                     Draw = () =>
                     {
-                        Graphics.DrawVertex(contactStart(), Color.GreenYellow);
-                        Graphics.DrawVertex(contactEnd(), Color.MonoGameOrange);
+                        Graphics.DrawVertex(contactStart(), Theme.ContactStart);
+                        Graphics.DrawVertex(contactEnd(), Theme.ContactEnd);
                     }
                 };
 
@@ -565,9 +565,10 @@ public static class CollisionDetectionSteppable
                 Step = $"Contact start",
                 Draw = () =>
                 {
-                    Graphics.Mid.P0(cirPos()).P1(contactEndC()).Color(Color.Aqua).DrawLine();
-                    Graphics.DrawVertex(contactStartC(), Color.GreenYellow);
-                    Graphics.DrawVertex(contactEndC(), Color.MonoGameOrange);
+                    Graphics.Mid.P0(cirPos()).P1(contactEndC()).Color(Theme.ContactDistance).DrawLine();
+                    Graphics.Mid.P0(contactEndC()).P1(contactStartC()).Color(Theme.ContactDepth).DrawLine();
+                    Graphics.DrawVertex(contactStartC(), Theme.ContactStart);
+                    Graphics.DrawVertex(contactEndC(), Theme.ContactEnd);
                 }
             };
         }
@@ -623,7 +624,7 @@ public static class CollisionDetectionSteppable
         };
     }
 
-    private static Action CreateDrawDepth(
+    private static Action CreateDrawDepthToVertex(
         Func<Vector2> vertexToCirc,
         Body circle,
         CircleShape circleShape,
