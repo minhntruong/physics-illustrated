@@ -8,9 +8,15 @@ public abstract class ShapeBuilder<TBuilder> : BuilderBase<TBuilder> where TBuil
     {
     }
 
-    public new TBuilder Center(Vector2 value)
+    public TBuilder Center(Vector2 value)
     {
         _center = value;
+        return (TBuilder)this;
+    }
+
+    public TBuilder Center(float x, float y)
+    {
+        _center = new Vector2(x, y);
         return (TBuilder)this;
     }
 }

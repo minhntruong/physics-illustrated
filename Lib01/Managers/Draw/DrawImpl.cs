@@ -23,6 +23,8 @@ public class DrawImpl
         // Initialize main memory-side resources
         _vertices = new VertexPositionColor[capacity];
         _indices = new int[capacity * 3];
+
+        OnViewportChange();
     }
 
     private GraphicsDevice _graphics;

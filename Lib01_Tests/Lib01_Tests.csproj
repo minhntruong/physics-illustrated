@@ -27,10 +27,11 @@
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\L00_Lib\L00_Lib.csproj" />
+    <ProjectReference Include="..\Lib01\Lib01.csproj" />
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
     <Message Text="Restoring dotnet tools" Importance="High" />
     <Exec Command="dotnet tool restore" />
   </Target>
+  <Import Project="..\L00_Lib_Shared\L00_Lib_Shared.projitems" Label="Shared" />
 </Project>

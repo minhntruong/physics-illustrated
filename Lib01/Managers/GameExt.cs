@@ -26,4 +26,14 @@ public class GameExt
         _input = new InputMgr(_game, Width(), Height());
     }
 
+    public static int Width()
+    {
+        return _game.GraphicsDevice.Viewport.Width;
+    }
+
+    public static int Height()
+    {
+        return _game.GraphicsDevice.Viewport.Height;
+    }
+
 }

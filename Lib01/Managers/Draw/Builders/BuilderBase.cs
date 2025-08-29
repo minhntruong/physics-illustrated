@@ -14,12 +14,6 @@ public abstract class BuilderBase<TBuilder> where TBuilder : BuilderBase<TBuilde
     protected Vector2 _center = Vector2.Zero;
     protected DrawStates _states;
 
-    public TBuilder Center(Vector2 value)
-    {
-        _center = value;
-        return (TBuilder)this;
-    }
-
     public TBuilder Color(Color value)
     {
         _states.Color = value;

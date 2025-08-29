@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using PhysicsIllustrated.Library.Managers;
-using static PhysicsIllustrated.Library.Managers.GameExt;
+using ShowPhysics.Library.Managers;
+using static ShowPhysics.Library.Managers.GameExt;
 
 namespace Lib01_Tests
 {
@@ -19,6 +19,8 @@ namespace Lib01_Tests
         protected override void Initialize()
         {
             Configure(1600, 900);
+
+            Graphics.Initialize(this, "Lib_Shared_Arial_24");
 
             base.Initialize();
         }
@@ -43,7 +45,9 @@ namespace Lib01_Tests
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            Graphics.Mid.Rect().Center(500, 500).Width(300).Height(200).Color(Color.White).Thickness(4).Stroke();
+
+            Graphics.Draw();
 
             base.Draw(gameTime);
         }
