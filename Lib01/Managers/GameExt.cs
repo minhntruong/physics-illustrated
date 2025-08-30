@@ -1,5 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
+using Microsoft.Xna.Framework;
 
 namespace ShowPhysics.Library.Managers;
 
@@ -25,6 +25,8 @@ public class GameExt
 
         _input = new InputMgr(_game, Width(), Height());
     }
+
+    public static InputMgr Input => _input;
 
     public static int Width()
     {

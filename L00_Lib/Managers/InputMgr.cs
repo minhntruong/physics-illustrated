@@ -25,6 +25,8 @@ public class InputMgr
     private KeyboardState _prvKbState, _curKbState;
     private Vector2 _validMousePos = Vector2.Zero;
 
+    //==========================================================================
+
     public void Update()
     {
         _prvMouseState = _curMouseState;

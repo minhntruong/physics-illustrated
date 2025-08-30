@@ -24,8 +24,9 @@ public class DrawImpl
         _vertices = new VertexPositionColor[capacity];
         _indices = new int[capacity * 3];
 
-        OnViewportChange();
+        Camera.OnChanged += OnCameraChanged;
     }
+
 
     private GraphicsDevice _graphics;
     private BasicEffect _effect;
@@ -68,15 +69,10 @@ public class DrawImpl
 
     //==========================================================================
 
-    public void OnViewportChange()
+    private void OnCameraChanged(object sender, CameraChangedEventArgs e)
     {
-        _projection = Matrix.CreateOrthographicOffCenter(
-            0f,
-            _graphics.Viewport.Width,
-            _graphics.Viewport.Height,
-            0f,
-            0f,
-            1f);
+        _view = e.View;
+        _projection = e.Projection;
     }
 
     public void Draw()

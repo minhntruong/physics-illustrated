@@ -35,9 +35,6 @@ public static class Graphics
     private static TextImpl _ui;
     private static TextBuilder _uiBuilder;
 
-    private static float _zoom = 1.0f;
-    private static Vector2 _origin = Vector2.Zero;
-
     //==========================================================================
 
     public static DrawImpl Top => _top;
@@ -78,8 +75,5 @@ public static class Graphics
 
     public static void OnViewportChange()
     {
-        _bot.OnViewportChange();
-        _mid.OnViewportChange();
-        _top.OnViewportChange();
     }
 }
