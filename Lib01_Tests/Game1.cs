@@ -1,29 +1,41 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using ShowPhysics.Library;
 using ShowPhysics.Library.Managers;
+using System;
 using static ShowPhysics.Library.Managers.GameExt;
 
 namespace Lib01_Tests;
 
-public class Game1 : Game
+public class Game1 : Game, IGameExt
 {
     public Game1()
     {
-        GameExt.Initialize(this);
+        Construct(this);
 
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
     }
 
+    public event EventHandler<EventArgs> WindowClientSizeChanged;
+
+    public void RaiseWindowClientSizeChanged()
+    {
+        WindowClientSizeChanged?.Invoke(this, EventArgs.Empty);
+    }
+
     protected override void Initialize()
     {
-        Configure(1600, 900);
+        GameExt.Initialize(1600, 900, () =>
+        {
+            Graphics.Initialize(this, "Lib_Shared_Arial_24");
+            Camera.Initialize(this);
+            Input.Initialize(this);
 
-        Graphics.Initialize(this, "Lib_Shared_Arial_24");
-
-        // Do this last
-        Camera.SetViewport(1600, 900); // TODO: make dynamic on resize
+            //TEST
+            //Camera.Origin = new Vector2(10, 10);
+        });
 
         base.Initialize();
     }
@@ -38,9 +50,18 @@ public class Game1 : Game
     {
         Input.Update();
 
+        Input.CheckMousePanCamera();
+        Input.CheckMouseZoomCamera();
+
+        if (Input.IsKeyClicked(Keys.R))
+        {
+            Camera.Zoom = 1f;
+            Camera.Origin = Vector2.Zero;
+        }
+
         if (Input.IsKeyClicked(Keys.Z))
         {
-            Camera.Zoom += 0.1f;
+            Camera.SetZoomFocus(.1f, new Vector2(500, 600));
         }
 
         base.Update(gameTime);
@@ -51,9 +72,11 @@ public class Game1 : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         Graphics.Mid.Rect().Center(500, 500).Width(300).Height(200).Color(Color.White).Thickness(4).Stroke();
-
+        Graphics.Mid.Line().Start(490, 500).End(510, 500).Color(Color.Yellow).Thickness(4).Stroke();
+        Graphics.Mid.Line().Start(500, 490).End(500, 510).Color(Color.Yellow).Thickness(4).Stroke();
         Graphics.Draw();
 
         base.Draw(gameTime);
     }
+
 }

@@ -18,9 +18,21 @@ public class LineBuilder : BuilderBase<LineBuilder>
         return this;
     }
 
+    public LineBuilder Start(float x, float y)
+    {
+        _start = new Vector2(x, y);
+        return this;
+    }
+
     public LineBuilder End(Vector2 value)
     {
         _end = value;
+        return this;
+    }
+
+    public LineBuilder End(float x, float y)
+    {
+        _end = new Vector2(x, y);
         return this;
     }
 

@@ -1,7 +1,14 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
+using Microsoft.Xna.Framework;
 
 namespace ShowPhysics.Library;
+
+public interface IGameExt
+{
+    event EventHandler<EventArgs> WindowClientSizeChanged;
+
+    void RaiseWindowClientSizeChanged();
+}
 
 public class CameraChangedEventArgs : EventArgs
 {

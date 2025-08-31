@@ -19,8 +19,7 @@ public static class Graphics
 
         OnLoadContent();
 
-        game.Window.ClientSizeChanged += (sender, args) => OnViewportChange();
-
+        (game as IGameExt).WindowClientSizeChanged += (sender, args) => OnViewportChange();
     }
 
     private static Game _game;

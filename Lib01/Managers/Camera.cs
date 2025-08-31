@@ -5,10 +5,9 @@ namespace ShowPhysics.Library.Managers;
 
 public static class Camera
 {
-    static Camera()
+    public static void Initialize(Game game)
     {
-        CalculateViewMatrix();
-        CalculateProjectionMatrix();
+        (game as IGameExt).WindowClientSizeChanged += (sender, args) => OnViewportChange();
     }
 
     private static float _zoom = 1.0f;
@@ -34,6 +33,7 @@ public static class Camera
         }
     }
 
+    // Origin is the top-left corner of the viewport in world coordinates (pre-zoom)
     public static Vector2 Origin
     {
         get => _origin;
@@ -47,14 +47,36 @@ public static class Camera
         }
     }
 
+    public static void SetZoomFocus(float zoomInc, Vector2 focusScreenPos)
+    {
+        // The goal is to:
+        // 1) Change the zoom level
+        // 2) Adjust the origin so that the world position under the cursor stays fixed at the new zoom level
+
+        var worldPos = focusScreenPos / _zoom + Origin;
+
+        _zoom += zoomInc;
+
+        // Adjust Origin so the world position under the curs
+
+        // TODO: This is not stable if you pan before zooming. Fix it.
+
+        _origin = worldPos - (worldPos / _zoom);
+
+        CalculateAndRaiseEvent();
+    }
+
     public static EventHandler<CameraChangedEventArgs> OnChanged;
 
     private static void CalculateViewMatrix()
     {
+        //_viewMatrix =
+        //    //Matrix.CreateTranslation(-Origin.X, -Origin.Y, 0f) *
+        //    Matrix.CreateScale(Zoom, Zoom, 1f) *
+        //    Matrix.CreateTranslation(-Origin.X, -Origin.Y, 0f);
         _viewMatrix =
             Matrix.CreateTranslation(-Origin.X, -Origin.Y, 0f) *
-            Matrix.CreateScale(Zoom, Zoom, 1f) *
-            Matrix.CreateTranslation(Origin.X, Origin.Y, 0f);
+            Matrix.CreateScale(Zoom, Zoom, 1f);
     }
 
     private static void CalculateProjectionMatrix()
@@ -70,18 +92,16 @@ public static class Camera
 
     public static Matrix ProjectionMatrix => _projectionMatrix;
 
-    public static void SetViewport(int width, int height)
+    //==========================================================================
+    private static void OnViewportChange()
     {
-        _viewportWidth = width;
-        _viewportHeight = height;
-
         CalculateAndRaiseEvent();
     }
 
     private static void CalculateAndRaiseEvent()
     {
         CalculateViewMatrix();
-        CalculateViewMatrix();
+        CalculateProjectionMatrix();
 
         OnChanged?.Invoke(null, new CameraChangedEventArgs(_viewMatrix, _projectionMatrix));
     }
