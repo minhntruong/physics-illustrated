@@ -219,6 +219,11 @@ public class DrawImpl
         return new LineBuilder(this);
     }
 
+    public StatesBuilder States()
+    {
+        return new StatesBuilder(this);
+    }
+
     public Span<Vector2> GetCoordinatesStorage(int count)
     {
         if (count > _coordinatesStorage.Length)

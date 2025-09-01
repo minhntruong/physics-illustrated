@@ -23,6 +23,20 @@ public abstract class BuilderBase<TBuilder> where TBuilder : BuilderBase<TBuilde
     public TBuilder Thickness(float value)
     {
         _states.Thickness = value;
+        _states.ThicknessAbs = false;
+        return (TBuilder)this;
+    }
+
+    public TBuilder ThicknessAbs(bool value = true)
+    {
+        _states.ThicknessAbs = value;
+        return (TBuilder)this;
+    }
+
+    public TBuilder ThicknessAbs(float value)
+    {
+        _states.Thickness = value;
+        _states.ThicknessAbs = true;
         return (TBuilder)this;
     }
 

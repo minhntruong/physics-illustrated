@@ -73,9 +73,13 @@ public class Game1 : Game, IGameExt
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        Graphics.Mid.Rect().Center(500, 500).Width(300).Height(200).Color(Color.White).Thickness(4).Stroke();
-        Graphics.Mid.Line().Start(490, 500).End(510, 500).Color(Color.Yellow).Thickness(1).Stroke();
-        Graphics.Mid.Line().Start(500, 490).End(500, 510).Color(Color.Yellow).Thickness(1).Stroke();
+        Graphics.Mid.States().Color(Color.White).ThicknessAbs(4).Default();
+        Graphics.Mid.Rect().Center(500, 500).Width(300).Height(200).Stroke();
+
+        Graphics.Mid.States().Color(Color.Yellow).Thickness(1).Default();
+        Graphics.Mid.Line().Start(490, 500).End(510, 500).Stroke();
+        Graphics.Mid.Line().Start(500, 490).End(500, 510).Stroke();
+
         Graphics.Draw();
 
         base.Draw(gameTime);
