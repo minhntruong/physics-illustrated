@@ -22,6 +22,9 @@ public class ShowBase
 
     protected List<Contact> _contacts = new List<Contact>();
 
+    protected string _menuText =
+        "'.' = toggle menu";
+
     public int Width()
     {
         return GraphicsDevice.Viewport.Width;
@@ -114,6 +117,7 @@ public class ShowBase
             }
         }
 
+        Graphics.UI.Position(20, 20).Text(_menuText);
     }
 }
 

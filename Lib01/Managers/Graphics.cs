@@ -68,8 +68,8 @@ public static class Graphics
         var spriteBatch2 = new SpriteBatch(_game.GraphicsDevice);
 
         _ui = new TextImpl(spriteBatch2, font);
-        _uiBuilder = new TextBuilder(_ui, false);
-        _uiBuilder.Anchor(TextAnchor.TopLeft).Scale(0.5f).Default();
+        _uiBuilder = new TextBuilder(_ui);
+        _uiBuilder.Color(Color.White).Anchor(TextAnchor.TopLeft).Scale(0.5f).Default();
     }
 
     public static void OnViewportChange()
