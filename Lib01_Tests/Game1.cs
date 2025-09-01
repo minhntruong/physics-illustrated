@@ -25,6 +25,8 @@ public class Game1 : Game, IGameExt
         WindowClientSizeChanged?.Invoke(this, EventArgs.Empty);
     }
 
+    private Vector2 _initOrigin = Vector2.Zero; // new Vector2(-400, 0);
+
     protected override void Initialize()
     {
         GameExt.Initialize(1600, 900, () =>
@@ -34,7 +36,7 @@ public class Game1 : Game, IGameExt
             Input.Initialize(this);
 
             //TEST
-            //Camera.Origin = new Vector2(10, 10);
+            Camera.Origin = _initOrigin;
         });
 
         base.Initialize();
@@ -56,12 +58,12 @@ public class Game1 : Game, IGameExt
         if (Input.IsKeyClicked(Keys.R))
         {
             Camera.Zoom = 1f;
-            Camera.Origin = Vector2.Zero;
+            Camera.Origin = _initOrigin;
         }
 
         if (Input.IsKeyClicked(Keys.Z))
         {
-            Camera.SetZoomFocus(.1f, new Vector2(500, 600));
+            Camera.SetZoomFocus(0f, new Vector2(500, 500));
         }
 
         base.Update(gameTime);
@@ -72,8 +74,8 @@ public class Game1 : Game, IGameExt
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         Graphics.Mid.Rect().Center(500, 500).Width(300).Height(200).Color(Color.White).Thickness(4).Stroke();
-        Graphics.Mid.Line().Start(490, 500).End(510, 500).Color(Color.Yellow).Thickness(4).Stroke();
-        Graphics.Mid.Line().Start(500, 490).End(500, 510).Color(Color.Yellow).Thickness(4).Stroke();
+        Graphics.Mid.Line().Start(490, 500).End(510, 500).Color(Color.Yellow).Thickness(1).Stroke();
+        Graphics.Mid.Line().Start(500, 490).End(500, 510).Color(Color.Yellow).Thickness(1).Stroke();
         Graphics.Draw();
 
         base.Draw(gameTime);

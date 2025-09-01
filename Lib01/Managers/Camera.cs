@@ -50,18 +50,16 @@ public static class Camera
     public static void SetZoomFocus(float zoomInc, Vector2 focusScreenPos)
     {
         // The goal is to:
-        // 1) Change the zoom level
-        // 2) Adjust the origin so that the world position under the cursor stays fixed at the new zoom level
+        // 1) Identify the world position @ focusScreenPos
+        // 2) Change the zoom level
+        // 3) Adjust the origin so that at the new zoom level,
+        //    the world position @ focusScreenPos stays the same
 
-        var worldPos = focusScreenPos / _zoom + Origin;
+        var worldPosPre = focusScreenPos / _zoom + Origin;
 
         _zoom += zoomInc;
 
-        // Adjust Origin so the world position under the curs
-
-        // TODO: This is not stable if you pan before zooming. Fix it.
-
-        _origin = worldPos - (worldPos / _zoom);
+        _origin = worldPosPre - focusScreenPos / _zoom;
 
         CalculateAndRaiseEvent();
     }
