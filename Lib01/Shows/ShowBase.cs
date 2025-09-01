@@ -22,8 +22,9 @@ public class ShowBase
 
     protected List<Contact> _contacts = new List<Contact>();
 
+    protected bool _menuVisible = true;
     protected string _menuText =
-        "'.' = toggle menu";
+        ". = toggle menu";
 
     public int Width()
     {
@@ -46,6 +47,11 @@ public class ShowBase
         {
             Camera.Zoom = 1f;
             Camera.Origin = Vector2.Zero;
+        }
+
+        if (Input.IsKeyClicked(Keys.OemPeriod))
+        {
+            _menuVisible = !_menuVisible;
         }
     }
 
@@ -117,7 +123,10 @@ public class ShowBase
             }
         }
 
-        Graphics.UI.Position(20, 20).Text(_menuText);
+        if (_menuVisible)
+        {
+            Graphics.UI.Position(20, 20).Text(_menuText);
+        }
     }
 }
 
