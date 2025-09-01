@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib00", "Lib00", "{02EA681E
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Lib01_Shared", "Lib01_Shared\Lib01_Shared.shproj", "{D88469E6-E673-401D-854E-30093E4B8C90}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib01_Circles", "Lib01_Circles\Lib01_Circles.csproj", "{81EAFA98-C745-4ABB-BB46-B0B53A88FF01}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{8C2D506C-CCCC-4518-953F-FADA7FC8B6B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C2D506C-CCCC-4518-953F-FADA7FC8B6B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C2D506C-CCCC-4518-953F-FADA7FC8B6B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81EAFA98-C745-4ABB-BB46-B0B53A88FF01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81EAFA98-C745-4ABB-BB46-B0B53A88FF01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81EAFA98-C745-4ABB-BB46-B0B53A88FF01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81EAFA98-C745-4ABB-BB46-B0B53A88FF01}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -61,6 +67,7 @@ Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		L00_Lib_Shared\L00_Lib_Shared.projitems*{3d6587bf-9e76-46b5-90f8-7e2536af9b21}*SharedItemsImports = 5
 		L00_Lib_Shared\L00_Lib_Shared.projitems*{7f11fb3d-ac40-44d6-9a60-00298da5de67}*SharedItemsImports = 5
+		Lib01_Shared\Lib01_Shared.projitems*{81eafa98-c745-4abb-bb46-b0b53a88ff01}*SharedItemsImports = 5
 		Lib01_Shared\Lib01_Shared.projitems*{8c2d506c-cccc-4518-953f-fada7fc8b6b7}*SharedItemsImports = 5
 		L00_Lib_Shared\L00_Lib_Shared.projitems*{a0cdbd0e-3a41-42b7-9425-a838bc2c7383}*SharedItemsImports = 13
 		Lib01_Shared\Lib01_Shared.projitems*{d88469e6-e673-401d-854e-30093e4b8c90}*SharedItemsImports = 13

@@ -204,6 +204,11 @@ public class DrawImpl
 
     //==========================================================================
 
+    public PolygonBuilder Poly()
+    {
+        return new PolygonBuilder(this);
+    }
+
     public RectangleBuilder Rect()
     {
         return new RectangleBuilder(this);

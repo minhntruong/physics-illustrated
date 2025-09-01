@@ -24,6 +24,10 @@ public static class Input
     private static Vector2 _panStartMouse;
     private static Vector2 _panStartOrigin;
 
+    private static bool _isObjDragging = false;
+    private static Vector2 _objDraggingStart = Vector2.Zero;
+    private static Vector2 _objDraggingDelta = Vector2.Zero;
+
     private static MouseState _prvMouseState, _curMouseState;
     private static KeyboardState _prvKbState, _curKbState;
     private static Vector2 _validMousePos = Vector2.Zero;
@@ -75,6 +79,40 @@ public static class Input
                 _isPanning = false;
             }
         }
+    }
+
+    public static void CheckObjectDraggingStart(Vector2 objPos)
+    {
+        if (_isObjDragging) { return; }
+
+        bool isCtrlDown = IsKeyDown(Keys.LeftControl) || IsKeyDown(Keys.RightControl);
+
+        if (isCtrlDown) { return; }
+
+        if (IsMouseLeftButtonPressedInside() == false) { return; }
+
+        _isObjDragging = true;
+        _objDraggingStart = objPos;
+        _objDraggingDelta = MousePosition() - _objDraggingStart;
+
+        System.Diagnostics.Debug.WriteLine($"Drag start: {_objDraggingStart}, delta: {_objDraggingDelta}");
+    }
+
+    public static bool IsObjectDragging(out Vector2 objPos)
+    {
+        objPos = Vector2.Zero;
+
+        if (_isObjDragging == false) { return false; }
+
+        if (IsMouseLeftButtonPressed() == false)
+        {
+            _isObjDragging = false;
+            return false;
+        }
+
+        objPos = MousePosition() - _objDraggingDelta;
+
+        return true;
     }
 
     public static void CheckMouseZoomCamera()
