@@ -95,7 +95,7 @@ public static class Input
         _objDraggingStart = objPos;
         _objDraggingDelta = MousePosition() - _objDraggingStart;
 
-        System.Diagnostics.Debug.WriteLine($"Drag start: {_objDraggingStart}, delta: {_objDraggingDelta}");
+        _game.IsMouseVisible = false;
     }
 
     public static bool IsObjectDragging(out Vector2 objPos)
@@ -107,6 +107,8 @@ public static class Input
         if (IsMouseLeftButtonPressed() == false)
         {
             _isObjDragging = false;
+
+            _game.IsMouseVisible = true;
             return false;
         }
 
