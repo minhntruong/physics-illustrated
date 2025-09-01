@@ -1,9 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ShowPhysics.Library;
 using ShowPhysics.Library.Managers;
-using System;
 using static ShowPhysics.Library.Managers.GameExt;
 
 namespace Lib01_Tests;
@@ -25,17 +25,16 @@ public class Game1 : Game, IGameExt
         WindowClientSizeChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    private Vector2 _initOrigin = Vector2.Zero; // new Vector2(-400, 0);
+    private Vector2 _initOrigin = Vector2.Zero;
 
     protected override void Initialize()
     {
         GameExt.Initialize(1600, 900, () =>
         {
-            Graphics.Initialize(this, "Lib_Shared_Arial_24");
+            Graphics.Initialize(this, "Lib01_Shared_Arial_24");
             Camera.Initialize(this);
             Input.Initialize(this);
 
-            //TEST
             Camera.Origin = _initOrigin;
         });
 
@@ -79,6 +78,9 @@ public class Game1 : Game, IGameExt
         Graphics.Mid.States().Color(Color.Yellow).Thickness(1).Default();
         Graphics.Mid.Line().Start(490, 500).End(510, 500).Stroke();
         Graphics.Mid.Line().Start(500, 490).End(500, 510).Stroke();
+
+        Graphics.Mid.States().Color(Color.White).ThicknessAbs(4).Default();
+        Graphics.Mid.Circle().Center(600, 200).Radius(100).Stroke();
 
         Graphics.Draw();
 

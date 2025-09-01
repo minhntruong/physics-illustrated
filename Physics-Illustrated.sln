@@ -15,6 +15,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib01", "Lib01\Lib01.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib01_Tests", "Lib01_Tests\Lib01_Tests.csproj", "{8C2D506C-CCCC-4518-953F-FADA7FC8B6B7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib00", "Lib00", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Lib01_Shared", "Lib01_Shared\Lib01_Shared.shproj", "{D88469E6-E673-401D-854E-30093E4B8C90}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,13 +49,20 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7F11FB3D-AC40-44D6-9A60-00298DA5DE67} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{44ED8FAD-8878-4554-8600-A90577A6524E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{A0CDBD0E-3A41-42B7-9425-A838BC2C7383} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{3D6587BF-9E76-46B5-90F8-7E2536AF9B21} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {44D32E1B-2DFC-4932-B19B-A0F0EA199A2A}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		L00_Lib_Shared\L00_Lib_Shared.projitems*{3d6587bf-9e76-46b5-90f8-7e2536af9b21}*SharedItemsImports = 5
 		L00_Lib_Shared\L00_Lib_Shared.projitems*{7f11fb3d-ac40-44d6-9a60-00298da5de67}*SharedItemsImports = 5
-		L00_Lib_Shared\L00_Lib_Shared.projitems*{8c2d506c-cccc-4518-953f-fada7fc8b6b7}*SharedItemsImports = 5
+		Lib01_Shared\Lib01_Shared.projitems*{8c2d506c-cccc-4518-953f-fada7fc8b6b7}*SharedItemsImports = 5
 		L00_Lib_Shared\L00_Lib_Shared.projitems*{a0cdbd0e-3a41-42b7-9425-a838bc2c7383}*SharedItemsImports = 13
+		Lib01_Shared\Lib01_Shared.projitems*{d88469e6-e673-401d-854e-30093e4b8c90}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

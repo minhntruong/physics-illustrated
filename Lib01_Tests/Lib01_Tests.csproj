@@ -33,5 +33,5 @@
     <Message Text="Restoring dotnet tools" Importance="High" />
     <Exec Command="dotnet tool restore" />
   </Target>
-  <Import Project="..\L00_Lib_Shared\L00_Lib_Shared.projitems" Label="Shared" />
+  <Import Project="..\Lib01_Shared\Lib01_Shared.projitems" Label="Shared" />
 </Project>
