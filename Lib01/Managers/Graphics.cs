@@ -63,11 +63,11 @@ public static class Graphics
 
         _text = new TextImpl(spriteBatch1, font);
         _textBuilder = new TextBuilder(_text);
-        _textBuilder.Anchor(TextAnchor.Center).Default();
+        _textBuilder.Color(Color.White).Anchor(TextAnchor.Center).Scale(1).Default();
 
         var spriteBatch2 = new SpriteBatch(_game.GraphicsDevice);
 
-        _ui = new TextImpl(spriteBatch2, font);
+        _ui = new TextImpl(spriteBatch2, font, false);
         _uiBuilder = new TextBuilder(_ui);
         _uiBuilder.Color(Color.White).Anchor(TextAnchor.TopLeft).Scale(0.5f).Default();
     }

@@ -82,6 +82,8 @@ public class Game1 : Game, IGameExt
         Graphics.Mid.States().Color(Color.White).ThicknessAbs(4).Default();
         Graphics.Mid.Circle().Center(600, 200).Radius(100).Stroke();
 
+        Graphics.Text.Position(500, 500).Scale(1.01f).Text("Hello World!");
+
         Graphics.Draw();
 
         base.Draw(gameTime);

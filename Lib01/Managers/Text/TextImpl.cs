@@ -6,10 +6,26 @@ namespace ShowPhysics.Library.Managers.Text;
 
 public partial class TextImpl
 {
-    public TextImpl(SpriteBatch spriteBatch, SpriteFont font)
+    public TextImpl(SpriteBatch spriteBatch, SpriteFont font, bool useCamera = true)
     {
         _spriteBatch = spriteBatch;
         _font = font;
+        _useCamera = useCamera;
+        
+        if (_useCamera)
+        {
+            Camera.OnChanged += OnCameraChanged;
+        }
+    }
+
+    private bool _useCamera;
+    private Matrix _view = Matrix.Identity;
+    private Matrix _projection;
+
+    private void OnCameraChanged(object sender, CameraChangedEventArgs e)
+    {
+        _view = e.View;
+        _projection = e.Projection;
     }
 
     private bool _begun = false;
@@ -35,7 +51,7 @@ public partial class TextImpl
     {
         if (!_begun)
         {
-            _spriteBatch.Begin();
+            _spriteBatch.Begin(transformMatrix: _view);
             _begun = true;
         }
 
@@ -48,25 +64,21 @@ public partial class TextImpl
             textBounds = _font.MeasureString(textStr);
         }
 
-        if (scale == 1.0f && rotation == 0.0f)
+        if (_useCamera)
         {
-            _spriteBatch.DrawString(_font, textStr, position, color);
-            return;
+            // This is so that the text size remains constant regardless of camera zoom level
+            scale /= Camera.Zoom;
         }
-        else
-        {
-            _spriteBatch.DrawString(
-                _font,
-                textStr,
-                position,
-                color,
-                rotation,
-                textBounds * 0.5f,
-                scale,
-                SpriteEffects.None,
-                0f);
-        }
+
+        _spriteBatch.DrawString(
+            _font,
+            textStr,
+            position,
+            color,
+            rotation,
+            textBounds * 0.5f,
+            scale,
+            SpriteEffects.None,
+            0f);
     }
-
-
 }
