@@ -20,12 +20,10 @@ public partial class TextImpl
 
     private bool _useCamera;
     private Matrix _view = Matrix.Identity;
-    private Matrix _projection;
 
     private void OnCameraChanged(object sender, CameraChangedEventArgs e)
     {
         _view = e.View;
-        _projection = e.Projection;
     }
 
     private bool _begun = false;

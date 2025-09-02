@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ShowPhysics.Library.Managers;
+using ShowPhysics.Library.Managers.Text;
 using ShowPhysics.Library.Physics;
 using ShowPhysics.Library.Physics.Shapes;
 using System;
@@ -26,6 +27,16 @@ public class ShowCircles : ShowBase
         CheckMovableObject();
 
         base.Update(gameTime);
+    }
+
+    public override void Draw()
+    {
+        Graphics.Mid.Line().Start(_movable.Position).End(Bodies[0].Position).Color(Theme.ContactDistance).ThicknessAbs(4).Stroke();
+
+        Graphics.Text
+            .LengthBetween(_movable.Position, Bodies[0].Position);
+
+        base.Draw();
     }
 
     //==========================================================================

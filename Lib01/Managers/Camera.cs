@@ -68,10 +68,6 @@ public static class Camera
 
     private static void CalculateViewMatrix()
     {
-        //_viewMatrix =
-        //    //Matrix.CreateTranslation(-Origin.X, -Origin.Y, 0f) *
-        //    Matrix.CreateScale(Zoom, Zoom, 1f) *
-        //    Matrix.CreateTranslation(-Origin.X, -Origin.Y, 0f);
         _viewMatrix =
             Matrix.CreateTranslation(-Origin.X, -Origin.Y, 0f) *
             Matrix.CreateScale(Zoom, Zoom, 1f);

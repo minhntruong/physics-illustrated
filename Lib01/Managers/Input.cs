@@ -25,8 +25,8 @@ public static class Input
     private static Vector2 _panStartOrigin;
 
     private static bool _isObjDragging = false;
-    private static Vector2 _objDraggingStart = Vector2.Zero;
-    private static Vector2 _objDraggingDelta = Vector2.Zero;
+    private static Vector2 _objDraggingStartWorld = Vector2.Zero;
+    private static Vector2 _objDraggingDeltaWorld = Vector2.Zero;
 
     private static MouseState _prvMouseState, _curMouseState;
     private static KeyboardState _prvKbState, _curKbState;
@@ -81,7 +81,7 @@ public static class Input
         }
     }
 
-    public static void CheckObjectDraggingStart(Vector2 objPos)
+    public static void CheckObjectDraggingStart(Vector2 objPosWorld)
     {
         if (_isObjDragging) { return; }
 
@@ -91,16 +91,19 @@ public static class Input
 
         if (IsMouseLeftButtonPressedInside() == false) { return; }
 
+        var mousePos = MousePosition();
+        var mousePosWorld = (mousePos + Camera.Origin) / Camera.Zoom  ;
+
         _isObjDragging = true;
-        _objDraggingStart = objPos;
-        _objDraggingDelta = MousePosition() - _objDraggingStart;
+        _objDraggingStartWorld = objPosWorld;
+        _objDraggingDeltaWorld = mousePosWorld - _objDraggingStartWorld;
 
         _game.IsMouseVisible = false;
     }
 
-    public static bool IsObjectDragging(out Vector2 objPos)
+    public static bool IsObjectDragging(out Vector2 objPosWorld)
     {
-        objPos = Vector2.Zero;
+        objPosWorld = Vector2.Zero;
 
         if (_isObjDragging == false) { return false; }
 
@@ -112,7 +115,10 @@ public static class Input
             return false;
         }
 
-        objPos = MousePosition() - _objDraggingDelta;
+        var mousePos = MousePosition();
+        var mousePosWorld = (mousePos + Camera.Origin) / Camera.Zoom;
+
+        objPosWorld = (mousePosWorld - _objDraggingDeltaWorld);
 
         return true;
     }
