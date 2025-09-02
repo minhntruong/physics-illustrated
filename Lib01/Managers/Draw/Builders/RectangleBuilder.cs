@@ -24,13 +24,6 @@ public class RectangleBuilder : ShapeBuilder<RectangleBuilder>
         return this;
     }
 
-    private Span<Vector2> GetCoordinates()
-    {
-        var data = _drawImpl.GetCoordinatesStorage(4);
-        Coordinates.Rectangle(_center, _width, _height, data);
-        return data;
-    }
-
     public RectangleBuilder Stroke()
     {
         var coords = GetCoordinates();
@@ -41,7 +34,19 @@ public class RectangleBuilder : ShapeBuilder<RectangleBuilder>
 
     public RectangleBuilder Fill()
     {
-        _drawImpl.CreateFilledRectangle(_center, _width, _height, _states.Color);
+        var width = _width * (_sizeAbs ? 1 / Camera.Zoom : 1);
+        var height = _height * (_sizeAbs ? 1 / Camera.Zoom : 1);
+
+        _drawImpl.CreateFilledRectangle(_center, width, height, _states.Color);
         return this;
+    }
+
+    //==========================================================================
+    private Span<Vector2> GetCoordinates()
+    {
+        var scale = _sizeAbs ? 1/Camera.Zoom : 1;
+        var data = _drawImpl.GetCoordinatesStorage(4);
+        Coordinates.Rectangle(_center, _width, _height, data, scale);
+        return data;
     }
 }

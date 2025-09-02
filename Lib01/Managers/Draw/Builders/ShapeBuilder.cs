@@ -8,6 +8,8 @@ public abstract class ShapeBuilder<TBuilder> : BuilderBase<TBuilder> where TBuil
     {
     }
 
+    protected bool _sizeAbs = false;
+
     public TBuilder Center(Vector2 value)
     {
         _center = value;
@@ -17,6 +19,12 @@ public abstract class ShapeBuilder<TBuilder> : BuilderBase<TBuilder> where TBuil
     public TBuilder Center(float x, float y)
     {
         _center = new Vector2(x, y);
+        return (TBuilder)this;
+    }
+
+    public TBuilder SizeAbs(bool value = true)
+    {
+        _sizeAbs = value;
         return (TBuilder)this;
     }
 }
