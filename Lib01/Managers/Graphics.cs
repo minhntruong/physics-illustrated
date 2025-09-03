@@ -7,12 +7,13 @@ using static ShowPhysics.Library.Managers.Text.TextImpl;
 
 namespace ShowPhysics.Library.Managers;
 
-public static class Graphics
+public static partial class Graphics
 {
     public static void Initialize(Game game, string fontName)
     {
         _game = game;
         _fontName = fontName;
+
         _bot = new DrawImpl(game.GraphicsDevice, 3_000);
         _mid = new DrawImpl(game.GraphicsDevice, 10_000);
         _top = new DrawImpl(game.GraphicsDevice, 3_000);

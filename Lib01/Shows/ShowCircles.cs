@@ -5,6 +5,7 @@ using ShowPhysics.Library.Managers;
 using ShowPhysics.Library.Managers.Text;
 using ShowPhysics.Library.Physics;
 using ShowPhysics.Library.Physics.Shapes;
+using ShowPhysics.Library.Physics.Steppables;
 using System;
 
 namespace ShowPhysics.Library.Shows;
@@ -40,6 +41,12 @@ public class ShowCircles : ShowBase
     }
 
     //==========================================================================
+
+    public override void InitializeSteps()
+    {
+        _steps = CollisionDetectionSteppable.IsCollidingCircles(Bodies[0], _movable, _contacts).GetEnumerator();
+        base.InitializeSteps();
+    }
 
     private void CheckMovableObject()
     {

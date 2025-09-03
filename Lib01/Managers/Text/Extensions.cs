@@ -14,4 +14,9 @@ public static class Extensions
         
         return builder.Position(pos).Text(length.ToString("0.0"));
     }
+
+    public static TextBuilder LengthBetween(this TextBuilder builder, Func<Vector2> a, Func<Vector2> b)
+    {
+        return builder.LengthBetween(a(), b());
+    }
 }
