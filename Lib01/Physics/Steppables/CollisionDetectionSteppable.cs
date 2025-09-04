@@ -24,10 +24,12 @@ public static partial class CollisionDetectionSteppable
         var circleA = (CircleShape) a.Shape;
         var circleB = (CircleShape) b.Shape;
 
+        var drawDistance = () => { Graphics.Distance(a, b, circleA.Radius + circleB.Radius); };
+
         yield return new Step
         {
             Name = "Measure the distance between the 2 circle centers",
-            Draw = () => { Graphics.Distance(a, b, circleA.Radius + circleB.Radius);}
+            Draw = () => { drawDistance(); }
         };
 
         var ab = b.Position - a.Position;
@@ -40,7 +42,7 @@ public static partial class CollisionDetectionSteppable
             yield return new Step
             {
                 Name = "No collision, the distance is greater than the sum of the radii",
-                Draw = () => { Graphics.Distance(a, b, circleA.Radius + circleB.Radius); },
+                Draw = () => { drawDistance(); },
                 IsColliding = false
             };
 
@@ -52,6 +54,13 @@ public static partial class CollisionDetectionSteppable
 
             yield break;
         }
+
+        yield return new Step
+        {
+            Name = "Collision detected, the distance is less than the sum of the radii",
+            Draw = () => { drawDistance(); },
+            IsColliding = true
+        };
 
         var contact = new Contact();
 
@@ -67,11 +76,5 @@ public static partial class CollisionDetectionSteppable
 
         contacts.Add(contact);
 
-        yield return new Step
-        {
-            Name = "Collision detected, the distance is less than the sum of the radii",
-            IsColliding = true,
-            IsCompleted = true,
-        };
     }
 }

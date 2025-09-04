@@ -31,7 +31,7 @@ public class ShowBase
     protected string _menuText =
         ". = toggle menu | " +
         "R = reset camera | " +
-        "S = step";
+        "S or Right Mouse = step";
 
     protected string _consoleText = "";
 
@@ -83,6 +83,8 @@ public class ShowBase
 
             if (_currentStep != null)
             {
+                if (_currentStep.IsCompleted) { _started = false; }
+
                 OnStepAdvanced();
             }
         }

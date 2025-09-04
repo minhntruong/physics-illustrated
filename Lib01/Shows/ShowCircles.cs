@@ -19,12 +19,20 @@ public class ShowCircles : ShowBase
 
         Bodies.Add(circle);
         Bodies.Add(_movable);
+
+        _menuText += "| 'I' = toggle radii";
     }
 
     private Body _movable;
+    private bool _showRadii = true;
 
     public override void Update(GameTime gameTime)
     {
+        if (Input.IsKeyClicked(Keys.I))
+        {
+            _showRadii = !_showRadii;
+        }
+
         CheckMovableObject();
 
         base.Update(gameTime);
@@ -39,6 +47,12 @@ public class ShowCircles : ShowBase
 
     public override void Draw()
     {
+        if (_showRadii)
+        {
+            Graphics.Radius(Bodies[0]);
+            Graphics.Radius(_movable);
+        }
+
         _currentStep?.Draw?.Invoke();
 
         base.Draw();
