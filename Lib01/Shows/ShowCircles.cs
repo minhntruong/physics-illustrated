@@ -30,12 +30,16 @@ public class ShowCircles : ShowBase
         base.Update(gameTime);
     }
 
+    public override void OnStepAdvanced()
+    {
+        if (_currentStep == null) { return; }
+
+        Console(_currentStep.Name);
+    }
+
     public override void Draw()
     {
-        Graphics.Mid.Line().Start(_movable.Position).End(Bodies[0].Position).Color(Theme.ContactDistance).ThicknessAbs(4).Stroke();
-
-        Graphics.Text
-            .LengthBetween(_movable.Position, Bodies[0].Position);
+        _currentStep?.Draw?.Invoke();
 
         base.Draw();
     }

@@ -16,6 +16,8 @@ public partial class TextImpl
         {
             Camera.OnChanged += OnCameraChanged;
         }
+
+        _cursor = new Cursor(_font);
     }
 
     private bool _useCamera;
@@ -29,6 +31,7 @@ public partial class TextImpl
     private bool _begun = false;
     private SpriteBatch _spriteBatch;
     private SpriteFont _font;
+    private Cursor _cursor;
 
     //==========================================================================
 
@@ -55,11 +58,14 @@ public partial class TextImpl
 
         var textStr = text.ToString();
 
-        var textBounds = Vector2.Zero;
+        var origin = Vector2.Zero;
+
+        var textBounds = _font.MeasureString(textStr);
+        // TODO: use textBounds to advance cursor somehow
 
         if (anchor == TextAnchor.Center)
         {
-            textBounds = _font.MeasureString(textStr);
+            origin = textBounds * 0.5f;
         }
 
         if (_useCamera)
@@ -74,7 +80,7 @@ public partial class TextImpl
             position,
             color,
             rotation,
-            textBounds * 0.5f,
+            origin,
             scale,
             SpriteEffects.None,
             0f);

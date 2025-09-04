@@ -155,6 +155,14 @@ public static class Input
         return _curMouseState.LeftButton == ButtonState.Pressed;
     }
 
+    public static bool IsMouseRightButtonClickedInside()
+    {
+        if (!IsMouseInside()) { return false; }
+
+        return _prvMouseState.RightButton == ButtonState.Released &&
+               _curMouseState.RightButton == ButtonState.Pressed;
+    }
+
     //==========================================================================
 
     private static void OnWindowSizeChanged()

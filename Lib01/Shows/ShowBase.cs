@@ -29,7 +29,11 @@ public class ShowBase
 
     protected bool _menuVisible = true;
     protected string _menuText =
-        ". = toggle menu";
+        ". = toggle menu | " +
+        "R = reset camera | " +
+        "S = step";
+
+    protected string _consoleText = "";
 
     public int Width()
     {
@@ -58,6 +62,35 @@ public class ShowBase
         {
             _menuVisible = !_menuVisible;
         }
+
+        if (Input.IsKeyClicked(Keys.S) || Input.IsMouseRightButtonClickedInside())
+        {
+            if (_started == false)
+            {
+                _started = true;
+                InitializeSteps();
+            }
+
+            if (_steps.MoveNext())
+            {
+                _currentStep = _steps.Current;
+            }
+            else
+            {
+                _started = false;
+                _currentStep = null;
+            }
+
+            if (_currentStep != null)
+            {
+                OnStepAdvanced();
+            }
+        }
+    }
+
+    public virtual void OnStepAdvanced()
+    {
+
     }
 
     public virtual void Update(GameTime gameTime)
@@ -138,12 +171,19 @@ public class ShowBase
 
         if (_menuVisible)
         {
-            Graphics.UI.Position(20, 20).Text(_menuText);
+            Graphics.UI.Position(10, 10).Text(_menuText);
         }
+
+        Graphics.UI.Position(10, 40).Text(_consoleText);
     }
 
     public virtual void InitializeSteps()
     {
         _contacts.Clear();
+    }
+
+    protected void Console(string text)
+    {
+        _consoleText += text + "\r\n";
     }
 }

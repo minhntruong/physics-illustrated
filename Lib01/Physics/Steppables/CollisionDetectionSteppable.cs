@@ -26,11 +26,8 @@ public static partial class CollisionDetectionSteppable
 
         yield return new Step
         {
-            Name = "Take the distance between the 2 circle centers",
-            Draw = () =>
-            {
-                Graphics.Distance(a, b);
-            }
+            Name = "Measure the distance between the 2 circle centers",
+            Draw = () => { Graphics.Distance(a, b, circleA.Radius + circleB.Radius);}
         };
 
         var ab = b.Position - a.Position;
@@ -43,8 +40,14 @@ public static partial class CollisionDetectionSteppable
             yield return new Step
             {
                 Name = "No collision, the distance is greater than the sum of the radii",
-                IsColliding = false,
-                IsCompleted = true
+                Draw = () => { Graphics.Distance(a, b, circleA.Radius + circleB.Radius); },
+                IsColliding = false
+            };
+
+            yield return new Step
+            {
+                Name = "Check completed",
+                IsCompleted = true,
             };
 
             yield break;

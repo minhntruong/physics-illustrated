@@ -25,5 +25,9 @@ public static class Theme
 
     public static Color ContactDistance { get; } = Color.Orange;
 
-    public static float Label { get; } = 0.8f;
+    public static Color ContactDistanceThreshold { get; } = Color.Red;
+
+    public static Color Label { get; } = Color.White;
+
+    public static float LabelScale { get; } = 0.8f;
 }
