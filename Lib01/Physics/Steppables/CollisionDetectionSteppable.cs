@@ -24,7 +24,7 @@ public static partial class CollisionDetectionSteppable
         var circleA = (CircleShape) a.Shape;
         var circleB = (CircleShape) b.Shape;
 
-        var drawDistance = () => { Graphics.Distance(a, b, circleA.Radius + circleB.Radius); };
+        var drawDistance = (bool label = true) => { Graphics.DrawLabeledDistance(a, b, circleA.Radius + circleB.Radius, label); };
 
         yield return new Step
         {
@@ -32,10 +32,10 @@ public static partial class CollisionDetectionSteppable
             Draw = () => { drawDistance(); }
         };
 
-        var ab = b.Position - a.Position;
+        var ab = () => b.Position - a.Position;
         var radiusSum = circleA.Radius + circleB.Radius;
 
-        var isColliding = ab.LengthSquared() <= radiusSum * radiusSum;
+        var isColliding = ab().LengthSquared() <= radiusSum * radiusSum;
 
         if (!isColliding)
         {
@@ -62,6 +62,7 @@ public static partial class CollisionDetectionSteppable
             IsColliding = true
         };
 
+        /*
         var contact = new Contact();
 
         contact.A = a;
@@ -75,6 +76,25 @@ public static partial class CollisionDetectionSteppable
         contact.Depth = (contact.End - contact.Start).Length();
 
         contacts.Add(contact);
+        */
 
+        yield return new Step
+        {
+            Name = "Now we gather information about the collision that will be used to resolve it later",
+            Draw = () => { drawDistance(false); }
+        };
+
+        var contactNormal = () => Vector2.Normalize(ab());
+        var contactStart = () => b.Position - contactNormal() * circleB.Radius;
+
+        yield return new Step
+        {
+            Name = "Along the distance line, from the center, extending the entire radius, is 1 contact point",
+            Draw = () =>
+            {
+                drawDistance(false);
+                Graphics.DrawVertex(contactStart(), Color.Lime, true);
+            }
+        };
     }
 }

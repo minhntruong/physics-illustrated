@@ -162,13 +162,7 @@ public class ShowBase
                 //Graphics.DrawVertex(body.Position, color);
             }
 
-            Graphics.Mid.Rect()
-                .Center(body.Position)
-                .Width(6)
-                .Height(6)
-                .SizeAbs()
-                .Color(Color.White)
-                .Fill();
+            Graphics.DrawVertex(body.Position);
         }
 
         if (_menuVisible)

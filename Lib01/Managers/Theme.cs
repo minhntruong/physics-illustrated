@@ -25,7 +25,7 @@ public static class Theme
 
     public static Color ContactDistance { get; } = Color.Orange;
 
-    public static Color ContactDistanceThreshold { get; } = Color.Red;
+    public static Color ContactDistanceThreshold { get; } = Color.MonoGameOrange;
 
     public static Color Label { get; } = Color.White;
 

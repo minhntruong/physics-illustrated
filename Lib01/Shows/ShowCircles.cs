@@ -49,8 +49,8 @@ public class ShowCircles : ShowBase
     {
         if (_showRadii)
         {
-            Graphics.Radius(Bodies[0]);
-            Graphics.Radius(_movable);
+            Graphics.DrawRadius(Bodies[0]);
+            Graphics.DrawRadius(_movable);
         }
 
         _currentStep?.Draw?.Invoke();
