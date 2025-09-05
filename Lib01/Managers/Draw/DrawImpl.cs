@@ -224,6 +224,11 @@ public class DrawImpl
         return new LineBuilder(this);
     }
 
+    public VectorBuilder Vector()
+    {
+        return new VectorBuilder(this);
+    }
+
     public StatesBuilder States()
     {
         return new StatesBuilder(this);

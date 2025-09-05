@@ -105,6 +105,8 @@ public static partial class CollisionDetectionSteppable
             Draw = () =>
             {
                 drawDistance(false);
+
+                Graphics.Mid.Vector().Start(b.Position).End(point()).Color(Color.Lime).ThicknessAbs(4).Stroke();
                 Graphics.DrawVertex(point(), Color.Lime, true);
 
                 //Graphics.DrawVertex(contactStart(), Color.Lime, true);
