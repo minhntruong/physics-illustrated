@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ShowPhysics.Library.Managers;
+using ShowPhysics.Library.Managers.Animation;
 using ShowPhysics.Library.Physics;
 using ShowPhysics.Library.Physics.Shapes;
 using ShowPhysics.Library.Physics.Steppables;
@@ -90,10 +91,7 @@ public class ShowBase
         }
     }
 
-    public virtual void OnStepAdvanced()
-    {
-
-    }
+    public virtual void OnStepAdvanced() {}
 
     public virtual void Update(GameTime gameTime)
     {
@@ -123,6 +121,10 @@ public class ShowBase
                 }
             }
         }
+
+        //=== Service animators ================================================
+
+        Animations.Update(gameTime);
     }
 
     public virtual void PreDraw()

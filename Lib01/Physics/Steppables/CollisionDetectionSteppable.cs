@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using ShowPhysics.Library.Managers;
+using ShowPhysics.Library.Managers.Animation;
 using ShowPhysics.Library.Physics.Shapes;
 using System;
 using System.Collections.Generic;
@@ -86,6 +87,17 @@ public static partial class CollisionDetectionSteppable
 
         var contactNormal = () => Vector2.Normalize(ab());
         var contactStart = () => b.Position - contactNormal() * circleB.Radius;
+        var contactStartProgress = (float current) => b.Position - contactNormal() * current;
+
+
+        var point = () => contactStartProgress(0);
+        var anim1 = new FloatAnimator(0, circleB.Radius, 1f);
+        anim1.OnRunning = (float current) =>
+        {
+            point = () => contactStartProgress(current);
+        };
+
+        Animations.Add(anim1);
 
         yield return new Step
         {
@@ -93,7 +105,9 @@ public static partial class CollisionDetectionSteppable
             Draw = () =>
             {
                 drawDistance(false);
-                Graphics.DrawVertex(contactStart(), Color.Lime, true);
+                Graphics.DrawVertex(point(), Color.Lime, true);
+
+                //Graphics.DrawVertex(contactStart(), Color.Lime, true);
             }
         };
     }
