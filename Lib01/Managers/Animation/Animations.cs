@@ -14,6 +14,13 @@ public static class Animations
         _animators.Add(animator);
     }
 
+    public static FloatAnimator AddFloat(float start, float end, float duration)
+    {
+        var animator = new FloatAnimator(start, end, duration);
+        _animators.Add(animator);
+        return animator;
+    }
+
     public static void Update(GameTime gameTime)
     {
         float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;

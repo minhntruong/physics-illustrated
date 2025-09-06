@@ -85,19 +85,22 @@ public static partial class CollisionDetectionSteppable
             Draw = () => { drawDistance(false); }
         };
 
+        // Wish
+        var anim = Animations.AddFloat(0, circleB.Radius, 1);
+
         var contactNormal = () => Vector2.Normalize(ab());
         var contactStart = () => b.Position - contactNormal() * circleB.Radius;
         var contactStartProgress = (float current) => b.Position - contactNormal() * current;
 
 
-        var point = () => contactStartProgress(0);
-        var anim1 = new FloatAnimator(0, circleB.Radius, 1f);
-        anim1.OnRunning = (float current) =>
-        {
-            point = () => contactStartProgress(current);
-        };
+        //var point = () => contactStartProgress(0);
+        //var anim1 = new FloatAnimator(0, circleB.Radius, 1f);
+        //anim1.OnRunning = (float current) =>
+        //{
+        //    point = () => contactStartProgress(current);
+        //};
 
-        Animations.Add(anim1);
+        //Animations.Add(anim1);
 
         yield return new Step
         {
@@ -106,10 +109,24 @@ public static partial class CollisionDetectionSteppable
             {
                 drawDistance(false);
 
+                var point = () => contactStartProgress(anim.Current);
+
                 Graphics.Mid.Vector().Start(b.Position).End(point()).Color(Color.Lime).ThicknessAbs(4).Stroke();
-                Graphics.DrawVertex(point(), Color.Lime, true);
+                //Graphics.DrawVertex(point(), Color.Lime, true);
 
                 //Graphics.DrawVertex(contactStart(), Color.Lime, true);
+            }
+        };
+
+        yield return new Step
+        {
+            Name = "Mark this contact point",
+            Draw = () =>
+            {
+                drawDistance(false);
+
+                var point = () => contactStartProgress(anim.Current);
+                Graphics.DrawVertex(point(), Color.Lime, true);
             }
         };
     }
