@@ -1,12 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ShowPhysics.Library;
 using ShowPhysics.Library.Managers;
 using ShowPhysics.Library.Shows;
 using static ShowPhysics.Library.Managers.GameExt;
-
 
 namespace Lib01_Circles;
 
@@ -22,7 +21,8 @@ public class Game1 : Game, IGameExt
 
     //==========================================================================
 
-    private ShowCircles _show;
+    private List<ShowBase> _shows = new();
+    private ShowBase _show;
 
     //==========================================================================
 
@@ -44,7 +44,8 @@ public class Game1 : Game, IGameExt
             Input.Initialize(this);
         });
 
-        _show = new ShowCircles(GraphicsDevice);
+        Register(new ShowCircles(GraphicsDevice));
+        Register(new ShowCirclePolygon(GraphicsDevice));
 
         base.Initialize();
     }
@@ -56,6 +57,13 @@ public class Game1 : Game, IGameExt
 
     protected override void Update(GameTime gameTime)
     {
+        if (Input.IsKeyClicked(Keys.OemPlus) && (Input.IsKeyDown(Keys.LeftShift) || Input.IsKeyDown(Keys.RightShift)))
+        {
+            var i = _shows.FindIndex(s => s == _show);
+            i = (i + 1) % _shows.Count;
+            _show = _shows[i];
+        }
+
         _show.PreUpdate();
 
         _show.Update(gameTime);
@@ -72,5 +80,13 @@ public class Game1 : Game, IGameExt
         Graphics.Draw();
 
         base.Draw(gameTime);
+    }
+
+    //==========================================================================
+
+    private void Register(ShowBase show)
+    {
+        _shows.Add(show);
+        _show = show;
     }
 }

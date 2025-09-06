@@ -15,7 +15,32 @@ public class ShowBase
 {
     public ShowBase(GraphicsDevice graphicsDevice)
     {
-        GraphicsDevice = graphicsDevice;    
+        GraphicsDevice = graphicsDevice;
+    }
+
+    public string Name
+    {
+        get => _name;
+        set
+        {
+            _name = value;
+            UpdateTitle();
+        }
+    }
+
+    protected void UpdateTitle()
+    {
+        _title = $"{_name} | {_menu}";
+    }
+
+    public string Menu 
+    { 
+        get => _menu;
+        set
+        {
+            _menu = value;
+            UpdateTitle();
+        }
     }
 
     protected GraphicsDevice GraphicsDevice { get; private set; }
@@ -28,11 +53,14 @@ public class ShowBase
 
     protected List<Contact> _contacts = new List<Contact>();
 
+    private string _name = "ShowBase";
     protected bool _menuVisible = true;
-    protected string _menuText =
+    protected string _menu =
         ". = toggle menu | " +
         "R = reset camera | " +
         "S or Right Mouse = step";
+
+    protected string _title;
 
     protected string _consoleText = "";
 
@@ -169,7 +197,7 @@ public class ShowBase
 
         if (_menuVisible)
         {
-            Graphics.UI.Position(10, 10).Text(_menuText);
+            Graphics.UI.Position(10, 10).Text(_title);
         }
 
         Graphics.UI.Position(10, 40).Text(_consoleText);

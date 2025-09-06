@@ -14,6 +14,9 @@ public class FloatAnimator
 
     public Action<float> OnRunning { get; set; }
 
+    // Easing function delegate
+    public Func<float, float> Easing { get; set; } = EasingFunctions.EaseInOutQuad;
+
     public FloatAnimator(float start, float end, float duration)
     {
         Start = start;
@@ -28,6 +31,7 @@ public class FloatAnimator
         if (IsCompleted) return;
         Elapsed += deltaTime;
         float t = Math.Clamp(Elapsed / Duration, 0f, 1f);
+        t = Easing(t); // Apply easing
         Current = Lerp(Start, End, t);
 
         OnRunning?.Invoke(Current);
@@ -43,4 +47,14 @@ public class FloatAnimator
     {
         return a + (b - a) * t;
     }
+}
+
+// Common easing functions
+public static class EasingFunctions
+{
+    public static float Linear(float t) => t;
+    public static float EaseInQuad(float t) => t * t;
+    public static float EaseOutQuad(float t) => t * (2 - t);
+    public static float EaseInOutQuad(float t) =>
+        t < 0.5f ? 2 * t * t : -1 + (4 - 2 * t) * t;
 }
