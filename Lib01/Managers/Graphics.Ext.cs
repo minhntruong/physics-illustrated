@@ -57,21 +57,31 @@ public static partial class Graphics
     {
         if (highlight)
         {
-            Mid.Rect()
+            Top.Rect()
                 .Center(position)
-                .Width(12)
-                .Height(12)
+                .Width(16)
+                .Height(16)
+                .SizeAbs()
+                .Color(color)
+                .Fill();
+
+            Top.Rect()
+                .Center(position)
+                .Width(10)
+                .Height(10)
                 .SizeAbs()
                 .Color(Color.White)
                 .Fill();
         }
-
-        Mid.Rect()
-            .Center(position)
-            .Width(6 + (highlight ? 4 : 0))
-            .Height(6 + (highlight ? 4 : 0))
-            .SizeAbs()
-            .Color(color)
-            .Fill();
+        else
+        {
+            Top.Rect()
+                .Center(position)
+                .Width(6)
+                .Height(6)
+                .SizeAbs()
+                .Color(color)
+                .Fill();
+        }
     }
 }

@@ -43,6 +43,11 @@ public class ShowCircles : ShowBase
         if (_currentStep == null) { return; }
 
         Console(_currentStep.Name);
+
+        if (_currentStep.IsColliding.HasValue)
+        {
+            _showRadii = false;
+        }
     }
 
     public override void Draw()
