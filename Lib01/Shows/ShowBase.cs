@@ -179,17 +179,16 @@ public class ShowBase
                     .Color(color)
                     .Radius(circleShape.Radius)
                     .Stroke();
-
-                //Graphics.DrawVertex(body.Position, color);
             }
             else if (body.Shape is PolygonShape polygonShape)
             {
                 Graphics.Mid.Poly()
                     .Center(body.Position)
                     .Color(color)
-                    .Coordinates(polygonShape.WorldVertices);
+                    .Coordinates(polygonShape.WorldVertices)
+                    .Stroke();
 
-                //Graphics.DrawVertex(body.Position, color);
+                Graphics.DrawVertex(polygonShape.WorldVertices[0]);
             }
 
             Graphics.DrawVertex(body.Position);

@@ -1,22 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using ShowPhysics.Library.Managers;
 using ShowPhysics.Library.Managers.Animation;
 using ShowPhysics.Library.Physics.Shapes;
-using System;
 using System.Collections.Generic;
 
 namespace ShowPhysics.Library.Physics.Steppables;
-
-public class Step
-{
-    public string Name { get; set; }
-
-    public bool? IsColliding { get; set; }
-    
-    public bool IsCompleted { get; set; }
-
-    public Action Draw { get; set;  }
-}
 
 public static partial class CollisionDetectionSteppable
 {

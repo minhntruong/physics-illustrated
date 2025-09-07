@@ -162,6 +162,10 @@ public static class Input
         return _prvMouseState.RightButton == ButtonState.Released &&
                _curMouseState.RightButton == ButtonState.Pressed;
     }
+    public static int MouseScrollWheelDelta()
+    {
+        return _curMouseState.ScrollWheelValue - _prvMouseState.ScrollWheelValue;
+    }
 
     //==========================================================================
 
@@ -178,11 +182,6 @@ public static class Input
     }
 
     //=== Mouse ================================================================
-
-    private static int MouseScrollWheelDelta()
-    {
-        return _curMouseState.ScrollWheelValue - _prvMouseState.ScrollWheelValue;
-    }
 
     private static bool IsMouseInside()
     {
