@@ -119,8 +119,6 @@ public class ShowBase
         }
     }
 
-    public virtual void OnStepAdvanced() {}
-
     public virtual void Update(GameTime gameTime)
     {
         foreach (Body body in Bodies)
@@ -202,11 +200,14 @@ public class ShowBase
         Graphics.UI.Position(10, 40).Text(_consoleText);
     }
 
-    public virtual void InitializeSteps()
+    //==========================================================================
+
+    protected virtual void InitializeSteps()
     {
         _contacts.Clear();
     }
-
+    protected virtual void OnStepAdvanced() { }
+    
     protected void Console(string text)
     {
         _consoleText += text + "\r\n";

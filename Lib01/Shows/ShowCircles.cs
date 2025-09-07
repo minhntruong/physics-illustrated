@@ -27,6 +27,8 @@ public class ShowCircles : ShowBase
     private Body _movable;
     private bool _showRadii = true;
 
+    //==========================================================================
+
     public override void Update(GameTime gameTime)
     {
         if (Input.IsKeyClicked(Keys.I))
@@ -37,18 +39,6 @@ public class ShowCircles : ShowBase
         CheckMovableObject();
 
         base.Update(gameTime);
-    }
-
-    public override void OnStepAdvanced()
-    {
-        if (_currentStep == null) { return; }
-
-        Console(_currentStep.Name);
-
-        if (_currentStep.IsColliding.HasValue)
-        {
-            _showRadii = false;
-        }
     }
 
     public override void Draw()
@@ -66,11 +56,25 @@ public class ShowCircles : ShowBase
 
     //==========================================================================
 
-    public override void InitializeSteps()
+    protected override void InitializeSteps()
     {
         _steps = CollisionDetectionSteppable.IsCollidingCircles(Bodies[0], _movable, _contacts).GetEnumerator();
         base.InitializeSteps();
     }
+
+    protected override void OnStepAdvanced()
+    {
+        if (_currentStep == null) { return; }
+
+        Console(_currentStep.Name);
+
+        if (_currentStep.IsColliding.HasValue)
+        {
+            _showRadii = false;
+        }
+    }
+
+    //==========================================================================
 
     private void CheckMovableObject()
     {

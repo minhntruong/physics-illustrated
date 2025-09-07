@@ -15,7 +15,13 @@ public class VectorBuilder : LineBuilderBase<VectorBuilder>
         _drawImpl.CreateLine(_start, _end, _states.Color, _states.Thickness);
 
         // Arrowhead parameters
-        float arrowLength = 16f; // Length of the arrowhead lines
+        float arrowLength = 32f; // Length of the arrowhead lines
+
+        if (_states.ThicknessAbs)
+        {
+            arrowLength /= Camera.Zoom;
+        }
+
         float arrowAngle = MathF.PI / 7f; // Angle between the arrowhead lines and the main line
 
         // Direction from P0 to P1

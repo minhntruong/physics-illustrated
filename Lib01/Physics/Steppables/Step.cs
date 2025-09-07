@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ShowPhysics.Library.Physics.Steppables.Commands;
+using System;
 
 namespace ShowPhysics.Library.Physics.Steppables;
 
@@ -11,4 +12,6 @@ public class Step
     public bool IsCompleted { get; set; }
 
     public Action Draw { get; set; }
+
+    public DrawCommand[] Commands { get; set; }
 }

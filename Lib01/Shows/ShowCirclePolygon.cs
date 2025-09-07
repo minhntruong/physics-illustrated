@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using ShowPhysics.Library.Managers;
 using ShowPhysics.Library.Physics;
 using ShowPhysics.Library.Physics.Shapes;
+using ShowPhysics.Library.Physics.Steppables;
 using System;
 
 namespace ShowPhysics.Library.Shows;
@@ -25,11 +26,48 @@ public class ShowCirclePolygon : ShowBase
     private Body _box;
     private Body _movable;
 
+    //==========================================================================
+
     public override void Update(GameTime gameTime)
     {
         CheckMovableObject();
 
         base.Update(gameTime);
+    }
+    
+    public override void Draw()
+    {
+        base.Draw();
+
+        if (_currentStep == null) { return; }
+
+        // Handle step-specific drawing
+        var step = _currentStep as StepCirclePoly;
+        if (step.SelectedEdge.HasValue)
+        {
+            var edge = step.SelectedEdge.Value;
+            var shape = _box.Shape as PolygonShape;
+
+            var v1 = shape.WorldVertices[edge];
+            var v2 = shape.WorldVertexAfter(edge);
+
+            Graphics.Mid.Line().Start(v1).End(v2).Color(Theme.EdgeSelected).Thickness(2).Stroke();
+        }
+    }
+
+    //==========================================================================
+
+    protected override void InitializeSteps()
+    {
+        _steps = CollisionDetectionSteppable.IsCollidingPolygonCircle(_box, _movable, _contacts).GetEnumerator();
+        base.InitializeSteps();
+    }
+
+    protected override void OnStepAdvanced()
+    {
+        if (_currentStep == null) { return; }
+
+        Console(_currentStep.Name);
     }
 
     //==========================================================================
