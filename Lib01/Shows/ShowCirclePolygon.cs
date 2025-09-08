@@ -41,17 +41,13 @@ public class ShowCirclePolygon : ShowBase
 
         if (_currentStep == null) { return; }
 
-        // Handle step-specific drawing
-        var step = _currentStep as StepCirclePoly;
-        if (step.SelectedEdge.HasValue)
+        // Handle draw commands
+        if (_currentStep.Commands?.Count > 0)
         {
-            var edge = step.SelectedEdge.Value;
-            var shape = _box.Shape as PolygonShape;
-
-            var v1 = shape.WorldVertices[edge];
-            var v2 = shape.WorldVertexAfter(edge);
-
-            Graphics.Mid.Line().Start(v1).End(v2).Color(Theme.EdgeSelected).Thickness(2).Stroke();
+            foreach (var cmd in _currentStep.Commands)
+            {
+                cmd.Draw();
+            }
         }
     }
 

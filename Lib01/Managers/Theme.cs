@@ -9,6 +9,8 @@ public static class Theme
 
     public static Color BgAnnotations { get; } = new Color(80, 118, 183);
 
+    public static float ShapeLineThicknessAbs = 2;
+
     public static Color Shape { get; } = Color.Cyan;
 
     public static Color EdgeSelected { get; } = Color.HotPink;

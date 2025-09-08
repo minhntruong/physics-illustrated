@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using ShowPhysics.Library.Physics.Math;
 using ShowPhysics.Library.Physics.Shapes;
+using ShowPhysics.Library.Physics.Steppables.Commands;
 
 namespace ShowPhysics.Library.Physics.Steppables;
 
@@ -22,7 +23,7 @@ public static partial class CollisionDetectionSteppable
 
         var distanceCircleEdge = float.MinValue;
 
-        yield return new StepCirclePoly
+        yield return new Step
         {
             Name = "First we find the closest facing edge to the circle center"
         };
@@ -30,20 +31,33 @@ public static partial class CollisionDetectionSteppable
         // Loop through all the edges of the polygon/box
         for (var i = 0; i < polyShape.WorldVertices.Length; i++)
         {
-            yield return new StepCirclePoly
+            var step = new Step
             {
-                Name = $"Evaluationg edge {i}",
-                SelectedEdge = i,
+                Name = $"Evaluationg edge {i}"
             };
+            step.AddCommand(new DrawSelectedEdgeCommand(polyShape, i));
+            yield return step;
 
             var edge = polyShape.WorldEdgeAt(i);
             var normal = edge.RightUnitNormal();
 
+            step.Name = "Take the perpendicular (normal) to this edge";
+            step.AddCommand(new DrawNormalCommand(polyShape, i));
+            yield return step;
+
             // Compare the circle center with the poly vertex
             var circleCenter = circle.Position - polyShape.WorldVertices[i];
 
+            step.Name = "Take the vector from the vertex to the circle center";
+            step.AddCommand(new DrawVectorToBodyCommand(polyShape, i, circle));
+            yield return step;
+
             // Project the circle center onto the edge normal
             var projection = Vector2.Dot(circleCenter, normal);
+
+            step.Name = $"Project the circle center vector onto the normal";
+            step.AddCommand(new DrawProjectionOnNormalFromBody(polyShape, i, circle));
+            yield return step;
 
             if (projection > 0)
             {
@@ -85,7 +99,7 @@ public static partial class CollisionDetectionSteppable
                 if (v1.LengthSquared() > circleShape.Radius * circleShape.Radius)
                 {
                     // Distance from vertex to circle center is greater than radius, no collision
-                    yield return new StepCirclePoly
+                    yield return new Step
                     {
                         IsColliding = false,
                         IsCompleted = true,
@@ -103,7 +117,7 @@ public static partial class CollisionDetectionSteppable
                 contact.Start = circle.Position + (contact.Normal * -circleShape.Radius);
                 contact.End = contact.Start + contact.Normal * contact.Depth;
 
-                yield return new StepCirclePoly
+                yield return new Step
                 {
                     IsColliding = true,
                     IsCompleted = true,
@@ -119,7 +133,7 @@ public static partial class CollisionDetectionSteppable
                 if (v1.LengthSquared() > circleShape.Radius * circleShape.Radius)
                 {
                     // Distance from vertex to circle center is greater than radius, no collision
-                    yield return new StepCirclePoly
+                    yield return new Step
                     {
                         IsColliding = false,
                         IsCompleted = true,
@@ -137,7 +151,7 @@ public static partial class CollisionDetectionSteppable
                 contact.Start = circle.Position + (contact.Normal * -circleShape.Radius);
                 contact.End = contact.Start + contact.Normal * contact.Depth;
 
-                yield return new StepCirclePoly
+                yield return new Step
                 {
                     IsColliding = true,
                     IsCompleted = true,
@@ -149,7 +163,7 @@ public static partial class CollisionDetectionSteppable
             if (distanceCircleEdge > circleShape.Radius)
             {
                 // Distance from edge to circle center is greater than radius, no collision
-                yield return new StepCirclePoly
+                yield return new Step
                 {
                     IsColliding = false,
                     IsCompleted = true,
@@ -166,7 +180,7 @@ public static partial class CollisionDetectionSteppable
             contact.Start = circle.Position - (contact.Normal * circleShape.Radius);
             contact.End = contact.Start + contact.Normal * contact.Depth;
 
-            yield return new StepCirclePoly
+            yield return new Step
             {
                 IsColliding = true,
                 IsCompleted = true,
@@ -185,7 +199,7 @@ public static partial class CollisionDetectionSteppable
             contact.Start = circle.Position - (contact.Normal * circleShape.Radius);
             contact.End = contact.Start + contact.Normal * contact.Depth;
 
-            yield return new StepCirclePoly
+            yield return new Step
             {
                 IsColliding = true,
                 IsCompleted = true,

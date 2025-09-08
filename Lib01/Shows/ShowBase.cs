@@ -186,7 +186,7 @@ public class ShowBase
                     .Coordinates(polygonShape.WorldVertices)
                     .Stroke();
 
-                Graphics.DrawVertex(polygonShape.WorldVertices[0]);
+                Graphics.DrawVertex(polygonShape.WorldVertices[0], Theme.Shape);
             }
 
             Graphics.DrawVertex(body.Position);
