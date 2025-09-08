@@ -47,6 +47,11 @@ public partial class TextImpl
         }
     }
 
+    public StatesBuilder States()
+    {
+        return new StatesBuilder(this);
+    }
+
     //==========================================================================
     private void CreateText(object text, Vector2 position, Color color, TextAnchor anchor = TextAnchor.TopLeft, float scale = 1, float rotation = 0)
     {

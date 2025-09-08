@@ -17,6 +17,13 @@ public class Step
     public List<DrawCommand> Commands { get; set; }
 }
 
+public class StepCirclePoly : Step
+{
+    public int? FacingEdgeIndex { get; set; }
+
+    public bool? IsCircleOutside { get; set; }
+}
+
 public static class Extensions
 {
     public static Step AddCommand(this Step step, DrawCommand command)

@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
-using ShowPhysics.Library.Managers.Draw;
 
 namespace ShowPhysics.Library.Managers.Text;
 
@@ -40,5 +39,11 @@ public partial class TextImpl
 
             return this;
         }
+
+        ////=== Little hack
+        //public StatesBuilder States()
+        //{
+        //    return new StatesBuilder(_textImpl);
+        //}
     }
 }

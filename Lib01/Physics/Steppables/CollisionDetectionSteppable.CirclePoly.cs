@@ -71,6 +71,21 @@ public static partial class CollisionDetectionSteppable
                 minNextVertex = polyShape.WorldVertexAfter(i); // s[nextIndex];
 
                 isOutside = true;
+
+                step.Name = "A positive projection was found, the circle center is outside the polygon";
+                yield return step;
+
+                var stepCP = new StepCirclePoly
+                {
+                    Name = "Now we determine which region the circle center is in (A, B or C)"
+                };
+                yield return stepCP;
+
+                stepCP.Name = "These are the regions";
+                stepCP.FacingEdgeIndex = i;
+                stepCP.IsCircleOutside = isOutside;
+                yield return stepCP;
+
                 break;
             }
             else

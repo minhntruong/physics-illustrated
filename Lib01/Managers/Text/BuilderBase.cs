@@ -40,6 +40,18 @@ public partial class TextImpl
             return (TBuilder)this;
         }
 
+        public TBuilder RotationOf(Vector2 fromPt, Vector2 toPt)
+        {
+            // Calculate the angle of the 2 points
+
+            var vector = toPt - fromPt;
+
+            float angle = MathF.Atan2(vector.Y, vector.X);
+            _states.Rotation = angle;
+
+            return (TBuilder)this;
+        }
+
         public void Default()
         {
             _textImpl.DefaultStates = _states;
