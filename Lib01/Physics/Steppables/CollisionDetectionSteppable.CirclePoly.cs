@@ -60,7 +60,7 @@ public static partial class CollisionDetectionSteppable
             var projection = Vector2.Dot(circleCenter, normal);
 
             step.Name = $"Project the circle center vector onto the normal";
-            step.AddCommand(new DrawProjectionOnNormalFromBody(polyShape, i, circle));
+            step.AddCommand(new DrawProjectionOnNormalFromBodyCommand(polyShape, i, circle));
             yield return step;
 
             if (projection > 0)
@@ -83,6 +83,7 @@ public static partial class CollisionDetectionSteppable
                 {
                     Name = "Now we determine which region the circle center is in (A, B or C)"
                 };
+                stepCP.AddCommand(new DrawSelectedEdgeCommand(polyShape, i));
                 yield return stepCP;
 
                 stepCP.Name = "These are the regions";
@@ -131,9 +132,21 @@ public static partial class CollisionDetectionSteppable
 
         var stepRegion = new Step
         {
-            Name = "To check if the circle center is in region A, first take the vector from the vertex to cirle center"
+            Name = "Check to see if the circle center is in region A"
         };
+        stepRegion.AddCommand(new DrawSelectedEdgeCommand(polyShape, selectedEdge));
+        yield return stepRegion;
+
+        stepRegion.Name = "First take the vector v1 from the vertex to cirle center";
         stepRegion.AddCommand(new DrawVectorToBodyCommand(polyShape, selectedEdge, circle));
+        yield return stepRegion;
+
+        stepRegion.Name = "Then take the vector v2 along the edge";
+        stepRegion.AddCommand(new DrawVectorAlongEdgeCommand(polyShape, selectedEdge));
+        yield return stepRegion;
+
+        stepRegion.Name = "Then project v1 onto v2";
+        stepRegion.AddCommand(new DrawProjectionOnEdgeFromBodyCommand(polyShape, selectedEdge, circle));
         yield return stepRegion;
 
         var v1 = circle.Position - minCurrVertex;

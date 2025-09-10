@@ -16,20 +16,29 @@ public class DrawCommand
 
 public class DrawPolyCommand : DrawCommand
 {
+    public DrawPolyCommand(PolygonShape shape)
+    {
+        Shape = shape ?? throw new ArgumentNullException(nameof(shape));
+    }
+
     public PolygonShape Shape { get; set; }
 }
 
 public class DrawPolyIndexCommand : DrawPolyCommand
 {
+    public DrawPolyIndexCommand(PolygonShape shape, int index)
+        : base(shape)
+    {
+        VertexIndex = index;
+    }
+
     public int VertexIndex { get; set; }
 }
 
 public class DrawSelectedEdgeCommand : DrawPolyIndexCommand
 {
-    public DrawSelectedEdgeCommand(PolygonShape shape, int index)
+    public DrawSelectedEdgeCommand(PolygonShape shape, int index) : base(shape, index)
     {
-        Shape = shape;
-        VertexIndex = index;
     }
 
     public override void Draw()
@@ -51,10 +60,8 @@ public class DrawSelectedEdgeCommand : DrawPolyIndexCommand
 
 public class DrawNormalCommand : DrawPolyIndexCommand
 {
-    public DrawNormalCommand(PolygonShape shape, int index)
+    public DrawNormalCommand(PolygonShape shape, int index) : base(shape, index)
     {
-        Shape = shape;
-        VertexIndex = index;
     }
 
     public override void Draw()
@@ -71,9 +78,25 @@ public class DrawNormalCommand : DrawPolyIndexCommand
     }
 }
 
-public class DrawProjectionOnNormalFromBody : DrawNormalCommand
+public class DrawVectorAlongEdgeCommand : DrawPolyIndexCommand
 {
-    public DrawProjectionOnNormalFromBody(PolygonShape shape, int index, Body target)
+    public DrawVectorAlongEdgeCommand(PolygonShape shape, int index) : base(shape, index)
+    {
+    }
+
+    public override void Draw()
+    {
+        var v1 = Shape.WorldVertices[VertexIndex];
+        var edge = Shape.WorldEdgeAt(VertexIndex);
+        var unitEdge = Vector2.Normalize(edge);
+        Graphics.Mid.States().ThicknessAbs(Theme.ShapeLineThicknessAbs).Default();
+        Graphics.Mid.Vector().Start(v1).End(v1 + unitEdge * 50).Color(Theme.EdgeSelected).Stroke();
+    }
+}
+
+public class DrawProjectionOnNormalFromBodyCommand : DrawPolyIndexCommand
+{
+    public DrawProjectionOnNormalFromBodyCommand(PolygonShape shape, int index, Body target)
         : base(shape, index)
     {
         Target = target ?? throw new ArgumentNullException(nameof(target));
@@ -98,12 +121,38 @@ public class DrawProjectionOnNormalFromBody : DrawNormalCommand
     }
 }
 
+public class DrawProjectionOnEdgeFromBodyCommand : DrawPolyIndexCommand
+{
+    public DrawProjectionOnEdgeFromBodyCommand(PolygonShape shape, int index, Body target)
+        : base(shape, index)
+    {
+        Target = target ?? throw new ArgumentNullException(nameof(target));
+    }
+
+    public Body Target { get; set; }
+
+    public override void Draw()
+    {
+        var v1 = Shape.WorldVertices[VertexIndex];
+        var edge = Shape.WorldEdgeAt(VertexIndex);
+        edge.Normalize();
+        var toCircle = Target.Position - v1;
+        var projection = Vector2.Dot(toCircle, edge);
+        var v2 = v1 + edge * projection;
+
+        Graphics.Mid.States().ThicknessAbs(Theme.ShapeLineThicknessAbs).Default();
+
+        Graphics.Mid.Vector().Start(v1).End(v2).Color(Theme.Projection).Stroke();
+
+        Graphics.Text.Scale(0.75f).LengthBetween(v1, v2, false).Color(Theme.Label).Text(projection.ToString("0.0"));
+    }
+}
+
 public class DrawVectorToBodyCommand : DrawPolyIndexCommand
 {
     public DrawVectorToBodyCommand(PolygonShape shape, int index, Body target)
+        : base(shape, index)
     {
-        Shape = shape;
-        VertexIndex = index;
         Target = target ?? throw new ArgumentNullException(nameof(target));
     }
 
