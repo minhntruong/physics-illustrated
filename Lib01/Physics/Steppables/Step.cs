@@ -14,6 +14,8 @@ public class Step
 
     public Action Draw { get; set; }
 
+    public List<Action> Draws { get; set; }
+
     public List<DrawCommand> Commands { get; set; }
 }
 
@@ -31,6 +33,13 @@ public static class Extensions
         if (step.Commands == null) { step.Commands = new List<DrawCommand>(); }
 
         step.Commands.Add(command);
+        return step;
+    }
+
+    public static Step AddDraw(this Step step, Action draw)
+    {
+        if (step.Draws == null) { step.Draws = new List<Action>(); }
+        step.Draws.Add(draw);
         return step;
     }
 }

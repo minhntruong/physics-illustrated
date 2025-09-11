@@ -6,7 +6,7 @@ namespace ShowPhysics.Library.Managers.Text;
 
 public static class Extensions
 {
-    public static TextBuilder LengthBetween(this TextBuilder builder, Vector2 a, Vector2 b, bool showLength = true)
+    public static TextBuilder TextLengthOf(this TextBuilder builder, Vector2 a, Vector2 b, bool showLength = true)
     {
         var pos = (a + b) * 0.5f;
 
@@ -21,6 +21,6 @@ public static class Extensions
 
     public static TextBuilder LengthBetween(this TextBuilder builder, Func<Vector2> a, Func<Vector2> b)
     {
-        return builder.LengthBetween(a(), b());
+        return builder.TextLengthOf(a(), b());
     }
 }

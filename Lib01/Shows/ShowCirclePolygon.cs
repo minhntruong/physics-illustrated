@@ -54,6 +54,15 @@ public class ShowCirclePolygon : ShowBase
             }
         }
 
+        // Handle draws
+        if (_currentStep.Draws?.Count > 0)
+        {
+            foreach (var draw in _currentStep.Draws)
+            {
+                draw();
+            }
+        }
+
         // Handle show-side drawings
         CheckDrawRegions();
     }
