@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ShowPhysics.Library.Managers.Animation;
+using System;
 using System.Collections.Generic;
 
 namespace ShowPhysics.Library.Physics.Steppables;
@@ -36,6 +37,13 @@ public static class Extensions
     {
         if (step.Draws == null) { step.Draws = new List<Action>(); }
         step.Draws.Add(draw);
+        return step;
+    }
+
+    public static Step AddDrawAnimatedFloat(this Step step, float maxValue, float duration, Action<float> animFunc)
+    {
+        var anim = Animations.AddFloat(0, maxValue, duration);
+        anim.OnRunning = animFunc;
         return step;
     }
 }

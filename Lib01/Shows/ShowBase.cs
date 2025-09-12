@@ -205,10 +205,17 @@ public class ShowBase
 
     //==========================================================================
 
+    protected void DrawAnimations()
+    {
+        // TEMP: until refactoring a better way to allow animations to be on top
+        Animations.Draw();
+    }
+
     protected virtual void InitializeSteps()
     {
         _contacts.Clear();
     }
+
     protected virtual void OnStepAdvanced() { }
     
     protected void Console(string text)

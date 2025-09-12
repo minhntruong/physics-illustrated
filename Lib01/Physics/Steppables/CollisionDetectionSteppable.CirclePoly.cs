@@ -182,6 +182,11 @@ public static partial class CollisionDetectionSteppable
             step.Name = "Take the line from vertex to circle center";
             step.AddDraw(() => Graphics.DrawLineToBody(polyShape, selectedEdge, circle, Theme.Normals));
             step.AddDraw(() => Graphics.DrawVertex(polyShape.WorldVertices[0]));
+            step.AddDrawAnimatedFloat(circleShape.Radius, 1.0f, (float animValue) =>
+            {
+                Graphics.DrawVectorFromBody(circle, polyShape, selectedEdge, animValue, Color.Lime);
+            });
+
             yield return step;
 
             contact = new Contact();

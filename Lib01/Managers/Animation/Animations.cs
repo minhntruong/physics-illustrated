@@ -24,15 +24,30 @@ public static class Animations
     public static void Update(GameTime gameTime)
     {
         float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-        
+
         for (int i = _animators.Count - 1; i >= 0; i--)
         {
             var animator = _animators[i];
-            animator.Update(deltaTime);
-            if (animator.IsCompleted)
+
+            if (animator.IsCompleted == false)
             {
-                _animators.RemoveAt(i);
+                animator.Update(deltaTime);
             }
+            else
+            {
+                // Remove?
+                //_animators.RemoveAt(i);
+            }
+        }
+    }
+
+    public static void Draw()
+    {
+        for (int i = _animators.Count - 1; i >= 0; i--)
+        {
+            var animator = _animators[i];
+
+            animator.OnRunning?.Invoke(animator.Current);
         }
     }
 }

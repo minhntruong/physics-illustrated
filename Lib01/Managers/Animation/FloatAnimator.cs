@@ -28,13 +28,12 @@ public class FloatAnimator
 
     public void Update(float deltaTime)
     {
-        if (IsCompleted) return;
+        if (IsCompleted) { return; }
+
         Elapsed += deltaTime;
         float t = Math.Clamp(Elapsed / Duration, 0f, 1f);
         t = Easing(t); // Apply easing
         Current = Lerp(Start, End, t);
-
-        OnRunning?.Invoke(Current);
     }
 
     public void Reset()

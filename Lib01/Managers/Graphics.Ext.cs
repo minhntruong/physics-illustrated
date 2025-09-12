@@ -148,6 +148,20 @@ public static partial class Graphics
         Mid.Vector().Start(v1).End(v2).Color(Theme.Normals).Stroke();
     }
 
+    public static void DrawVectorFromBody(Body source, PolygonShape destShape, int destVertexIndex, float distance, Color color)
+    {
+        var v1 = source.Position;
+        var v2 = destShape.WorldVertices[destVertexIndex];
+        var direction = Vector2.Normalize(v2 - v1);
+
+        Mid.Vector()
+            .Start(v1)
+            .End(v1 + direction * distance)
+            .ThicknessAbs(Theme.ShapeLineThicknessAbs)
+            .Color(color)
+            .Stroke();
+    }
+
     public static void DrawProjectionOnNormalFromBody(PolygonShape shape, int vertexIndex, Body target)
     {
         var v1 = shape.WorldVertices[vertexIndex];
