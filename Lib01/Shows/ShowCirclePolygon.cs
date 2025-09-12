@@ -27,7 +27,6 @@ public class ShowCirclePolygon : ShowBase
     private Body _box;
     private Body _movable;
     private int? _facingEdgeIndex = null;
-    private bool? _isCircleOutside = null;
     private bool _showRegions = true;
 
     //==========================================================================
@@ -44,15 +43,6 @@ public class ShowCirclePolygon : ShowBase
         base.Draw();
 
         if (_currentStep == null) { return; }
-
-        // Handle draw commands
-        if (_currentStep.Commands?.Count > 0)
-        {
-            foreach (var cmd in _currentStep.Commands)
-            {
-                cmd.Draw();
-            }
-        }
 
         // Handle draws
         if (_currentStep.Draws?.Count > 0)
@@ -87,11 +77,12 @@ public class ShowCirclePolygon : ShowBase
             {
                 _facingEdgeIndex = stepCP.FacingEdgeIndex.Value;
             }
+        }
 
-            if (stepCP.IsCircleOutside.HasValue)
-            {
-                _isCircleOutside = stepCP.IsCircleOutside.Value;
-            }
+        if (_currentStep.IsCompleted)
+        {
+            // Stop drawing regions when the step is completed
+            _facingEdgeIndex = null;
         }
     }
 
@@ -129,10 +120,7 @@ public class ShowCirclePolygon : ShowBase
 
     private void CheckDrawRegions()
     {
-        if (!_showRegions || !_facingEdgeIndex.HasValue || !_isCircleOutside.HasValue)
-        {
-            return;
-        }
+        if (!_showRegions || !_facingEdgeIndex.HasValue || _facingEdgeIndex.Value < 0) { return; }
 
         // Draw the region between the two vertices
         var polyShape = (PolygonShape)_box.Shape;

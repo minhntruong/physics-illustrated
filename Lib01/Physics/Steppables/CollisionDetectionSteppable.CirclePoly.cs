@@ -29,15 +29,15 @@ public static partial class CollisionDetectionSteppable
 
         var selectedEdge = -1;
 
+        var step = new StepCirclePoly();
+
         // Loop through all the edges of the polygon/box
         for (var i = 0; i < polyShape.WorldVertices.Length; i++)
         {
             selectedEdge = i;
 
-            var step = new Step
-            {
-                Name = $"Evaluationg edge {i}"
-            };
+            step.Reset();
+            step.Name = $"Evaluationg edge {i}";
             step.AddDraw(() => Graphics.DrawSelectedEdge(polyShape, i));
             yield return step;
 
@@ -78,17 +78,14 @@ public static partial class CollisionDetectionSteppable
                 step.Name = "A positive projection was found, the circle center is outside the polygon";
                 yield return step;
 
-                var stepCP = new StepCirclePoly
-                {
-                    Name = "Now we determine which region the circle center is in (A, B or C)"
-                };
-                stepCP.AddDraw(() => Graphics.DrawSelectedEdge(polyShape, i));
-                yield return stepCP;
+                step.Reset();
+                step.Name = "Now we determine which region the circle center is in (A, B or C)";
+                step.AddDraw(() => Graphics.DrawSelectedEdge(polyShape, i));
+                yield return step;
 
-                stepCP.Name = "These are the regions";
-                stepCP.FacingEdgeIndex = i;
-                stepCP.IsCircleOutside = isOutside;
-                yield return stepCP;
+                step.Name = "These are the regions";
+                step.FacingEdgeIndex = i;
+                yield return step;
 
                 break;
             }
@@ -129,49 +126,63 @@ public static partial class CollisionDetectionSteppable
 
         //=== Check if we are in region A
 
-        var stepRegion = new Step
-        {
-            Name = "Check to see if the circle center is in region A"
-        };
-        stepRegion.AddDraw(() => Graphics.DrawSelectedEdge(polyShape, selectedEdge));
-        yield return stepRegion;
+        step.Reset();
+        step.Name = "Check to see if the circle center is in region A";
+        step.AddDraw(() => Graphics.DrawSelectedEdge(polyShape, selectedEdge));
+        yield return step;
 
-        stepRegion.Name = "First take the vector v1 from the vertex to cirle center";
-        stepRegion.AddDraw(() => Graphics.DrawVectorToBody(polyShape, selectedEdge, circle));
-        yield return stepRegion;
+        step.Name = "First take the vector v1 from the vertex to cirle center";
+        step.AddDraw(() => Graphics.DrawVectorToBody(polyShape, selectedEdge, circle));
+        yield return step;
 
-        stepRegion.Name = "Then take the vector v2 along the edge";
-        stepRegion.AddDraw(() => Graphics.DrawVectorAlongEdge(polyShape, selectedEdge));
-        yield return stepRegion;
+        step.Name = "Then take the vector v2 along the edge";
+        step.AddDraw(() => Graphics.DrawVectorAlongEdge(polyShape, selectedEdge));
+        yield return step;
 
-        stepRegion.Name = "Then project v1 onto v2";
-        stepRegion.AddDraw(() => Graphics.DrawProjectionOnEdgeFromBody(polyShape, selectedEdge, circle));
-        yield return stepRegion;
+        step.Name = "Then project v1 onto v2";
+        step.AddDraw(() => Graphics.DrawProjectionOnEdgeFromBody(polyShape, selectedEdge, circle));
+        yield return step;
 
         var v1 = circle.Position - minCurrVertex;
         var v2 = minNextVertex - minCurrVertex;
 
         if (Vector2.Dot(v1, v2) < 0)
         {
-            stepRegion.Name = "The projection is negative, so we are in region A";
-            yield return stepRegion;
+            step.Name = "The projection is negative, so we are in region A";
+            yield return step;
 
-            var stepDist = new Step
-            {
-                Name = "Now measure the distance from the circle center to the vertex"
-            };
-            stepDist.AddDraw(() => Graphics.DrawLabeledDistance(polyShape, selectedEdge, circle, circleShape.Radius));
-            yield return stepDist;
+            step.Reset();
+            step.Name = "Now measure the distance from the circle center to the vertex";
+            step.AddDraw(() => Graphics.DrawLabeledDistance(polyShape, selectedEdge, circle, circleShape.Radius));
+            yield return step;
 
             if (v1.LengthSquared() > circleShape.Radius * circleShape.Radius)
             {
                 // Distance from vertex to circle center is greater than radius, no collision
-                yield return new Step
-                {
-                    IsColliding = false,
-                    IsCompleted = true,
-                };
+                step.Name = $"Distance is greater than radius ({circleShape.Radius}), no collision";
+                yield return step;
+
+                step.Reset();
+                step.Name = "Check completed";
+                step.IsColliding = false;
+                step.IsCompleted = true;
+                yield return step;
+
+                yield break;
             }
+
+            step.Name = $"Distance is less than radius ({circleShape.Radius}), collision detected";
+            yield return step;
+
+            step.Reset();
+            step.Name = "Now, gather collision info for the response step";
+            step.FacingEdgeIndex = -1; // Signal stop showing regions
+            yield return step;
+
+            step.Name = "Take the line from vertex to circle center";
+            step.AddDraw(() => Graphics.DrawLineToBody(polyShape, selectedEdge, circle, Theme.Normals));
+            step.AddDraw(() => Graphics.DrawVertex(polyShape.WorldVertices[0]));
+            yield return step;
 
             contact = new Contact();
             contacts.Add(contact);

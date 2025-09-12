@@ -130,6 +130,15 @@ public static partial class Graphics
         Mid.Line().Start(v1).End(v1 + normal * 1500).Color(Theme.Normals).Stroke();
     }
 
+    public static void DrawLineToBody(PolygonShape shape, int vertexIndex, Body target, Color color)
+    {
+        var v1 = shape.WorldVertices[vertexIndex];
+        var v2 = target.Position;
+
+        Mid.States().ThicknessAbs(Theme.ShapeLineThicknessAbs).Default();
+        Mid.Line().Start(v1).End(v2).Color(color).Stroke();
+    }
+
     public static void DrawVectorToBody(PolygonShape shape, int vertexIndex, Body target)
     {
         var v1 = shape.WorldVertices[vertexIndex];

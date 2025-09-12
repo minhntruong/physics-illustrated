@@ -1,5 +1,4 @@
-﻿using ShowPhysics.Library.Physics.Steppables.Commands;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace ShowPhysics.Library.Physics.Steppables;
@@ -16,26 +15,23 @@ public class Step
 
     public List<Action> Draws { get; set; }
 
-    public List<DrawCommand> Commands { get; set; }
+    public void Reset()
+    {
+        Name = "";
+        IsColliding = null;
+        IsCompleted = false;
+        Draw = null;
+        Draws = null;
+    }
 }
 
 public class StepCirclePoly : Step
 {
     public int? FacingEdgeIndex { get; set; }
-
-    public bool? IsCircleOutside { get; set; }
 }
 
 public static class Extensions
 {
-    public static Step AddCommand(this Step step, DrawCommand command)
-    {
-        if (step.Commands == null) { step.Commands = new List<DrawCommand>(); }
-
-        step.Commands.Add(command);
-        return step;
-    }
-
     public static Step AddDraw(this Step step, Action draw)
     {
         if (step.Draws == null) { step.Draws = new List<Action>(); }

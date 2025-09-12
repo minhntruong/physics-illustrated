@@ -112,7 +112,10 @@ public class ShowBase
 
             if (_currentStep != null)
             {
-                if (_currentStep.IsCompleted) { _started = false; }
+                if (_currentStep.IsCompleted) 
+                { 
+                    _started = false; 
+                }
 
                 OnStepAdvanced();
             }
