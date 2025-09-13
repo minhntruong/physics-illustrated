@@ -236,6 +236,14 @@ public static partial class CollisionDetectionSteppable
         step.AddDraw(() => Graphics.DrawVectorToBody(polyShape, polyShape.NextVertexIndex(selectedEdge), circle));
         yield return step;
 
+        step.Text = "Then take the vector v2 backward along the edge";
+        step.AddDraw(() => Graphics.DrawVectorAlongEdge(polyShape, selectedEdge, true));
+        yield return step;
+
+        step.Text = "Then project v1 onto v2";
+        step.AddDraw(() => Graphics.DrawProjectionOnEdgeFromBody(polyShape, selectedEdge, circle, true));
+        yield return step;
+
         v1 = circle.Position - minNextVertex;  // vector from next nearest vertex to circle center
         v2 = minCurrVertex - minNextVertex;    // the nearest edge
 

@@ -28,5 +28,22 @@ public static class Extensions
         return new Vector2(s * v.Y, -s * v.X);
     }
 
+    public static bool Vector2TryParse(string s, out Vector2 v)
+    {
+        v = Vector2.Zero;
 
+        // {X:1.2 Y:3.4}
+
+        var parts = s.Trim('{', '}').Split(' ', ':');
+
+        if (parts.Length != 4) { return false; }
+
+        if (float.TryParse(parts[1], out var x) && float.TryParse(parts[3], out var y))
+        {
+            v = new Vector2(x, y);
+            return true;
+        }
+
+        return false;
+    }
 }

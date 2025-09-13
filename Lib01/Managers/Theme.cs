@@ -11,6 +11,8 @@ public static class Theme
 
     public static float ShapeLineThicknessAbs = 2;
 
+    public static float ShapeOverlayLineThicknessAbs = 4;
+
     public static Color Shape { get; } = Color.Cyan;
 
     public static Color EdgeSelected { get; } = Color.HotPink;

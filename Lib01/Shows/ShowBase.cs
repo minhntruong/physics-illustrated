@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.IO;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ShowPhysics.Library.Managers;
@@ -6,7 +8,6 @@ using ShowPhysics.Library.Managers.Animation;
 using ShowPhysics.Library.Physics;
 using ShowPhysics.Library.Physics.Shapes;
 using ShowPhysics.Library.Physics.Steppables;
-using System;
 using System.Collections.Generic;
 
 namespace ShowPhysics.Library.Shows;
@@ -57,6 +58,7 @@ public class ShowBase
     protected bool _menuVisible = true;
     protected string _menu =
         ". = toggle menu | " +
+        "C = clear console | " +
         "R = reset camera | " +
         "S or Right Mouse = step";
 
@@ -74,12 +76,21 @@ public class ShowBase
         return GraphicsDevice.Viewport.Height;
     }
 
+    public virtual void LoadContent()
+    {
+    }
+
     public virtual void PreUpdate()
     {
         Input.Update();
 
         Input.CheckMousePanCamera();
         Input.CheckMouseZoomCamera();
+
+        if (Input.IsKeyClicked(Keys.C))
+        {
+            _consoleText = "";
+        }
 
         if (Input.IsKeyClicked(Keys.R))
         {

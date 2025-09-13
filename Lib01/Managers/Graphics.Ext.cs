@@ -182,31 +182,60 @@ public static partial class Graphics
             .Text(projection.ToString("0.0"));
     }
 
-    public static void DrawProjectionOnEdgeFromBody(PolygonShape shape, int vertexIndex, Body target)
+    public static void DrawProjectionOnEdgeFromBody(PolygonShape shape, int vertexIndex, Body target, bool reverse = false)
     {
-        var v1 = shape.WorldVertices[vertexIndex];
-        var edge = shape.WorldEdgeAt(vertexIndex);
+        var from = vertexIndex;
+        var to = shape.NextVertexIndex(vertexIndex);
+
+        if (reverse)
+        {
+            from = shape.NextVertexIndex(vertexIndex);
+            to = vertexIndex;
+        }
+
+        var v1 = shape.WorldVertices[from];
+        var vEdge = shape.WorldVertices[to];
+
+        var edge = vEdge - v1;
         edge.Normalize();
+
         var toCircle = target.Position - v1;
         var projection = Vector2.Dot(toCircle, edge);
-        var v2 = v1 + edge * projection;
+        var vProj = v1 + edge * projection;
 
-        Mid.States().ThicknessAbs(Theme.ShapeLineThicknessAbs).Default();
+        Mid.States().ThicknessAbs(Theme.ShapeOverlayLineThicknessAbs).Default();
 
-        Mid.Vector().Start(v1).End(v2).Color(Theme.Projection).Stroke();
+        Mid.Vector().Start(v1).End(vProj).Color(Theme.Projection).Stroke();
 
         var formatted = projection >= 0 ? projection.ToString("0.0") : $"({projection:0.0})";
-        Text.Scale(Theme.LabelScale).Color(Theme.Label).TextLengthOf(v1, v2, false).Text(formatted);
+
+        Text
+            .Anchor(TextAnchor.TopBaselineCenter)
+            .Scale(Theme.LabelScale)
+            .Color(Theme.Label)
+            .TextLengthOf(v1, vProj, false)
+            .Text(formatted);
     }
 
-    public static void DrawVectorAlongEdge(PolygonShape shape, int vertexIndex)
+    public static void DrawVectorAlongEdge(PolygonShape shape, int vertexIndex, bool reverse = false)
     {
-        var v1 = shape.WorldVertices[vertexIndex];
-        var edge = shape.WorldEdgeAt(vertexIndex);
-        var unitEdge = Vector2.Normalize(edge);
+        var from = vertexIndex;
+        var to = shape.NextVertexIndex(vertexIndex);
+        
+        if (reverse)
+        {
+            from = shape.NextVertexIndex(vertexIndex);
+            to = vertexIndex;
+        }
+
+        var v1 = shape.WorldVertices[from];
+        var v2 = shape.WorldVertices[to];
+
+        var dir = v2 - v1;
+        var unit = Vector2.Normalize(dir);
         
         Mid.States().ThicknessAbs(Theme.ShapeLineThicknessAbs).Default();
-        Mid.Vector().Start(v1).End(v1 + unitEdge * 50).Color(Theme.EdgeSelected).Stroke();
+        Mid.Vector().Start(v1).End(v1 + unit * 50).Color(Theme.EdgeSelected).Stroke();
     }
 
     public static void DrawContactFromCircle(PolygonShape shape, int vertexIndex, Body circleBody, Color color)

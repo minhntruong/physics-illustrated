@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace ShowPhysics.Library.Managers.Text;
 
-public enum TextAnchor { TopLeft, Center };
+public enum TextAnchor { TopLeft, Center, TopBaselineCenter };
 
 public struct TextStates
 {

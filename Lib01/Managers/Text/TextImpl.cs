@@ -68,9 +68,14 @@ public partial class TextImpl
         var textBounds = _font.MeasureString(textStr);
         // TODO: use textBounds to advance cursor somehow
 
-        if (anchor == TextAnchor.Center)
+        if (anchor == TextAnchor.Center || anchor == TextAnchor.TopBaselineCenter)
         {
             origin = textBounds * 0.5f;
+        }
+
+        if (anchor == TextAnchor.TopBaselineCenter)
+        {
+            origin.Y -= textBounds.Y * 0.8f; // Approximate baseline adjustment
         }
 
         if (_useCamera)

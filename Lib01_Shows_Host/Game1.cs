@@ -53,6 +53,11 @@ public class Game1 : Game, IGameExt
     protected override void LoadContent()
     {
         Graphics.OnLoadContent();
+
+        foreach (var show in _shows)
+        {
+            show.LoadContent();
+        }
     }
 
     protected override void Update(GameTime gameTime)

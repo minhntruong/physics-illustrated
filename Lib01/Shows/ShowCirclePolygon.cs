@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.IO;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ShowPhysics.Library.Managers;
@@ -6,7 +8,7 @@ using ShowPhysics.Library.Physics;
 using ShowPhysics.Library.Physics.Math;
 using ShowPhysics.Library.Physics.Shapes;
 using ShowPhysics.Library.Physics.Steppables;
-using System;
+using static ShowPhysics.Library.Physics.Math.Extensions;
 
 namespace ShowPhysics.Library.Shows;
 
@@ -22,18 +24,62 @@ public class ShowCirclePolygon : ShowBase
 
         Bodies.Add(_box);
         Bodies.Add(_movable);
+
+        _fileName = $"view_{GetType().Name}.txt";
+
+        _menu += " | V: save view";
+        UpdateTitle();
     }
 
     private Body _box;
     private Body _movable;
     private int? _facingEdgeIndex = null;
     private bool _showRegions = true;
+    private string _fileName;
 
     //==========================================================================
+
+    public override void LoadContent()
+    {
+        if (File.Exists(_fileName))
+        {
+            var lines = File.ReadAllLines(_fileName);
+            
+            foreach (var line in lines)
+            {
+                var parts = line.Split('=');
+                if (parts.Length != 2) { return; }
+                var key = parts[0].Trim();
+                var value = parts[1].Trim();
+
+                if (key == "Origin" && Vector2TryParse(value, out var origin))
+                {
+                    Camera.Origin = origin;
+                }
+                else if (key == "Scale" && float.TryParse(value, out var scale))
+                {
+                    Camera.Zoom = scale;
+                }
+                else if (key == "PolyRotation" && float.TryParse(value, out var rotation))
+                {
+                    _box.Rotation = rotation;
+                }
+                else if (key == "CirclePosition" && Vector2TryParse(value, out var position))
+                {
+                    _movable.Position = position;
+                }
+            }
+        }
+    }
 
     public override void Update(GameTime gameTime)
     {
         CheckMovableObject();
+
+        if (Input.IsKeyClicked(Keys.V))
+        {
+            File.WriteAllText(_fileName, $"Origin = {Camera.Origin}\nScale = {Camera.Zoom}\nPolyRotation = {_box.Rotation}\nCirclePosition = {_movable.Position}");
+        }
 
         base.Update(gameTime);
     }
