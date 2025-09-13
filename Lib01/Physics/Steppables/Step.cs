@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace ShowPhysics.Library.Physics.Steppables;
 
-public class Step
+public partial class Step
 {
-    public string Name { get; set; }
+    public string Text { get; set; }
 
     public bool? IsColliding { get; set; }
 
@@ -16,9 +16,11 @@ public class Step
 
     public List<Action> Draws { get; set; }
 
+    public Contact Contact { get; set; }
+
     public void Reset()
     {
-        Name = "";
+        Text = "";
         IsColliding = null;
         IsCompleted = false;
         Draw = null;
@@ -26,7 +28,7 @@ public class Step
     }
 }
 
-public class StepCirclePoly : Step
+public partial class StepCirclePoly : Step
 {
     public int? FacingEdgeIndex { get; set; }
 }
@@ -46,4 +48,11 @@ public static class Extensions
         anim.OnRunning = animFunc;
         return step;
     }
+
+    public static Step ClearDrawAnimations(this Step step)
+    {
+        Animations.Clear();
+        return step;
+    }
+
 }

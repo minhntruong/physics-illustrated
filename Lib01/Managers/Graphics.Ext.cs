@@ -208,4 +208,22 @@ public static partial class Graphics
         Mid.States().ThicknessAbs(Theme.ShapeLineThicknessAbs).Default();
         Mid.Vector().Start(v1).End(v1 + unitEdge * 50).Color(Theme.EdgeSelected).Stroke();
     }
+
+    public static void DrawContactFromCircle(PolygonShape shape, int vertexIndex, Body circleBody, Color color)
+    {
+        var v1 = circleBody.Position;
+        var normal = Vector2.Normalize(shape.WorldVertices[vertexIndex] - v1);
+        var v2 = v1 + normal * (circleBody.Shape as CircleShape).Radius;
+
+        DrawVertex(v2, color, true);
+    }
+
+    public static void DrawContact(PolygonShape shape, int vertexIndex, Color color)
+    {
+        var v1 = shape.WorldVertices[vertexIndex];
+
+        DrawVertex(v1, color, true);
+    }
+
+
 }

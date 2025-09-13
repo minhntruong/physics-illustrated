@@ -22,14 +22,14 @@ public static partial class CollisionDetectionSteppable
 
         var distanceCircleEdge = float.MinValue;
 
-        yield return new Step
+        var step = new StepCirclePoly
         {
-            Name = "First we find the closest facing edge to the circle center"
+            Text = "First we find the closest facing edge to the circle center"
         };
 
-        var selectedEdge = -1;
+        yield return step;
 
-        var step = new StepCirclePoly();
+        var selectedEdge = -1;
 
         // Loop through all the edges of the polygon/box
         for (var i = 0; i < polyShape.WorldVertices.Length; i++)
@@ -37,19 +37,19 @@ public static partial class CollisionDetectionSteppable
             selectedEdge = i;
 
             step.Reset();
-            step.Name = $"Evaluationg edge {i}";
+            step.Text = $"Evaluationg edge {i}";
             step.AddDraw(() => Graphics.DrawSelectedEdge(polyShape, i));
             yield return step;
 
-            step.Name = "Take the perpendicular (normal) to this edge";
+            step.Text = "Take the perpendicular (normal) to this edge";
             step.AddDraw(() => Graphics.DrawNormal(polyShape, i));
             yield return step;
 
-            step.Name = "Take the vector from the vertex to the circle center";
+            step.Text = "Take the vector from the vertex to the circle center";
             step.AddDraw(() => Graphics.DrawVectorToBody(polyShape, i, circle));
             yield return step;
 
-            step.Name = $"Project the circle center vector onto the normal";
+            step.Text = $"Project the circle center vector onto the normal";
             step.AddDraw(() => Graphics.DrawProjectionOnNormalFromBody(polyShape, i, circle));
             yield return step;
 
@@ -75,15 +75,15 @@ public static partial class CollisionDetectionSteppable
 
                 isOutside = true;
 
-                step.Name = "A positive projection was found, the circle center is outside the polygon";
+                step.Text = "A positive projection was found, the circle center is outside the polygon";
                 yield return step;
 
                 step.Reset();
-                step.Name = "Now we determine which region the circle center is in (A, B or C)";
+                step.Text = "Now we determine which region the circle center is in (A, B or C)";
                 step.AddDraw(() => Graphics.DrawSelectedEdge(polyShape, i));
                 yield return step;
 
-                step.Name = "These are the regions";
+                step.Text = "These are the regions";
                 step.FacingEdgeIndex = i;
                 yield return step;
 
@@ -127,19 +127,19 @@ public static partial class CollisionDetectionSteppable
         //=== Check if we are in region A
 
         step.Reset();
-        step.Name = "Check to see if the circle center is in region A";
+        step.Text = "Check to see if the circle center is in region A";
         step.AddDraw(() => Graphics.DrawSelectedEdge(polyShape, selectedEdge));
         yield return step;
 
-        step.Name = "First take the vector v1 from the vertex to cirle center";
+        step.Text = "First take the vector v1 from the vertex to cirle center";
         step.AddDraw(() => Graphics.DrawVectorToBody(polyShape, selectedEdge, circle));
         yield return step;
 
-        step.Name = "Then take the vector v2 along the edge";
+        step.Text = "Then take the vector v2 along the edge";
         step.AddDraw(() => Graphics.DrawVectorAlongEdge(polyShape, selectedEdge));
         yield return step;
 
-        step.Name = "Then project v1 onto v2";
+        step.Text = "Then project v1 onto v2";
         step.AddDraw(() => Graphics.DrawProjectionOnEdgeFromBody(polyShape, selectedEdge, circle));
         yield return step;
 
@@ -148,22 +148,22 @@ public static partial class CollisionDetectionSteppable
 
         if (Vector2.Dot(v1, v2) < 0)
         {
-            step.Name = "The projection is negative, so we are in region A";
+            step.Text = "The projection is negative, so we are in region A";
             yield return step;
 
             step.Reset();
-            step.Name = "Now measure the distance from the circle center to the vertex";
+            step.Text = "Now measure the distance from the circle center to the vertex";
             step.AddDraw(() => Graphics.DrawLabeledDistance(polyShape, selectedEdge, circle, circleShape.Radius));
             yield return step;
 
             if (v1.LengthSquared() > circleShape.Radius * circleShape.Radius)
             {
                 // Distance from vertex to circle center is greater than radius, no collision
-                step.Name = $"Distance is greater than radius ({circleShape.Radius}), no collision";
+                step.Text = $"Distance is greater than radius ({circleShape.Radius}), no collision";
                 yield return step;
 
                 step.Reset();
-                step.Name = "Check completed";
+                step.Text = "Check completed";
                 step.IsColliding = false;
                 step.IsCompleted = true;
                 yield return step;
@@ -171,15 +171,15 @@ public static partial class CollisionDetectionSteppable
                 yield break;
             }
 
-            step.Name = $"Distance is less than radius ({circleShape.Radius}), collision detected";
+            step.Text = $"Distance is less than radius ({circleShape.Radius}), collision detected";
             yield return step;
 
             step.Reset();
-            step.Name = "Now, gather collision info for the response step";
+            step.Text = "Now, gather collision info for the response step";
             step.FacingEdgeIndex = -1; // Signal stop showing regions
             yield return step;
 
-            step.Name = "Take the line from vertex to circle center";
+            step.Text = "Take the line from vertex to circle center";
             step.AddDraw(() => Graphics.DrawLineToBody(polyShape, selectedEdge, circle, Theme.Normals));
             step.AddDraw(() => Graphics.DrawVertex(polyShape.WorldVertices[0]));
             step.AddDrawAnimatedFloat(circleShape.Radius, 1.0f, (float animValue) =>
@@ -187,6 +187,17 @@ public static partial class CollisionDetectionSteppable
                 Graphics.DrawVectorFromBody(circle, polyShape, selectedEdge, animValue, Color.Lime);
             });
 
+            yield return step;
+
+            step.ClearDrawAnimations();
+            step.Text = "This is 1 contact point";
+            step.AddDraw(() => Graphics.DrawContactFromCircle(polyShape, selectedEdge, circle, Theme.ContactStart));
+            yield return step;
+
+            step.Reset();
+            step.Text = "This is the other contact point";
+            step.AddDraw(() => Graphics.DrawContactFromCircle(polyShape, selectedEdge, circle, Theme.ContactStart));
+            step.AddDraw(() => Graphics.DrawContact(polyShape, selectedEdge, Theme.ContactEnd));
             yield return step;
 
             contact = new Contact();
@@ -200,14 +211,31 @@ public static partial class CollisionDetectionSteppable
             contact.Start = circle.Position + (contact.Normal * -circleShape.Radius);
             contact.End = contact.Start + contact.Normal * contact.Depth;
 
-            yield return new Step
-            {
-                IsColliding = true,
-                IsCompleted = true,
-            };
+            step.Text = "Check completed";
+            step.Contact = contact;
+            step.IsColliding = true;
+            step.IsCompleted = true;
+            yield return step;
+
+            yield break;
+        }
+        else
+        {
+            step.Text = "The projection is positive, so we are not in region A";
+            yield return step;
         }
 
-        // Check if we are in region B
+        //=== Check if we are in region B
+        step.Reset();
+
+        step.Text = "Check to see if the circle center is in region B";
+        step.AddDraw(() => Graphics.DrawSelectedEdge(polyShape, selectedEdge));
+        yield return step;
+
+        step.Text = "First take the vector v1 from the vertex to cirle center";
+        step.AddDraw(() => Graphics.DrawVectorToBody(polyShape, polyShape.NextVertexIndex(selectedEdge), circle));
+        yield return step;
+
         v1 = circle.Position - minNextVertex;  // vector from next nearest vertex to circle center
         v2 = minCurrVertex - minNextVertex;    // the nearest edge
 

@@ -71,7 +71,7 @@ public class ShowCirclePolygon : ShowBase
     {
         if (_currentStep == null) { return; }
 
-        Console(_currentStep.Name);
+        Console(_currentStep.Text);
 
         if (_currentStep is StepCirclePoly stepCP)
         {

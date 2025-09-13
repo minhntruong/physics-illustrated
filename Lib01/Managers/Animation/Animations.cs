@@ -8,6 +8,11 @@ public static class Animations
 {
     private static List<FloatAnimator> _animators = new List<FloatAnimator>();
 
+    public static void Clear()
+    {
+        _animators.Clear();
+    }
+
     public static void Add(FloatAnimator animator)
     {
         if (animator == null) throw new ArgumentNullException(nameof(animator));

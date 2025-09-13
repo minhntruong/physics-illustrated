@@ -66,7 +66,7 @@ public class ShowCircles : ShowBase
     {
         if (_currentStep == null) { return; }
 
-        Console(_currentStep.Name);
+        Console(_currentStep.Text);
 
         if (_currentStep.IsColliding.HasValue)
         {

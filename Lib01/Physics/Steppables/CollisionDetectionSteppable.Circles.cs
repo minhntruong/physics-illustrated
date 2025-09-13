@@ -18,7 +18,7 @@ public static partial class CollisionDetectionSteppable
 
         yield return new Step
         {
-            Name = "Measure the distance between the 2 circle centers",
+            Text = "Measure the distance between the 2 circle centers",
             Draw = () => { drawDistance(); }
         };
 
@@ -31,14 +31,14 @@ public static partial class CollisionDetectionSteppable
         {
             yield return new Step
             {
-                Name = "No collision, the distance is greater than the sum of the radii",
+                Text = "No collision, the distance is greater than the sum of the radii",
                 Draw = () => { drawDistance(); },
                 IsColliding = false
             };
 
             yield return new Step
             {
-                Name = "Check completed",
+                Text = "Check completed",
                 IsCompleted = true,
             };
 
@@ -47,14 +47,14 @@ public static partial class CollisionDetectionSteppable
 
         yield return new Step
         {
-            Name = "Collision detected, the distance is less than the sum of the radii",
+            Text = "Collision detected, the distance is less than the sum of the radii",
             Draw = () => { drawDistance(); },
             IsColliding = true
         };
 
         yield return new Step
         {
-            Name = "Now we gather information about the collision that will be used to resolve it later",
+            Text = "Now we gather information about the collision that will be used to resolve it later",
             Draw = () => { drawDistance(false); }
         };
 
@@ -65,7 +65,7 @@ public static partial class CollisionDetectionSteppable
 
         yield return new Step
         {
-            Name = "Along the distance line, from the center, extending the entire radius, is 1 contact point",
+            Text = "Along the distance line, from the center, extending the entire radius, is 1 contact point",
             Draw = () =>
             {
                 drawDistance(false);
@@ -84,7 +84,7 @@ public static partial class CollisionDetectionSteppable
 
         yield return new Step
         {
-            Name = "Mark this contact point",
+            Text = "Mark this contact point",
             Draw = () =>
             {
                 drawDistance(false);
@@ -98,7 +98,7 @@ public static partial class CollisionDetectionSteppable
 
         yield return new Step
         {
-            Name = "From the other circle, extending the entire radius, is the 2nd contact point",
+            Text = "From the other circle, extending the entire radius, is the 2nd contact point",
             Draw = () =>
             {
                 drawDistance(false);
@@ -118,7 +118,7 @@ public static partial class CollisionDetectionSteppable
 
         yield return new Step
         {
-            Name = "Mark this contact point",
+            Text = "Mark this contact point",
             Draw = () =>
             {
                 drawDistance(false);
@@ -130,7 +130,7 @@ public static partial class CollisionDetectionSteppable
 
         yield return new Step
         {
-            Name = "Resulting contact information",
+            Text = "Resulting contact information",
             Draw = () =>
             {
                 drawContactStart();
@@ -154,7 +154,7 @@ public static partial class CollisionDetectionSteppable
 
         yield return new Step
         {
-            Name = "Check completed",
+            Text = "Check completed",
             IsCompleted = true
         };
     }
