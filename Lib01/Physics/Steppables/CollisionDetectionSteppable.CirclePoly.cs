@@ -249,14 +249,30 @@ public static partial class CollisionDetectionSteppable
 
         if (Vector2.Dot(v1, v2) < 0)
         {
+            step.Text = "The projection is negative, so we are in region B";
+            yield return step;
+
+            var nextVertexIndex = polyShape.NextVertexIndex(selectedEdge);
+
+            step.Reset();
+            step.Text = "Now measure the distance from the circle center to the vertex";
+            step.AddDraw(() => Graphics.DrawLabeledDistance(polyShape, nextVertexIndex, circle, circleShape.Radius));
+
+            yield return step;
+
             if (v1.LengthSquared() > circleShape.Radius * circleShape.Radius)
             {
                 // Distance from vertex to circle center is greater than radius, no collision
-                yield return new Step
-                {
-                    IsColliding = false,
-                    IsCompleted = true,
-                };
+                step.Text = $"Distance is greater than radius ({circleShape.Radius}), no collision";
+                yield return step;
+
+                step.Reset();
+                step.Text = "Check completed";
+                step.IsColliding = false;
+                step.IsCompleted = true;
+                yield return step;
+
+                yield break;
             }
 
             contact = new Contact();
