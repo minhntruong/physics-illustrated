@@ -18,7 +18,8 @@ public class ShowCirclePolygon : ShowBase
     {
         Name = "Circle-to-Polygon Collision Detection";
 
-        _box = new Body(new BoxShape(250, 250), Width() / 2, Height() / 2, 1.0f);
+        //_box = new Body(new BoxShape(250, 250), Width() / 2, Height() / 2, 1.0f);
+        _box = new Body(PolygonShape.Create(250, 5), Width() / 2, Height() / 2, 1.0f);
         _box.Rotation = 0.5f;
         _movable = new Body(new CircleShape(80), Width() * 0.8f, 100, 1.0f);
 
@@ -27,7 +28,7 @@ public class ShowCirclePolygon : ShowBase
 
         _fileName = $"view_{GetType().Name}.txt";
 
-        _menu += " | V: save view";
+        _menu += " | V = save view";
         UpdateTitle();
     }
 

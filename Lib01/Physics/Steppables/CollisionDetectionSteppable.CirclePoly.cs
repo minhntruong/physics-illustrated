@@ -153,6 +153,7 @@ public static partial class CollisionDetectionSteppable
 
             step.Reset();
             step.Text = "Now measure the distance from the circle center to the vertex";
+            step.AddDraw(() => Graphics.DrawVertex(polyShape, selectedEdge));
             step.AddDraw(() => Graphics.DrawLabeledDistance(polyShape, selectedEdge, circle, circleShape.Radius));
             yield return step;
 
@@ -256,6 +257,7 @@ public static partial class CollisionDetectionSteppable
 
             step.Reset();
             step.Text = "Now measure the distance from the circle center to the vertex";
+            step.AddDraw(() => Graphics.DrawVertex(polyShape, nextVertexIndex));
             step.AddDraw(() => Graphics.DrawLabeledDistance(polyShape, nextVertexIndex, circle, circleShape.Radius));
 
             yield return step;
@@ -275,6 +277,35 @@ public static partial class CollisionDetectionSteppable
                 yield break;
             }
 
+            step.Text = $"Distance is less than radius ({circleShape.Radius}), collision detected";
+            yield return step;
+
+            step.Reset();
+            step.Text = "Now, gather collision info for the response step";
+            step.FacingEdgeIndex = -1; // Signal stop showing regions
+            yield return step;
+
+            step.Text = "Take the line from vertex to circle center";
+            step.AddDraw(() => Graphics.DrawLineToBody(polyShape, nextVertexIndex, circle, Theme.Normals));
+            step.AddDraw(() => Graphics.DrawVertex(polyShape.WorldVertices[nextVertexIndex]));
+            step.AddDrawAnimatedFloat(circleShape.Radius, 1.0f, (float animValue) =>
+            {
+                Graphics.DrawVectorFromBody(circle, polyShape, nextVertexIndex, animValue, Color.Lime);
+            });
+
+            yield return step;
+
+            step.ClearDrawAnimations();
+            step.Text = "This is 1 contact point";
+            step.AddDraw(() => Graphics.DrawContactFromCircle(polyShape, nextVertexIndex, circle, Theme.ContactStart));
+            yield return step;
+
+            step.Reset();
+            step.Text = "This is the other contact point";
+            step.AddDraw(() => Graphics.DrawContactFromCircle(polyShape, nextVertexIndex, circle, Theme.ContactStart));
+            step.AddDraw(() => Graphics.DrawContact(polyShape, nextVertexIndex, Theme.ContactEnd));
+            yield return step;
+
             contact = new Contact();
             contacts.Add(contact);
 
@@ -286,14 +317,27 @@ public static partial class CollisionDetectionSteppable
             contact.Start = circle.Position + (contact.Normal * -circleShape.Radius);
             contact.End = contact.Start + contact.Normal * contact.Depth;
 
-            yield return new Step
-            {
-                IsColliding = true,
-                IsCompleted = true,
-            };
+            step.Text = "Check completed";
+            step.Contact = contact;
+            step.IsColliding = true;
+            step.IsCompleted = true;
+            yield return step;
+
+            yield break;
         }
 
         // We are in region C
+
+        step.Reset();
+        step.Text = "The only option left is region C";
+        step.AddDraw(() => Graphics.DrawSelectedEdge(polyShape, selectedEdge));
+        yield return step;
+
+        step.Text = "For region C, the distance from the circle center to the edge is the projection we found earlier";
+        step.AddDraw(() => Graphics.DrawNormal(polyShape, selectedEdge));
+        step.AddDraw(() => Graphics.DrawVectorToBody(polyShape, selectedEdge, circle));
+        step.AddDraw(() => Graphics.DrawProjectionOnNormalFromBody(polyShape, selectedEdge, circle, circleShape.Radius));
+        yield return step;
 
         if (distanceCircleEdge > circleShape.Radius)
         {

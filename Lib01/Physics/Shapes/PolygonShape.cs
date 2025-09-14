@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using ShowPhysics.Library.Managers.Draw;
 using ShowPhysics.Library.Physics.Math;
 using System;
 using System.Collections.Generic;
@@ -7,20 +8,31 @@ namespace ShowPhysics.Library.Physics.Shapes;
 
 public class PolygonShape : Shape
 {
-    public PolygonShape(params (float X, float Y)[] vertices)
+    public PolygonShape(params Vector2[] localVertices)
     {
-        if (vertices.Length < 3)
+        if (localVertices.Length < 3)
         {
             throw new ArgumentException("A polygon must have at least 3 vertices.");
         }
 
-        LocalVertices = new Vector2[vertices.Length];
-        WorldVertices = new Vector2[vertices.Length];
+        LocalVertices = localVertices.Clone() as Vector2[];
+        WorldVertices = localVertices.Clone() as Vector2[];
+    }
 
-        for (int i = 0; i < vertices.Length; i++)
+    public PolygonShape(params (float X, float Y)[] localVertices)
+    {
+        if (localVertices.Length < 3)
         {
-            LocalVertices[i] = new Vector2(vertices[i].X, vertices[i].Y);
-            WorldVertices[i] = new Vector2(vertices[i].X, vertices[i].Y); // Initially, world vertices are the same as local
+            throw new ArgumentException("A polygon must have at least 3 vertices.");
+        }
+
+        LocalVertices = new Vector2[localVertices.Length];
+        WorldVertices = new Vector2[localVertices.Length];
+
+        for (int i = 0; i < localVertices.Length; i++)
+        {
+            LocalVertices[i] = new Vector2(localVertices[i].X, localVertices[i].Y);
+            WorldVertices[i] = new Vector2(localVertices[i].X, localVertices[i].Y); // Initially, world vertices are the same as local
         }
     }
 
@@ -167,5 +179,18 @@ public class PolygonShape : Shape
         }
 
         return nextIndex;
+    }
+
+    //==========================================================================
+
+    public static PolygonShape Create(float radius, int segments)
+    {
+        var vertices = new Vector2[segments];
+
+        Coordinates.Circle(new Vector2(0, 0), radius, segments, vertices.AsSpan());
+
+        var poly = new PolygonShape(vertices);
+
+        return poly;
     }
 }

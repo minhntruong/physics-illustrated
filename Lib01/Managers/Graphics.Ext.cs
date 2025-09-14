@@ -64,6 +64,12 @@ public static partial class Graphics
         }
     }
 
+    public static void DrawVertex(PolygonShape shape, int vertexIndex)
+    {
+        var position = shape.WorldVertices[vertexIndex];
+        DrawVertex(position, Color.White);
+    }
+
     public static void DrawVertex(Vector2 position)
     {
         DrawVertex(position, Color.White);
@@ -110,7 +116,7 @@ public static partial class Graphics
             .Start(v1)
             .End(v2)
             .Color(Theme.EdgeSelected)
-            .ThicknessAbs(Theme.ShapeLineThicknessAbs)
+            .ThicknessAbs(Theme.ShapeOverlayLineThicknessAbs)
             .Stroke();
 
         DrawVertex(v1);
@@ -162,7 +168,7 @@ public static partial class Graphics
             .Stroke();
     }
 
-    public static void DrawProjectionOnNormalFromBody(PolygonShape shape, int vertexIndex, Body target)
+    public static void DrawProjectionOnNormalFromBody(PolygonShape shape, int vertexIndex, Body target, float threshold = 0)
     {
         var v1 = shape.WorldVertices[vertexIndex];
         var edge = shape.WorldEdgeAt(vertexIndex);
@@ -171,15 +177,23 @@ public static partial class Graphics
         var projection = Vector2.Dot(toCircle, normal);
         var v2 = v1 + normal * projection;
 
-        Mid.States().ThicknessAbs(Theme.ShapeLineThicknessAbs).Default();
+        Mid.States().ThicknessAbs(Theme.ShapeOverlayLineThicknessAbs).Default();
 
-        Mid.Vector().Start(v1).End(v2).Color(Theme.Projection).Stroke();
+        var color = Theme.Projection;
+        if (threshold > 0 && projection < threshold)
+        {
+            color = Theme.ContactDistanceThreshold;
+        }
+
+        Mid.Vector().Start(v1).End(v2).Color(color).Stroke();
+
+        var formatted = projection >= 0 ? projection.ToString("0.0") : $"({projection:0.0})";
 
         Text
             .Color(Theme.Label)
             .Scale(Theme.LabelScale)
             .TextLengthOf(v1, v2, false)
-            .Text(projection.ToString("0.0"));
+            .Text(formatted);
     }
 
     public static void DrawProjectionOnEdgeFromBody(PolygonShape shape, int vertexIndex, Body target, bool reverse = false)

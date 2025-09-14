@@ -14,7 +14,7 @@ public class BoxShape : PolygonShape
             (-width / 2, +height / 2)  // BL
 
             // The below won't work with the current algorithms
-            // Count-clock-wise winding
+            // Counter-clock-wise winding
             //(+width / 2, -height / 2), // TR
             //(-width / 2, -height / 2), // TL
             //(-width / 2, +height / 2),  // BL
