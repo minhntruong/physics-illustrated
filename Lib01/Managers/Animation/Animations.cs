@@ -38,21 +38,6 @@ public static class Animations
             {
                 animator.Update(deltaTime);
             }
-            else
-            {
-                // Remove?
-                //_animators.RemoveAt(i);
-            }
-        }
-    }
-
-    public static void Draw()
-    {
-        for (int i = _animators.Count - 1; i >= 0; i--)
-        {
-            var animator = _animators[i];
-
-            animator.OnRunning?.Invoke(animator.Current);
         }
     }
 }

@@ -9,10 +9,7 @@ public class FloatAnimator
     public float Duration { get; }
     public float Elapsed { get; private set; }
     public bool IsCompleted => Elapsed >= Duration;
-
     public float Current { get; private set; }
-
-    public Action<float> OnRunning { get; set; }
 
     // Easing function delegate
     public Func<float, float> Easing { get; set; } = EasingFunctions.EaseInOutQuad;

@@ -14,7 +14,7 @@ public partial class Step
 
     public Action Draw { get; set; }
 
-    public List<Action> Draws { get; set; }
+    public List<Action> Draws { get; } = new List<Action>();
 
     public Contact Contact { get; set; }
 
@@ -24,7 +24,7 @@ public partial class Step
         IsColliding = null;
         IsCompleted = false;
         Draw = null;
-        Draws = null;
+        Draws.Clear();
     }
 }
 
@@ -35,24 +35,41 @@ public partial class StepCirclePoly : Step
 
 public static class Extensions
 {
-    public static Step AddDraw(this Step step, Action draw)
+    public static Action AddDraw(this Step step, Action draw)
     {
-        if (step.Draws == null) { step.Draws = new List<Action>(); }
         step.Draws.Add(draw);
-        return step;
+        return draw;
     }
 
-    public static Step AddDrawAnimatedFloat(this Step step, float maxValue, float duration, Action<float> animFunc)
+    public static Action AddDrawAnimatedFloat(this Step step, float duration, Action<float> animFunc)
+    {
+        var anim = Animations.AddFloat(0, 1, duration);
+
+        var drawAction = () => animFunc(anim.Current);
+
+        step.AddDraw(drawAction);
+
+        return drawAction;
+    }
+
+    public static Action AddDrawAnimatedFloat(this Step step, float maxValue, float duration, Action<float> animFunc)
     {
         var anim = Animations.AddFloat(0, maxValue, duration);
-        anim.OnRunning = animFunc;
-        return step;
+
+        var drawAction = () => animFunc(anim.Current);
+
+        step.AddDraw(drawAction);
+
+        return drawAction;
     }
 
-    public static Step ClearDrawAnimations(this Step step)
+    public static void RemoveDraw(this Step step, Action draw)
+    {
+        step.Draws.Remove(draw);
+    }
+
+    public static void ClearDrawAnimations(this Step step)
     {
         Animations.Clear();
-        return step;
     }
-
 }

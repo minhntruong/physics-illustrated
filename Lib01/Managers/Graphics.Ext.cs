@@ -123,7 +123,7 @@ public static partial class Graphics
         DrawVertex(v2);
     }
 
-    public static void DrawNormal(PolygonShape shape, int vertexIndex)
+    public static void DrawEdgeNormal(PolygonShape shape, int vertexIndex, float distanceFactor = 1)
     {
         var v1 = shape.WorldVertices[vertexIndex];
         var edge = shape.WorldEdgeAt(vertexIndex);
@@ -131,12 +131,12 @@ public static partial class Graphics
 
         Mid.States().ThicknessAbs(Theme.ShapeLineThicknessAbs).Default();
 
-        Mid.Vector().Start(v1).End(v1 + normal * 50).Color(Theme.Normals).Stroke();
+        Mid.Vector().Start(v1).End(v1 + normal * distanceFactor * 50).Color(Theme.Normals).Stroke();
 
         Mid.Line().Start(v1).End(v1 + normal * 1500).Color(Theme.Normals).Stroke();
     }
 
-    public static void DrawLineToBody(PolygonShape shape, int vertexIndex, Body target, Color color)
+    public static void DrawLineFromVertexToBody(PolygonShape shape, int vertexIndex, Body target, Color color)
     {
         var v1 = shape.WorldVertices[vertexIndex];
         var v2 = target.Position;
@@ -145,16 +145,17 @@ public static partial class Graphics
         Mid.Line().Start(v1).End(v2).Color(color).Stroke();
     }
 
-    public static void DrawVectorToBody(PolygonShape shape, int vertexIndex, Body target)
+    public static void DrawVectorFromVertexToBody(PolygonShape shape, int vertexIndex, Body target, float distanceFactor = 1)
     {
         var v1 = shape.WorldVertices[vertexIndex];
-        var v2 = target.Position;
+        var dir = target.Position - v1;
+        var v2 = v1 + dir * distanceFactor;
 
         Mid.States().ThicknessAbs(Theme.ShapeLineThicknessAbs).Default();
         Mid.Vector().Start(v1).End(v2).Color(Theme.Normals).Stroke();
     }
 
-    public static void DrawVectorFromBody(Body source, PolygonShape destShape, int destVertexIndex, float distance, Color color)
+    public static void DrawVectorFromBodyToVertex(Body source, PolygonShape destShape, int destVertexIndex, Color color, float distance)
     {
         var v1 = source.Position;
         var v2 = destShape.WorldVertices[destVertexIndex];

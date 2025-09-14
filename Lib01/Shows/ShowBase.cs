@@ -219,7 +219,7 @@ public class ShowBase
     protected void DrawAnimations()
     {
         // TEMP: until refactoring a better way to allow animations to be on top
-        Animations.Draw();
+        //Animations.Draw();
     }
 
     protected virtual void InitializeSteps()

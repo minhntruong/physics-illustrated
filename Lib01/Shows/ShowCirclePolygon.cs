@@ -103,7 +103,7 @@ public class ShowCirclePolygon : ShowBase
         // Handle show-side drawings
         CheckDrawRegions();
 
-        DrawAnimations();
+        //DrawAnimations();
     }
 
     //==========================================================================

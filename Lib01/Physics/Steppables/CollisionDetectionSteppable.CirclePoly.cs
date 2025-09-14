@@ -42,11 +42,11 @@ public static partial class CollisionDetectionSteppable
             yield return step;
 
             step.Text = "Take the perpendicular (normal) to this edge";
-            step.AddDraw(() => Graphics.DrawNormal(polyShape, i));
+            step.AddDrawAnimatedFloat(1, (float animValue) => Graphics.DrawEdgeNormal(polyShape, i, animValue));
             yield return step;
 
             step.Text = "Take the vector from the vertex to the circle center";
-            step.AddDraw(() => Graphics.DrawVectorToBody(polyShape, i, circle));
+            step.AddDrawAnimatedFloat(1, (float animValue) => Graphics.DrawVectorFromVertexToBody(polyShape, i, circle, animValue));
             yield return step;
 
             step.Text = $"Project the circle center vector onto the normal";
@@ -132,7 +132,7 @@ public static partial class CollisionDetectionSteppable
         yield return step;
 
         step.Text = "First take the vector v1 from the vertex to cirle center";
-        step.AddDraw(() => Graphics.DrawVectorToBody(polyShape, selectedEdge, circle));
+        step.AddDraw(() => Graphics.DrawVectorFromVertexToBody(polyShape, selectedEdge, circle));
         yield return step;
 
         step.Text = "Then take the vector v2 along the edge";
@@ -181,16 +181,16 @@ public static partial class CollisionDetectionSteppable
             yield return step;
 
             step.Text = "Take the line from vertex to circle center";
-            step.AddDraw(() => Graphics.DrawLineToBody(polyShape, selectedEdge, circle, Theme.Normals));
+            step.AddDraw(() => Graphics.DrawLineFromVertexToBody(polyShape, selectedEdge, circle, Theme.Normals));
             step.AddDraw(() => Graphics.DrawVertex(polyShape.WorldVertices[0]));
-            step.AddDrawAnimatedFloat(circleShape.Radius, 1.0f, (float animValue) =>
+            var anim1 = step.AddDrawAnimatedFloat(circleShape.Radius, 1.0f, (float animValue) =>
             {
-                Graphics.DrawVectorFromBody(circle, polyShape, selectedEdge, animValue, Color.Lime);
+                Graphics.DrawVectorFromBodyToVertex(circle, polyShape, selectedEdge, Color.Lime, animValue);
             });
 
             yield return step;
 
-            step.ClearDrawAnimations();
+            step.RemoveDraw(anim1);
             step.Text = "This is 1 contact point";
             step.AddDraw(() => Graphics.DrawContactFromCircle(polyShape, selectedEdge, circle, Theme.ContactStart));
             yield return step;
@@ -234,7 +234,7 @@ public static partial class CollisionDetectionSteppable
         yield return step;
 
         step.Text = "First take the vector v1 from the vertex to cirle center";
-        step.AddDraw(() => Graphics.DrawVectorToBody(polyShape, polyShape.NextVertexIndex(selectedEdge), circle));
+        step.AddDraw(() => Graphics.DrawVectorFromVertexToBody(polyShape, polyShape.NextVertexIndex(selectedEdge), circle));
         yield return step;
 
         step.Text = "Then take the vector v2 backward along the edge";
@@ -286,11 +286,11 @@ public static partial class CollisionDetectionSteppable
             yield return step;
 
             step.Text = "Take the line from vertex to circle center";
-            step.AddDraw(() => Graphics.DrawLineToBody(polyShape, nextVertexIndex, circle, Theme.Normals));
+            step.AddDraw(() => Graphics.DrawLineFromVertexToBody(polyShape, nextVertexIndex, circle, Theme.Normals));
             step.AddDraw(() => Graphics.DrawVertex(polyShape.WorldVertices[nextVertexIndex]));
             step.AddDrawAnimatedFloat(circleShape.Radius, 1.0f, (float animValue) =>
             {
-                Graphics.DrawVectorFromBody(circle, polyShape, nextVertexIndex, animValue, Color.Lime);
+                Graphics.DrawVectorFromBodyToVertex(circle, polyShape, nextVertexIndex, Color.Lime, animValue);
             });
 
             yield return step;
@@ -334,8 +334,8 @@ public static partial class CollisionDetectionSteppable
         yield return step;
 
         step.Text = "For region C, the distance from the circle center to the edge is the projection we found earlier";
-        step.AddDraw(() => Graphics.DrawNormal(polyShape, selectedEdge));
-        step.AddDraw(() => Graphics.DrawVectorToBody(polyShape, selectedEdge, circle));
+        step.AddDraw(() => Graphics.DrawEdgeNormal(polyShape, selectedEdge));
+        step.AddDraw(() => Graphics.DrawVectorFromVertexToBody(polyShape, selectedEdge, circle));
         step.AddDraw(() => Graphics.DrawProjectionOnNormalFromBody(polyShape, selectedEdge, circle, circleShape.Radius));
         yield return step;
 
