@@ -41,7 +41,7 @@ public static class Extensions
         return draw;
     }
 
-    public static Action AddDrawAnimatedFloat(this Step step, float duration, Action<float> animFunc)
+    public static Action AddAnim(this Step step, float duration, Action<float> animFunc)
     {
         var anim = Animations.AddFloat(0, 1, duration);
 
@@ -52,7 +52,7 @@ public static class Extensions
         return drawAction;
     }
 
-    public static Action AddDrawAnimatedFloat(this Step step, float maxValue, float duration, Action<float> animFunc)
+    public static Action AddAnim(this Step step, float maxValue, float duration, Action<float> animFunc)
     {
         var anim = Animations.AddFloat(0, maxValue, duration);
 

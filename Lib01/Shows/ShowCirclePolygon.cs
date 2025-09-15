@@ -19,8 +19,8 @@ public class ShowCirclePolygon : ShowBase
         Name = "Circle-to-Polygon Collision Detection";
 
         //_box = new Body(new BoxShape(250, 250), Width() / 2, Height() / 2, 1.0f);
-        _box = new Body(PolygonShape.Create(250, 5), Width() / 2, Height() / 2, 1.0f);
-        _box.Rotation = 0.5f;
+        _box = new Body(PolygonShape.Create(250, 8), Width() / 2, Height() / 2, 1.0f);
+        _box.Rotation = 0;
         _movable = new Body(new CircleShape(80), Width() * 0.8f, 100, 1.0f);
 
         Bodies.Add(_box);

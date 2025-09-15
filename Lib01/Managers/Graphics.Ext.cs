@@ -9,6 +9,8 @@ namespace ShowPhysics.Library.Managers;
 
 public static partial class Graphics
 {
+    //=== DISTANCE =============================================================
+
     public static void DrawLabeledDistance(Body a, Body b, bool label = true)
     {
         DrawLabeledDistance(a.Position, b.Position, 0, label);
@@ -107,33 +109,46 @@ public static partial class Graphics
         }
     }
 
-    public static void DrawSelectedEdge(PolygonShape shape, int vertexIndex)
+    //public static void DrawEdge(PolygonShape shape, int vertexIndex)
+    //{
+    //    var v1 = shape.WorldVertices[vertexIndex];
+    //    var v2 = shape.WorldVertexAfter(vertexIndex);
+
+    //    Mid.Line()
+    //        .Start(v1)
+    //        .End(v2)
+    //        .Color(Theme.EdgeSelected)
+    //        .ThicknessAbs(Theme.ShapeOverlayLineThicknessAbs)
+    //        .Stroke();
+
+    //    DrawVertex(v1);
+    //    DrawVertex(v2);
+    //}
+
+    //public static void DrawEdgeNormal(PolygonShape shape, int vertexIndex, float distanceFactor = 1)
+    //{
+    //    var v1 = shape.WorldVertices[vertexIndex];
+    //    var edge = shape.WorldEdgeAt(vertexIndex);
+    //    var normal = edge.RightUnitNormal();
+
+    //    Mid.States().ThicknessAbs(Theme.ShapeLineThicknessAbs).Default();
+
+    //    Mid.Vector().Start(v1).End(v1 + normal * distanceFactor * 50).Color(Theme.Normals).Stroke();
+
+    //    Mid.Line().Start(v1).End(v1 + normal * 1500).Color(Theme.Normals).Stroke();
+    //}
+
+    public static void DrawEdgeNormalFromBody(PolygonShape poly, int vertexIndex, Body source, float distanceFactor = 1)
     {
-        var v1 = shape.WorldVertices[vertexIndex];
-        var v2 = shape.WorldVertexAfter(vertexIndex);
-
-        Mid.Line()
-            .Start(v1)
-            .End(v2)
-            .Color(Theme.EdgeSelected)
-            .ThicknessAbs(Theme.ShapeOverlayLineThicknessAbs)
-            .Stroke();
-
-        DrawVertex(v1);
-        DrawVertex(v2);
-    }
-
-    public static void DrawEdgeNormal(PolygonShape shape, int vertexIndex, float distanceFactor = 1)
-    {
-        var v1 = shape.WorldVertices[vertexIndex];
-        var edge = shape.WorldEdgeAt(vertexIndex);
+        var v1 = source.Position;
+        var edge = poly.WorldEdgeAt(vertexIndex);
         var normal = edge.RightUnitNormal();
 
         Mid.States().ThicknessAbs(Theme.ShapeLineThicknessAbs).Default();
 
-        Mid.Vector().Start(v1).End(v1 + normal * distanceFactor * 50).Color(Theme.Normals).Stroke();
+        Mid.Vector().Start(v1).End(v1 + -normal * distanceFactor * 50).Color(Theme.Normals).Stroke();
 
-        Mid.Line().Start(v1).End(v1 + normal * 1500).Color(Theme.Normals).Stroke();
+        Mid.Line().Start(v1).End(v1 + -normal * 1500).Color(Theme.Normals).Stroke();
     }
 
     public static void DrawLineFromVertexToBody(PolygonShape shape, int vertexIndex, Body target, Color color)
@@ -145,15 +160,15 @@ public static partial class Graphics
         Mid.Line().Start(v1).End(v2).Color(color).Stroke();
     }
 
-    public static void DrawVectorFromVertexToBody(PolygonShape shape, int vertexIndex, Body target, float distanceFactor = 1)
-    {
-        var v1 = shape.WorldVertices[vertexIndex];
-        var dir = target.Position - v1;
-        var v2 = v1 + dir * distanceFactor;
+    //public static void DrawVectorFromVertexToBody(PolygonShape shape, int vertexIndex, Body target, float distanceFactor = 1)
+    //{
+    //    var v1 = shape.WorldVertices[vertexIndex];
+    //    var dir = target.Position - v1;
+    //    var v2 = v1 + dir * distanceFactor;
 
-        Mid.States().ThicknessAbs(Theme.ShapeLineThicknessAbs).Default();
-        Mid.Vector().Start(v1).End(v2).Color(Theme.Normals).Stroke();
-    }
+    //    Mid.States().ThicknessAbs(Theme.ShapeLineThicknessAbs).Default();
+    //    Mid.Vector().Start(v1).End(v2).Color(Theme.Normals).Stroke();
+    //}
 
     public static void DrawVectorFromBodyToVertex(Body source, PolygonShape destShape, int destVertexIndex, Color color, float distance)
     {
@@ -165,6 +180,20 @@ public static partial class Graphics
             .Start(v1)
             .End(v1 + direction * distance)
             .ThicknessAbs(Theme.ShapeLineThicknessAbs)
+            .Color(color)
+            .Stroke();
+    }
+
+    public static void DrawEdgeNormalVectorFromBody(Body source, PolygonShape edgePoly, int edgeInd, Color color, float distance)
+    {
+        var v1 = source.Position;
+        var edge = edgePoly.WorldEdgeAt(edgeInd);
+        var normal = edge.RightUnitNormal();
+
+        Mid.Vector()
+            .Start(v1)
+            .End(v1 + -normal * distance)
+            .ThicknessAbs(Theme.ShapeOverlayLineThicknessAbs)
             .Color(color)
             .Stroke();
     }
@@ -253,11 +282,23 @@ public static partial class Graphics
         Mid.Vector().Start(v1).End(v1 + unit * 50).Color(Theme.EdgeSelected).Stroke();
     }
 
-    public static void DrawContactFromCircle(PolygonShape shape, int vertexIndex, Body circleBody, Color color)
+    //=== CONTACTS =============================================================
+
+    public static void DrawContactFromCircleByVertex(Body circleBody, PolygonShape poly, int vertexIndex, Color color)
     {
         var v1 = circleBody.Position;
-        var normal = Vector2.Normalize(shape.WorldVertices[vertexIndex] - v1);
+        var normal = Vector2.Normalize(poly.WorldVertices[vertexIndex] - v1);
         var v2 = v1 + normal * (circleBody.Shape as CircleShape).Radius;
+
+        DrawVertex(v2, color, true);
+    }
+
+    public static void DrawContactFromCircleByEdgeNormal(Body source, PolygonShape edgePoly, int edgeInd, Color color)
+    {
+        var v1 = source.Position;
+        var edge = edgePoly.WorldEdgeAt(edgeInd);
+        var normal = edge.RightUnitNormal();
+        var v2 = v1 + -normal * (source.Shape as CircleShape).Radius;
 
         DrawVertex(v2, color, true);
     }

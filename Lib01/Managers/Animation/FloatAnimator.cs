@@ -1,4 +1,5 @@
 ﻿using System;
+using static ShowPhysics.Library.Managers.Animation.Transitions;
 
 namespace ShowPhysics.Library.Managers.Animation;
 
@@ -39,10 +40,10 @@ public class FloatAnimator
         Current = Start;
     }
 
-    private static float Lerp(float a, float b, float t)
-    {
-        return a + (b - a) * t;
-    }
+    //private static float Lerp(float a, float b, float t)
+    //{
+    //    return a + (b - a) * t;
+    //}
 }
 
 // Common easing functions
