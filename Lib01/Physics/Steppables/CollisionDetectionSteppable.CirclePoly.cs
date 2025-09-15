@@ -148,7 +148,8 @@ public static partial class CollisionDetectionSteppable
         yield return step;
 
         step.Text = "Then project v1 onto v2";
-        step.AddDraw(() => Graphics.DrawProjectionOnEdgeFromBody(polyShape, selectedEdge, circle));
+        //step.AddDraw(() => Graphics.DrawProjectionOnEdgeFromBody(polyShape, selectedEdge, circle));
+        step.AddAnim(1, (float animValue) => Coords.EdgeUnitToBody(polyShape, selectedEdge, circle).DrawProjection(animValue));
         yield return step;
 
         var v1 = circle.Position - minCurrVertex;

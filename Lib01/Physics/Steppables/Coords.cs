@@ -41,14 +41,34 @@ public static class Coords
         return (v1, v2);
     }
 
-    public static (Vector2 Start, Vector2 ToBody, Vector2 Normal) EdgeNormalToBody(PolygonShape poly, int vertexInd, Body body)
+    public static (Vector2 Start, Vector2 ToBody, Vector2 EdgeNormal) EdgeNormalToBody(PolygonShape poly, int vertexInd, Body body)
     {
-        var (start, normal) = EdgeNormal(poly, vertexInd);
+        var (start, edgeNormal) = EdgeNormal(poly, vertexInd);
         var (v1, v2) = VertexToBody(poly, vertexInd, body);
 
         // start & v1 should be the same
 
-        return (start, v2 - v1, normal);
+        return (start, v2 - v1, edgeNormal);
+    }
+
+    public static (Vector2 Start, Vector2 ToBody, Vector2 EdgeUnit) EdgeUnitToBody(PolygonShape poly, int vertexInd, Body body, bool reverse = false)
+    {
+        var start = poly.WorldVertices[vertexInd];
+        var edgeEnd = poly.WorldVertexAfter(vertexInd);
+
+        if (reverse)
+        {
+            var temp = start;
+            start = edgeEnd; 
+            edgeEnd = temp;
+        }
+
+        var unit = Vector2.Normalize(edgeEnd - start);
+        var toBody = body.Position - start;
+
+        // start & v1 should be the same
+
+        return (start, toBody, unit);
     }
 }
 
