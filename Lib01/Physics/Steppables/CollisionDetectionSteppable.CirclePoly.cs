@@ -162,8 +162,10 @@ public static partial class CollisionDetectionSteppable
 
             step.Reset();
             step.Text = "Now measure the distance from the circle center to the vertex";
-            step.AddDraw(() => Graphics.DrawVertex(polyShape, selectedEdge));
-            step.AddDraw(() => Graphics.DrawLabeledDistance(polyShape, selectedEdge, circle, circleShape.Radius));
+            //step.AddDraw(() => Graphics.DrawVertex(polyShape, selectedEdge));
+            step.AddDraw(() => Coords.Vertex(polyShape, selectedEdge).DrawVertex());
+            step.AddAnim(1, (float animValue) => Coords.BodyToVertex(circle, polyShape, selectedEdge).DrawLabeledDistance(circleShape.Radius, true, animValue));
+            //step.AddDraw(() => Graphics.DrawLabeledDistance(polyShape, selectedEdge, circle, circleShape.Radius));
             yield return step;
 
             if (v1.LengthSquared() > circleShape.Radius * circleShape.Radius)
@@ -189,13 +191,17 @@ public static partial class CollisionDetectionSteppable
             step.FacingEdgeIndex = -1; // Signal stop showing regions
             yield return step;
 
-            step.Text = "Take the line from vertex to circle center";
-            step.AddDraw(() => Graphics.DrawLineFromVertexToBody(polyShape, selectedEdge, circle, Theme.Normals));
-            step.AddDraw(() => Graphics.DrawVertex(polyShape.WorldVertices[0]));
-            var anim1 = step.AddAnim(circleShape.Radius, 1.0f, (float animValue) =>
-            {
-                Graphics.DrawVectorFromBodyToVertex(circle, polyShape, selectedEdge, Color.Lime, animValue);
-            });
+            step.Text = "Take the line from the circle center to the vertex";
+            //step.AddDraw(() => Graphics.DrawLineFromVertexToBody(polyShape, selectedEdge, circle, Theme.Normals));
+            step.AddDraw(() => Coords.VertexToBody(polyShape, selectedEdge, circle).DrawLine(Theme.Normals));
+            //step.AddDraw(() => Graphics.DrawVertex(polyShape.WorldVertices[0]));
+            step.AddDraw(() => Coords.Vertex(polyShape, selectedEdge).DrawVertex());
+
+            var anim1 = step.AddAnim(1, (float animValue) => Coords.BodyExtentToVertex(circle, circleShape.Radius, polyShape, selectedEdge).DrawVector(Color.Lime, animValue));
+            //var anim1 = step.AddAnim(circleShape.Radius, 1.0f, (float animValue) =>
+            //{
+            //    Graphics.DrawVectorFromBodyToVertex(circle, polyShape, selectedEdge, Color.Lime, animValue);
+            //});
 
             yield return step;
 
@@ -248,11 +254,13 @@ public static partial class CollisionDetectionSteppable
         yield return step;
 
         step.Text = "Then take the vector v2 backward along the edge";
-        step.AddDraw(() => Graphics.DrawVectorAlongEdge(polyShape, selectedEdge, true));
+        //step.AddDraw(() => Graphics.DrawVectorAlongEdge(polyShape, selectedEdge, true));
+        step.AddAnim(1, (float animValue) => Coords.Edge(polyShape, selectedEdge, true).DrawVector(Theme.EdgeSelected, animValue, 50));
         yield return step;
 
         step.Text = "Then project v1 onto v2";
-        step.AddDraw(() => Graphics.DrawProjectionOnEdgeFromBody(polyShape, selectedEdge, circle, true));
+        //step.AddDraw(() => Graphics.DrawProjectionOnEdgeFromBody(polyShape, selectedEdge, circle, true));
+        step.AddAnim(1, (float animValue) => Coords.EdgeUnitToBody(polyShape, selectedEdge, circle, true).DrawProjection(animValue));
         yield return step;
 
         v1 = circle.Position - minNextVertex;  // vector from next nearest vertex to circle center
@@ -267,8 +275,10 @@ public static partial class CollisionDetectionSteppable
 
             step.Reset();
             step.Text = "Now measure the distance from the circle center to the vertex";
-            step.AddDraw(() => Graphics.DrawVertex(polyShape, nextVertexIndex));
-            step.AddDraw(() => Graphics.DrawLabeledDistance(polyShape, nextVertexIndex, circle, circleShape.Radius));
+            //step.AddDraw(() => Graphics.DrawVertex(polyShape, nextVertexIndex));
+            //step.AddDraw(() => Graphics.DrawLabeledDistance(polyShape, nextVertexIndex, circle, circleShape.Radius));
+            step.AddDraw(() => Coords.Vertex(polyShape, selectedEdge).DrawVertex());
+            step.AddAnim(1, (float animValue) => Coords.BodyToVertex(circle, polyShape, nextVertexIndex).DrawLabeledDistance(circleShape.Radius, true, animValue));
 
             yield return step;
 

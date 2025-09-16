@@ -9,6 +9,11 @@ namespace ShowPhysics.Library.Physics.Steppables;
 
 public static class Coords
 {
+    public static Vector2 Vertex(PolygonShape poly, int vertexInd)
+    {
+        return poly.WorldVertices[vertexInd];
+    }
+
     public static (Vector2 Start, Vector2 End) Edge(PolygonShape poly, int vertexInd, bool reverse = false)
     {
         var v1 = poly.WorldVertices[vertexInd];
@@ -37,6 +42,14 @@ public static class Coords
     {
         var v1 = poly.WorldVertices[vertexInd];
         var v2 = body.Position;
+
+        return (v1, v2);
+    }
+
+    public static (Vector2 Start, Vector2 End) BodyToVertex(Body body, PolygonShape poly, int vertexInd)
+    {
+        var v1 = body.Position;
+        var v2 = poly.WorldVertices[vertexInd];
 
         return (v1, v2);
     }
@@ -70,10 +83,54 @@ public static class Coords
 
         return (start, toBody, unit);
     }
+
+    public static (Vector2 Start, Vector2 End) BodyExtentToVertex(Body body, float extent, PolygonShape poly, int vertexInd)
+    {
+        var v1 = body.Position;
+        var vertex = poly.WorldVertices[vertexInd];
+        var dir = Vector2.Normalize(vertex - v1);
+        var v2 = v1 + dir * extent;
+
+        return (v1, v2);
+    }
 }
 
 public static class CoordinatesExtensions
 {
+    public static void DrawVertex(this Vector2 v)
+    {
+        Graphics.DrawVertex(v);
+    }
+
+    public static void DrawLabeledDistance(this (Vector2 v1, Vector2 v2) data, float threshold = 0, bool showLabel = true, float transitionFactor = 1)
+    {
+        var color = Theme.ContactDistance;
+
+        if (threshold > 0 && Vector2.Distance(data.v1, data.v2) <= threshold)
+        {
+            color = Theme.ContactDistanceThreshold;
+        }
+
+        var v1 = data.v1;
+        var v2 = data.v1 + (data.v2 - data.v1) * transitionFactor;
+
+        Graphics.Mid.Line()
+            .Start(v1)
+            .End(v2)
+            .Color(color)
+            .ThicknessAbs(Theme.ShapeOverlayLineThicknessAbs)
+            .Stroke();
+
+        if (!showLabel) { return; }
+
+        if (transitionFactor < 1) { return; }
+
+        Graphics.Text
+            .Color(Theme.Label)
+            .Scale(Theme.LabelScale)
+            .TextLengthOf(v1, v2);
+    }
+
     public static void DrawEdgeNormalRef(this (Vector2 Start, Vector2 Normal) data, float distanceFactor = 1)
     {
         Graphics.Mid.States().ThicknessAbs(Theme.ShapeLineThicknessAbs).Default();
@@ -122,6 +179,16 @@ public static class CoordinatesExtensions
 
         Graphics.DrawVertex(v1);
         Graphics.DrawVertex(v2);
+    }
+
+    public static void DrawLine(this (Vector2 Start, Vector2 End) data, Color color, float transitionFactor = 1)
+    {
+        Graphics.Mid.Line()
+            .Start(data.Start)
+            .End(data.Start + (data.End - data.Start) * transitionFactor)
+            .Color(color)
+            .ThicknessAbs(Theme.ShapeLineThicknessAbs)
+            .Stroke();
     }
 
     public static void DrawProjection(this (Vector2 Start, Vector2 V1, Vector2 V2) data, float transitionFactor = 1)
