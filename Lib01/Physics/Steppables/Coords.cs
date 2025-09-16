@@ -9,11 +9,13 @@ namespace ShowPhysics.Library.Physics.Steppables;
 
 public static class Coords
 {
+    //=== POINTS ===============================================================
     public static Vector2 Vertex(PolygonShape poly, int vertexInd)
     {
         return poly.WorldVertices[vertexInd];
     }
 
+    //=== LINES ================================================================
     public static (Vector2 Start, Vector2 End) Edge(PolygonShape poly, int vertexInd, bool reverse = false)
     {
         var v1 = poly.WorldVertices[vertexInd];
@@ -54,6 +56,17 @@ public static class Coords
         return (v1, v2);
     }
 
+    public static (Vector2 Start, Vector2 End) BodyExtentToVertex(Body body, float extent, PolygonShape poly, int vertexInd)
+    {
+        var v1 = body.Position;
+        var vertex = poly.WorldVertices[vertexInd];
+        var dir = Vector2.Normalize(vertex - v1);
+        var v2 = v1 + dir * extent;
+
+        return (v1, v2);
+    }
+
+    //=== LINES ================================================================
     public static (Vector2 Start, Vector2 ToBody, Vector2 EdgeNormal) EdgeNormalToBody(PolygonShape poly, int vertexInd, Body body)
     {
         var (start, edgeNormal) = EdgeNormal(poly, vertexInd);
@@ -83,16 +96,6 @@ public static class Coords
 
         return (start, toBody, unit);
     }
-
-    public static (Vector2 Start, Vector2 End) BodyExtentToVertex(Body body, float extent, PolygonShape poly, int vertexInd)
-    {
-        var v1 = body.Position;
-        var vertex = poly.WorldVertices[vertexInd];
-        var dir = Vector2.Normalize(vertex - v1);
-        var v2 = v1 + dir * extent;
-
-        return (v1, v2);
-    }
 }
 
 public static class CoordinatesExtensions
@@ -100,6 +103,11 @@ public static class CoordinatesExtensions
     public static void DrawVertex(this Vector2 v)
     {
         Graphics.DrawVertex(v);
+    }
+
+    public static void DrawContact(this Vector2 v, Color color)
+    {
+        Graphics.DrawVertex(v, color, true);
     }
 
     public static void DrawLabeledDistance(this (Vector2 v1, Vector2 v2) data, float threshold = 0, bool showLabel = true, float transitionFactor = 1)

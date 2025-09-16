@@ -207,13 +207,15 @@ public static partial class CollisionDetectionSteppable
 
             step.RemoveDraw(anim1);
             step.Text = "This is 1 contact point";
-            step.AddDraw(() => Graphics.DrawContactFromCircleByVertex(circle, polyShape, selectedEdge, Theme.ContactStart));
+            //step.AddDraw(() => Graphics.DrawContactFromCircleByVertex(circle, polyShape, selectedEdge, Theme.ContactStart));
+            step.AddDraw(() => Coords.BodyExtentToVertex(circle, circleShape.Radius, polyShape, selectedEdge).End.DrawContact(Theme.ContactStart));
             yield return step;
 
-            step.Reset();
+            //step.Reset();
             step.Text = "This is the other contact point";
-            step.AddDraw(() => Graphics.DrawContactFromCircleByVertex(circle, polyShape, selectedEdge, Theme.ContactStart));
-            step.AddDraw(() => Graphics.DrawContact(polyShape, selectedEdge, Theme.ContactEnd));
+            //step.AddDraw(() => Graphics.DrawContactFromCircleByVertex(circle, polyShape, selectedEdge, Theme.ContactStart));
+            //step.AddDraw(() => Graphics.DrawContact(polyShape, selectedEdge, Theme.ContactEnd));
+            step.AddDraw(() => Coords.Vertex(polyShape, selectedEdge).DrawContact(Theme.ContactEnd));
             yield return step;
 
             contact = new Contact();
