@@ -199,7 +199,7 @@ public static class CoordinatesExtensions
             .Stroke();
     }
 
-    public static void DrawProjection(this (Vector2 Start, Vector2 V1, Vector2 V2) data, float transitionFactor = 1)
+    public static void DrawProjection(this (Vector2 Start, Vector2 V1, Vector2 V2) data, float transitionFactor = 1, float threshold = 0)
     {
         var projection = Vector2.Dot(data.V1, data.V2);
         
@@ -210,6 +210,11 @@ public static class CoordinatesExtensions
         var nV2 = Vector2.Lerp(nV2TransStart, nV2TransEnd, transitionFactor);
 
         var color = Theme.Projection;
+
+        if (threshold > 0 && System.Math.Abs(projection) <= threshold)
+        {
+            color = Theme.ContactDistanceThreshold;
+        }
 
         Graphics.Mid.Vector()
             .Start(nV1)

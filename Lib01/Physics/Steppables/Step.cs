@@ -63,13 +63,19 @@ public static class Extensions
         return drawAction;
     }
 
+    public static void RemoveLastDraw(this Step step)
+    {
+        if (step.Draws.Count > 0)
+            step.Draws.RemoveAt(step.Draws.Count - 1);
+    }
+
     public static void RemoveDraw(this Step step, Action draw)
     {
         step.Draws.Remove(draw);
     }
 
-    public static void ClearDrawAnimations(this Step step)
-    {
-        Animations.Clear();
-    }
+    //public static void ClearDrawAnimations(this Step step)
+    //{
+    //    Animations.Clear();
+    //}
 }

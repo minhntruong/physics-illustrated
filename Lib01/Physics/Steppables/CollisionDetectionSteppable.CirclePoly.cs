@@ -197,7 +197,7 @@ public static partial class CollisionDetectionSteppable
             //step.AddDraw(() => Graphics.DrawVertex(polyShape.WorldVertices[0]));
             step.AddDraw(() => Coords.Vertex(polyShape, selectedEdge).DrawVertex());
 
-            var anim1 = step.AddAnim(1, (float animValue) => Coords.BodyExtentToVertex(circle, circleShape.Radius, polyShape, selectedEdge).DrawVector(Color.Lime, animValue));
+            /*var anim1 =*/ step.AddAnim(1, (float animValue) => Coords.BodyExtentToVertex(circle, circleShape.Radius, polyShape, selectedEdge).DrawVector(Color.Lime, animValue));
             //var anim1 = step.AddAnim(circleShape.Radius, 1.0f, (float animValue) =>
             //{
             //    Graphics.DrawVectorFromBodyToVertex(circle, polyShape, selectedEdge, Color.Lime, animValue);
@@ -205,7 +205,8 @@ public static partial class CollisionDetectionSteppable
 
             yield return step;
 
-            step.RemoveDraw(anim1);
+            //step.RemoveDraw(anim1);
+            step.RemoveLastDraw();
             step.Text = "This is 1 contact point";
             //step.AddDraw(() => Graphics.DrawContactFromCircleByVertex(circle, polyShape, selectedEdge, Theme.ContactStart));
             step.AddDraw(() => Coords.BodyExtentToVertex(circle, circleShape.Radius, polyShape, selectedEdge).End.DrawContact(Theme.ContactStart));
@@ -308,24 +309,30 @@ public static partial class CollisionDetectionSteppable
             yield return step;
 
             step.Text = "Take the line from vertex to circle center";
-            step.AddDraw(() => Graphics.DrawLineFromVertexToBody(polyShape, nextVertexIndex, circle, Theme.Normals));
-            step.AddDraw(() => Graphics.DrawVertex(polyShape.WorldVertices[nextVertexIndex]));
-            step.AddAnim(circleShape.Radius, 1.0f, (float animValue) =>
-            {
-                Graphics.DrawVectorFromBodyToVertex(circle, polyShape, nextVertexIndex, Color.Lime, animValue);
-            });
+            step.AddDraw(() => Coords.VertexToBody(polyShape, nextVertexIndex, circle).DrawLine(Theme.Normals));
+            step.AddDraw(() => Coords.Vertex(polyShape, nextVertexIndex).DrawVertex());
+            step.AddAnim(1, (float animValue) => Coords.BodyExtentToVertex(circle, circleShape.Radius, polyShape, nextVertexIndex).DrawVector(Color.Lime, animValue));
+            //step.AddDraw(() => Graphics.DrawLineFromVertexToBody(polyShape, nextVertexIndex, circle, Theme.Normals));
+            //step.AddDraw(() => Graphics.DrawVertex(polyShape.WorldVertices[nextVertexIndex]));
+            //step.AddAnim(circleShape.Radius, 1.0f, (float animValue) =>
+            //{
+            //    Graphics.DrawVectorFromBodyToVertex(circle, polyShape, nextVertexIndex, Color.Lime, animValue);
+            //});
 
             yield return step;
 
-            step.ClearDrawAnimations();
+            //step.ClearDrawAnimations();
+            step.RemoveLastDraw();
             step.Text = "This is 1 contact point";
-            step.AddDraw(() => Graphics.DrawContactFromCircleByVertex(circle, polyShape, nextVertexIndex, Theme.ContactStart));
+            step.AddDraw(() => Coords.BodyExtentToVertex(circle, circleShape.Radius, polyShape, nextVertexIndex).End.DrawContact(Theme.ContactStart));
+            //step.AddDraw(() => Graphics.DrawContactFromCircleByVertex(circle, polyShape, nextVertexIndex, Theme.ContactStart));
             yield return step;
 
-            step.Reset();
+            //step.Reset();
             step.Text = "This is the other contact point";
-            step.AddDraw(() => Graphics.DrawContactFromCircleByVertex(circle, polyShape, nextVertexIndex, Theme.ContactStart));
-            step.AddDraw(() => Graphics.DrawContact(polyShape, nextVertexIndex, Theme.ContactEnd));
+            step.AddDraw(() => Coords.Vertex(polyShape, nextVertexIndex).DrawContact(Theme.ContactEnd));
+            //step.AddDraw(() => Graphics.DrawContactFromCircleByVertex(circle, polyShape, nextVertexIndex, Theme.ContactStart));
+            //step.AddDraw(() => Graphics.DrawContact(polyShape, nextVertexIndex, Theme.ContactEnd));
             yield return step;
 
             contact = new Contact();
@@ -355,11 +362,21 @@ public static partial class CollisionDetectionSteppable
         step.AddDraw(() => (polyShape, selectedEdge).DrawEdge());
         yield return step;
 
-        step.Text = "For region C, the distance from the circle center to the edge is the projection we found earlier";
-        step.AddDraw(() => Coords.EdgeNormal(polyShape, selectedEdge).DrawEdgeNormalRef()); // Graphics.DrawEdgeNormal(polyShape, selectedEdge));
+        step.Text = "For region C, the distance from the circle center to the edge we found earlier";
+        yield return step;
+
+        step.Text = "Take the ege normal";
+        step.AddAnim(1, (float animValue) => Coords.EdgeNormal(polyShape, selectedEdge).DrawEdgeNormalRef(animValue)); // Graphics.DrawEdgeNormal(polyShape, selectedEdge));
+        yield return step;
+
+        step.Text = "And the vector from the vertex to the circle center";
         step.AddAnim(1, (float animValue) => Coords.VertexToBody(polyShape, selectedEdge, circle).DrawVector(Theme.Normals, animValue));
+        yield return step;
+
+        step.Text = "Project the circle center vector onto the normal";
         //step.AddDraw(() => Graphics.DrawVectorFromVertexToBody(polyShape, selectedEdge, circle));
-        step.AddDraw(() => Graphics.DrawProjectionOnNormalFromBody(polyShape, selectedEdge, circle, circleShape.Radius));
+        //step.AddDraw(() => Graphics.DrawProjectionOnNormalFromBody(polyShape, selectedEdge, circle, circleShape.Radius));
+        step.AddAnim(1, (float animValue) => Coords.EdgeNormalToBody(polyShape, selectedEdge, circle).DrawProjection(animValue, circleShape.Radius));
         yield return step;
 
         if (distanceCircleEdge > circleShape.Radius)
