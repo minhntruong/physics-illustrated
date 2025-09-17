@@ -66,7 +66,7 @@ public static class Coords
         return (v1, v2);
     }
 
-    //=== LINES ================================================================
+    //=== EDGES ================================================================
     public static (Vector2 Start, Vector2 ToBody, Vector2 EdgeNormal) EdgeNormalToBody(PolygonShape poly, int vertexInd, Body body)
     {
         var (start, edgeNormal) = EdgeNormal(poly, vertexInd);
@@ -96,9 +96,28 @@ public static class Coords
 
         return (start, toBody, unit);
     }
+
+    public static (Vector2 Start, Vector2 EdgeNormal) BodyNegEdgeNormal(Body source, PolygonShape poly, int vertexInd)
+    {
+        var v1 = source.Position;
+        var edge = poly.WorldEdgeAt(vertexInd);
+        var normal = -edge.RightUnitNormal();
+
+        return (v1, normal);
+    }
+
+    public static (Vector2 Start, Vector2 End) BodyExtentByNegEdgeNormal(Body source, float extent, PolygonShape poly, int vertexInd, float transitionFactor = 1)
+    {
+        var v1 = source.Position;
+        var edge = poly.WorldEdgeAt(vertexInd);
+        var normal = -edge.RightUnitNormal();
+        var v2 = v1 + normal * extent * transitionFactor;
+
+        return (v1, v2);
+    }
 }
 
-public static class CoordinatesExtensions
+public static class CoordsDraws
 {
     public static void DrawVertex(this Vector2 v)
     {
@@ -139,7 +158,7 @@ public static class CoordinatesExtensions
             .TextLengthOf(v1, v2);
     }
 
-    public static void DrawEdgeNormalRef(this (Vector2 Start, Vector2 Normal) data, float distanceFactor = 1)
+    public static void DrawRefLineWithNormal(this (Vector2 Start, Vector2 Normal) data, float distanceFactor = 1)
     {
         Graphics.Mid.States().ThicknessAbs(Theme.ShapeLineThicknessAbs).Default();
 
@@ -197,6 +216,11 @@ public static class CoordinatesExtensions
             .Color(color)
             .ThicknessAbs(Theme.ShapeLineThicknessAbs)
             .Stroke();
+    }
+
+    public static float CalcProjection(this (Vector2 start, Vector2 v1, Vector2 v2) data)
+    {
+        return Vector2.Dot(data.v1, data.v2);
     }
 
     public static void DrawProjection(this (Vector2 Start, Vector2 V1, Vector2 V2) data, float transitionFactor = 1, float threshold = 0)

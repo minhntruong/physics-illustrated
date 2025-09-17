@@ -45,7 +45,7 @@ public static partial class CollisionDetectionSteppable
             //step.AddDrawAnimatedFloat(1, (float animValue) => Graphics.DrawEdgeNormal(polyShape, i, animValue));
             step.AddAnim(1, (float animValue) => 
             {
-                Coords.EdgeNormal(polyShape, selectedEdge).DrawEdgeNormalRef(animValue);
+                Coords.EdgeNormal(polyShape, selectedEdge).DrawRefLineWithNormal(animValue);
             });
             yield return step;
 
@@ -366,7 +366,7 @@ public static partial class CollisionDetectionSteppable
         yield return step;
 
         step.Text = "Take the ege normal";
-        step.AddAnim(1, (float animValue) => Coords.EdgeNormal(polyShape, selectedEdge).DrawEdgeNormalRef(animValue)); // Graphics.DrawEdgeNormal(polyShape, selectedEdge));
+        step.AddAnim(1, (float animValue) => Coords.EdgeNormal(polyShape, selectedEdge).DrawRefLineWithNormal(animValue)); // Graphics.DrawEdgeNormal(polyShape, selectedEdge));
         yield return step;
 
         step.Text = "And the vector from the vertex to the circle center";
@@ -399,16 +399,39 @@ public static partial class CollisionDetectionSteppable
         yield return step;
 
         step.Text = "Consider the perpendicular of the edge from the circle center";
-        step.AddDraw(() => Graphics.DrawEdgeNormalFromBody(polyShape, selectedEdge, circle));
+        //step.AddDraw(() => Graphics.DrawEdgeNormalFromBody(polyShape, selectedEdge, circle));
+        step.AddAnim(1, (float animValue) => Coords.BodyNegEdgeNormal(circle, polyShape, selectedEdge).DrawRefLineWithNormal(animValue));
         yield return step;
 
         step.Text = "Extend to the radius of the circle";
-        var anim2 = step.AddAnim(circleShape.Radius, 1, (float animValue) => Graphics.DrawEdgeNormalVectorFromBody(circle, polyShape, selectedEdge, Color.Lime, animValue));
+        //var anim2 = step.AddAnim(circleShape.Radius, 1, (float animValue) => Graphics.DrawEdgeNormalVectorFromBody(circle, polyShape, selectedEdge, Color.Lime, animValue));
+        step.AddAnim(1, (float animValue) => Coords.BodyExtentByNegEdgeNormal(circle, circleShape.Radius, polyShape, selectedEdge).DrawVector(Color.Lime, animValue));
         yield return step;
 
-        step.RemoveDraw(anim2);
+        //step.RemoveDraw(anim2);
+        step.RemoveLastDraw();
         step.Text = "This is 1 contact point";
-        step.AddDraw(() => Graphics.DrawContactFromCircleByEdgeNormal(circle, polyShape, selectedEdge, Theme.ContactStart));
+        //step.AddDraw(() => Graphics.DrawContactFromCircleByEdgeNormal(circle, polyShape, selectedEdge, Theme.ContactStart));
+        step.AddDraw(() => Coords.BodyExtentByNegEdgeNormal(circle, circleShape.Radius, polyShape, selectedEdge).End.DrawContact(Theme.ContactStart));
+        yield return step;
+
+        step.Text = "To calculate the 2nd contact point, we go back to the distance calculation";
+        yield return step;
+
+        step.Text = "This is the distance from the circle center to the edge";
+        step.AddAnim(1, (float animValue) => Coords.EdgeNormal(polyShape, selectedEdge).DrawRefLineWithNormal(animValue)); // Graphics.DrawEdgeNormal(polyShape, selectedEdge));
+        step.AddAnim(1, (float animValue) => Coords.VertexToBody(polyShape, selectedEdge, circle).DrawVector(Theme.Normals, animValue));
+        step.AddAnim(1, (float animValue) => Coords.EdgeNormalToBody(polyShape, selectedEdge, circle).DrawProjection(animValue, circleShape.Radius));
+        yield return step;
+
+        step.Text = "Extend the edge normal by the distance";
+        var p = Coords.EdgeNormalToBody(polyShape, selectedEdge, circle).CalcProjection();
+        step.AddAnim(1, (float animValue) => Coords.BodyExtentByNegEdgeNormal(circle, p, polyShape, selectedEdge).DrawVector(Theme.ContactEnd, animValue));
+        yield return step;
+
+        step.RemoveLastDraw();
+        step.Text = "This is the other contact point";
+        step.AddDraw(() => Coords.BodyExtentByNegEdgeNormal(circle, p, polyShape, selectedEdge).End.DrawContact(Theme.ContactEnd));
         yield return step;
 
         contact = new Contact();
