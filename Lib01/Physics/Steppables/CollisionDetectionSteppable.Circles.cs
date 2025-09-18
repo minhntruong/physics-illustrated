@@ -14,6 +14,16 @@ public static partial class CollisionDetectionSteppable
         var circleA = (CircleShape)a.Shape;
         var circleB = (CircleShape)b.Shape;
 
+        var step = new Step();
+
+        step.Text = "Measure the distance between the 2 circle centers";
+        step.AddAnim(1, (float animValue) =>
+        {
+            Coords.Line(a, b).DrawLabeledDistance(circleA.Radius + circleB.Radius, true, animValue);
+        });
+        yield return step;
+
+
         var drawDistance = (bool label = true) => { Graphics.DrawLabeledDistance(a, b, circleA.Radius + circleB.Radius, label); };
 
         yield return new Step

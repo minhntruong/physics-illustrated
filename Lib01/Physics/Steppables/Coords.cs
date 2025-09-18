@@ -16,6 +16,12 @@ public static class Coords
     }
 
     //=== LINES ================================================================
+
+    public static (Vector2 Start, Vector2 End) Line(Body source, Body dest)
+    {
+        return (source.Position, dest.Position);
+    }
+
     public static (Vector2 Start, Vector2 End) Edge(PolygonShape poly, int vertexInd, bool reverse = false)
     {
         var v1 = poly.WorldVertices[vertexInd];

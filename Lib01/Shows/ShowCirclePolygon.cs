@@ -28,8 +28,7 @@ public class ShowCirclePolygon : ShowBase
 
         _fileName = $"view_{GetType().Name}.txt";
 
-        _menu += " | V = save view";
-        UpdateTitle();
+        Menu += " | V = save view";
     }
 
     private Body _box;
@@ -89,16 +88,7 @@ public class ShowCirclePolygon : ShowBase
     {
         base.Draw();
 
-        if (_currentStep == null) { return; }
-
-        // Handle draws
-        if (_currentStep.Draws?.Count > 0)
-        {
-            foreach (var draw in _currentStep.Draws)
-            {
-                draw();
-            }
-        }
+        ProcessStepDraws();
 
         // Handle show-side drawings
         CheckDrawRegions();

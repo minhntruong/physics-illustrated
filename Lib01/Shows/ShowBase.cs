@@ -216,6 +216,20 @@ public class ShowBase
 
     //==========================================================================
 
+    protected void ProcessStepDraws()
+    {
+        if (_currentStep == null) { return; }
+
+        // Handle draws
+        if (_currentStep.Draws?.Count > 0)
+        {
+            foreach (var draw in _currentStep.Draws)
+            {
+                draw();
+            }
+        }
+    }
+
     protected void DrawAnimations()
     {
         // TEMP: until refactoring a better way to allow animations to be on top

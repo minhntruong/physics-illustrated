@@ -43,15 +43,19 @@ public class ShowCircles : ShowBase
 
     public override void Draw()
     {
+        base.Draw();
+
         if (_showRadii)
         {
             Graphics.DrawRadius(Bodies[0]);
             Graphics.DrawRadius(_movable);
         }
 
+        ProcessStepDraws();
+
+        // TODO: remove
         _currentStep?.Draw?.Invoke();
 
-        base.Draw();
     }
 
     //==========================================================================
