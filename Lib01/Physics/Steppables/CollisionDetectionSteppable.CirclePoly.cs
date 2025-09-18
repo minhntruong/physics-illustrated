@@ -425,13 +425,30 @@ public static partial class CollisionDetectionSteppable
         yield return step;
 
         step.Text = "Extend the edge normal by the distance";
-        var p = Coords.EdgeNormalToBody(polyShape, selectedEdge, circle).CalcProjection();
-        step.AddAnim(1, (float animValue) => Coords.BodyExtentByNegEdgeNormal(circle, p, polyShape, selectedEdge).DrawVector(Theme.ContactEnd, animValue));
+        step.AddAnim(1, (float animValue) =>
+        {
+            var p = Coords.EdgeNormalToBody(polyShape, selectedEdge, circle).CalcProjection();
+            Coords.BodyExtentByNegEdgeNormal(circle, p, polyShape, selectedEdge).DrawVector(Theme.ContactEnd, animValue);
+        });
         yield return step;
 
         step.RemoveLastDraw();
         step.Text = "This is the other contact point";
-        step.AddDraw(() => Coords.BodyExtentByNegEdgeNormal(circle, p, polyShape, selectedEdge).End.DrawContact(Theme.ContactEnd));
+        step.AddDraw(() =>
+        {
+            var p = Coords.EdgeNormalToBody(polyShape, selectedEdge, circle).CalcProjection();
+            Coords.BodyExtentByNegEdgeNormal(circle, p, polyShape, selectedEdge).End.DrawContact(Theme.ContactEnd);
+        });
+        yield return step;
+
+        step.Reset();
+        step.Text = "These are the contact information";
+        step.AddDraw(() =>
+        {
+            Coords.BodyExtentByNegEdgeNormal(circle, circleShape.Radius, polyShape, selectedEdge).End.DrawContact(Theme.ContactStart);
+            var p = Coords.EdgeNormalToBody(polyShape, selectedEdge, circle).CalcProjection();
+            Coords.BodyExtentByNegEdgeNormal(circle, p, polyShape, selectedEdge).End.DrawContact(Theme.ContactEnd);
+        });
         yield return step;
 
         contact = new Contact();
@@ -444,10 +461,11 @@ public static partial class CollisionDetectionSteppable
         contact.Start = circle.Position - (contact.Normal * circleShape.Radius);
         contact.End = contact.Start + contact.Normal * contact.Depth;
 
-        yield return new Step
-        {
-            IsColliding = true,
-            IsCompleted = true,
-        };
+        step.Reset();
+        step.Text = "Check completed";
+        step.Contact = contact;
+        step.IsColliding = true;
+        step.IsCompleted = true;
+        yield return step;
     }
 }

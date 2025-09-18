@@ -7,7 +7,7 @@ public static class Theme
 {
     public static Color Bg { get; } = new Color(69, 102, 160);
 
-    public static Color BgAnnotations { get; } = new Color(80, 118, 183);
+    public static Color BgAnnotations { get; } = Color.CornflowerBlue; // new Color(80, 118, 183);
 
     public static float ShapeLineThicknessAbs = 2;
 
