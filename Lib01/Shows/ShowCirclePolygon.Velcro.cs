@@ -12,11 +12,11 @@ using static ShowPhysics.Library.Physics.Math.Extensions;
 
 namespace ShowPhysics.Library.Shows;
 
-public class ShowCirclePolygon : ShowBase
+public class ShowCirclePolygonVelcro : ShowBase
 {
-    public ShowCirclePolygon(GraphicsDevice graphicsDevice) : base(graphicsDevice)
+    public ShowCirclePolygonVelcro(GraphicsDevice graphicsDevice) : base(graphicsDevice)
     {
-        Name = "Circle-to-Polygon Collision Detection";
+        Name = "VELCRO / Circle-to-Polygon Collision Detection";
 
         //_box = new Body(new BoxShape(250, 250), Width() / 2, Height() / 2, 1.0f);
         _box = new Body(PolygonShape.Create(250, 8), Width() / 2, Height() / 2, 1.0f);
@@ -33,8 +33,6 @@ public class ShowCirclePolygon : ShowBase
 
     private Body _box;
     private Body _movable;
-    private int? _facingEdgeIndex = null;
-    private bool _showRegions = true;
     private string _fileName;
 
     //==========================================================================
@@ -44,7 +42,7 @@ public class ShowCirclePolygon : ShowBase
         if (File.Exists(_fileName))
         {
             var lines = File.ReadAllLines(_fileName);
-            
+
             foreach (var line in lines)
             {
                 var parts = line.Split('=');
@@ -83,7 +81,7 @@ public class ShowCirclePolygon : ShowBase
 
         base.Update(gameTime);
     }
-    
+
     public override void Draw()
     {
         base.Draw();
@@ -91,14 +89,13 @@ public class ShowCirclePolygon : ShowBase
         ProcessStepDraws();
 
         // Handle show-side drawings
-        CheckDrawRegions();
     }
 
     //==========================================================================
 
     protected override void InitializeSteps()
     {
-        _steps = CollisionDetectionSteppable.IsCollidingPolygonCircle(_box, _movable, _contacts).GetEnumerator();
+        _steps = CollisionDetectionSteppableVelcro.IsCollidingPolygonCircle(_box, _movable, _contacts).GetEnumerator();
         base.InitializeSteps();
     }
 
@@ -108,18 +105,8 @@ public class ShowCirclePolygon : ShowBase
 
         Console(_currentStep.Text);
 
-        if (_currentStep is StepCirclePoly stepCP)
-        {
-            if (stepCP.FacingEdgeIndex.HasValue)
-            {
-                _facingEdgeIndex = stepCP.FacingEdgeIndex.Value;
-            }
-        }
-
         if (_currentStep.IsCompleted)
         {
-            // Stop drawing regions when the step is completed
-            _facingEdgeIndex = null;
         }
     }
 
@@ -153,58 +140,5 @@ public class ShowCirclePolygon : ShowBase
 
             _box.Rotation = r;
         }
-    }
-
-    private void CheckDrawRegions()
-    {
-        if (!_showRegions || !_facingEdgeIndex.HasValue || _facingEdgeIndex.Value < 0) { return; }
-
-        // Draw the region between the two vertices
-        var polyShape = (PolygonShape)_box.Shape;
-
-        var v1 = polyShape.WorldVertices[_facingEdgeIndex.Value];
-        var v2 = polyShape.WorldVertexAfter(_facingEdgeIndex.Value);
-
-        var edge = v2 - v1;
-        var edgeUnit = Vector2.Normalize(edge);
-        var edgeNormal = edge.RightUnitNormal();
-
-        Graphics.Bot.States().Color(Theme.BgAnnotations).ThicknessAbs(Theme.ShapeLineThicknessAbs).Default();
-
-        // A base
-        Graphics.Bot
-            .Line()
-            .Start(v1)
-            .End((v1 - v2) * 1000)
-            .Stroke();
-
-        Graphics.Text.Color(Theme.Normals).RotationOf(v1, v2).Default();
-
-        Graphics.Text
-            .Position(v1 - edgeUnit * 100 + edgeNormal * 40)
-            .Text("A");
-
-        // A vertical
-        Graphics.Bot.Line().Start(v1).End(v1 + edgeNormal * 1000).Stroke();
-
-        // B base
-        Graphics.Bot.Line()
-            .Start(v2)
-            .End((v2 - v1) * 1000)
-            .Stroke();
-
-        Graphics.Text
-            .Position(v2 + edgeUnit * 100 + edgeNormal * 40)
-            .Text("B");
-
-        // B vertical
-        Graphics.Bot.Line()
-            .Start(v2)
-            .End(v2 + edgeNormal * 1000)
-            .Stroke();
-
-        Graphics.Text
-            .Position(v1 + edge * 0.5f + edgeNormal * 40)
-            .Text("C");
     }
 }
