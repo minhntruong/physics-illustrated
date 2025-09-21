@@ -17,6 +17,15 @@ public static class Coords
 
     //=== LINES ================================================================
 
+    public static (Vector2 Start, Vector2 End) CircleRadius(Body body)
+    {
+        var start = body.Position;
+        var circle = (CircleShape)body.Shape;
+        var end = start - new Vector2(circle.Radius, 0); // To the left
+
+        return (start, end);
+    }
+
     public static (Vector2 Start, Vector2 End) Line(Body source, Body dest)
     {
         return (source.Position, dest.Position);
@@ -67,6 +76,15 @@ public static class Coords
         var v1 = body.Position;
         var vertex = poly.WorldVertices[vertexInd];
         var dir = Vector2.Normalize(vertex - v1);
+        var v2 = v1 + dir * extent;
+
+        return (v1, v2);
+    }
+
+    public static (Vector2 Start, Vector2 End) BodyExtentToBody(Body source, Body dest, float extent)
+    {
+        var v1 = source.Position;
+        var dir = Vector2.Normalize(dest.Position - v1);
         var v2 = v1 + dir * extent;
 
         return (v1, v2);
@@ -135,7 +153,7 @@ public static class CoordsDraws
         Graphics.DrawVertex(v, color, true);
     }
 
-    public static void DrawLabeledDistance(this (Vector2 v1, Vector2 v2) data, float threshold = 0, bool showLabel = true, float transitionFactor = 1)
+    public static void DrawContactDistance(this (Vector2 v1, Vector2 v2) data, float threshold = 0, bool showLabel = true, float transitionFactor = 1)
     {
         var color = Theme.ContactDistance;
 
@@ -157,6 +175,24 @@ public static class CoordsDraws
         if (!showLabel) { return; }
 
         if (transitionFactor < 1) { return; }
+
+        Graphics.Text
+            .Color(Theme.Label)
+            .Scale(Theme.LabelScale)
+            .TextLengthOf(v1, v2);
+    }
+
+    public static void DrawDistance(this (Vector2 v1, Vector2 v2) data, Color color)
+    {
+        var v1 = data.v1;
+        var v2 = data.v2;
+
+        Graphics.Mid.Line()
+            .Start(v1)
+            .End(v2)
+            .Color(color)
+            .ThicknessAbs(Theme.ShapeLineThicknessAbs)
+            .Stroke();
 
         Graphics.Text
             .Color(Theme.Label)

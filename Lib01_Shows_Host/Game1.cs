@@ -45,7 +45,7 @@ public class Game1 : Game, IGameExt
         });
 
         Register(new ShowCircles(GraphicsDevice));
-        //Register(new ShowCirclePolygon(GraphicsDevice));
+        Register(new ShowCirclePolygon(GraphicsDevice));
 
         base.Initialize();
     }

@@ -47,15 +47,11 @@ public class ShowCircles : ShowBase
 
         if (_showRadii)
         {
-            Graphics.DrawRadius(Bodies[0]);
-            Graphics.DrawRadius(_movable);
+            Coords.CircleRadius(Bodies[0]).DrawDistance(Theme.Shape);
+            Coords.CircleRadius(_movable).DrawDistance(Theme.Shape);
         }
 
         ProcessStepDraws();
-
-        // TODO: remove
-        _currentStep?.Draw?.Invoke();
-
     }
 
     //==========================================================================

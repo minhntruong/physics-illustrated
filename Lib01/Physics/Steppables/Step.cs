@@ -12,8 +12,6 @@ public partial class Step
 
     public bool IsCompleted { get; set; }
 
-    public Action Draw { get; set; }
-
     public List<Action> Draws { get; } = new List<Action>();
 
     public Contact Contact { get; set; }
@@ -23,7 +21,6 @@ public partial class Step
         Text = "";
         IsColliding = null;
         IsCompleted = false;
-        Draw = null;
         Draws.Clear();
     }
 }
@@ -41,8 +38,9 @@ public static class Extensions
         return draw;
     }
 
-    public static Action AddAnim(this Step step, float duration, Action<float> animFunc)
+    public static Action AddAnim(this Step step, Action<float> animFunc)
     {
+        var duration = 1f;
         var anim = Animations.AddFloat(0, 1, duration);
 
         var drawAction = () => animFunc(anim.Current);
@@ -73,9 +71,4 @@ public static class Extensions
     {
         step.Draws.Remove(draw);
     }
-
-    //public static void ClearDrawAnimations(this Step step)
-    //{
-    //    Animations.Clear();
-    //}
 }

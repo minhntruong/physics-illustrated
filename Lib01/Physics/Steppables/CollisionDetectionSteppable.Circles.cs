@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using ShowPhysics.Library.Managers;
-using ShowPhysics.Library.Managers.Animation;
 using ShowPhysics.Library.Physics.Shapes;
 using System.Collections.Generic;
 
@@ -17,136 +16,55 @@ public static partial class CollisionDetectionSteppable
         var step = new Step();
 
         step.Text = "Measure the distance between the 2 circle centers";
-        step.AddAnim(1, (float animValue) =>
+        step.AddAnim((float animValue) =>
         {
-            Coords.Line(a, b).DrawLabeledDistance(circleA.Radius + circleB.Radius, true, animValue);
+            Coords.Line(a, b).DrawContactDistance(circleA.Radius + circleB.Radius, true, animValue);
         });
         yield return step;
-
-
-        var drawDistance = (bool label = true) => { Graphics.DrawLabeledDistance(a, b, circleA.Radius + circleB.Radius, label); };
-
-        yield return new Step
-        {
-            Text = "Measure the distance between the 2 circle centers",
-            Draw = () => { drawDistance(); }
-        };
 
         var ab = () => b.Position - a.Position;
         var radiusSum = circleA.Radius + circleB.Radius;
 
-        var isColliding = () => ab().LengthSquared() <= radiusSum * radiusSum;
+        var isColliding = () => ab().Length() <= radiusSum;
 
         if (!isColliding())
         {
-            yield return new Step
-            {
-                Text = "No collision, the distance is greater than the sum of the radii",
-                Draw = () => { drawDistance(); },
-                IsColliding = false
-            };
+            step.Text = "No collision, the distance is greater than the sum of the radii";
+            yield return step;
 
-            yield return new Step
-            {
-                Text = "Check completed",
-                IsCompleted = true,
-            };
+            step.Text = "Check completed";
+            step.IsCompleted = true;
+            step.IsColliding = false;
+            yield return step;
 
             yield break;
         }
 
-        yield return new Step
-        {
-            Text = "Collision detected, the distance is less than the sum of the radii",
-            Draw = () => { drawDistance(); },
-            IsColliding = true
-        };
+        step.Text = "Collision detected, the distance is less than the sum of the radii";
+        yield return step;
 
-        yield return new Step
-        {
-            Text = "Now we gather information about the collision that will be used to resolve it later",
-            Draw = () => { drawDistance(false); }
-        };
+        step.Reset();
+        step.Text = "Now we gather information about the collision that will be used to resolve it later";
+        step.AddDraw(() => Coords.Line(a, b).DrawLine(Theme.BgAnnotations));
+        yield return step;
 
-        var animB = Animations.AddFloat(0, circleB.Radius, 1);
+        step.Text = "Along the distance line, from the center, extending the entire radius, is 1 contact point";
+        step.AddAnim((float animValue) => Coords.BodyExtentToBody(b, a, circleB.Radius).DrawVector(Theme.ContactStart, animValue));
+        yield return step;
 
-        var contactNormal = () => Vector2.Normalize(ab());
-        var contactPtFromB = (float current) => b.Position - contactNormal() * current;
+        step.RemoveLastDraw();
+        step.Text = "This is the first contact point";
+        step.AddDraw(() => Coords.BodyExtentToBody(b, a, circleB.Radius).End.DrawContact(Theme.ContactStart));
+        yield return step;
 
-        yield return new Step
-        {
-            Text = "Along the distance line, from the center, extending the entire radius, is 1 contact point",
-            Draw = () =>
-            {
-                drawDistance(false);
+        step.Text = "From the other circle, extending the entire radius, is the 2nd contact point";
+        step.AddAnim((float animValue) => Coords.BodyExtentToBody(a, b, circleA.Radius).DrawVector(Theme.ContactEnd, animValue));
+        yield return step;
 
-                var point = () => contactPtFromB(animB.Current);
-
-                Graphics.Mid.Vector().Start(b.Position).End(point()).Color(Color.Lime).ThicknessAbs(4).Stroke();
-            }
-        };
-
-        var drawContactStart = () =>
-        {
-            var point = () => contactPtFromB(animB.Current);
-            Graphics.DrawVertex(point(), Color.Lime, true);
-        };
-
-        yield return new Step
-        {
-            Text = "Mark this contact point",
-            Draw = () =>
-            {
-                drawDistance(false);
-                drawContactStart();
-            }
-        };
-
-        var animA = Animations.AddFloat(0, circleA.Radius, 1);
-
-        var contactPtFromA = (float current) => a.Position + contactNormal() * current;
-
-        yield return new Step
-        {
-            Text = "From the other circle, extending the entire radius, is the 2nd contact point",
-            Draw = () =>
-            {
-                drawDistance(false);
-                drawContactStart();
-
-                var point = () => contactPtFromA(animA.Current);
-
-                Graphics.Mid.Vector().Start(a.Position).End(point()).Color(Color.Orange).ThicknessAbs(4).Stroke();
-            }
-        };
-
-        var drawContactEnd = () =>
-        {
-            var point = () => contactPtFromA(animA.Current);
-            Graphics.DrawVertex(point(), Color.Orange, true);
-        };
-
-        yield return new Step
-        {
-            Text = "Mark this contact point",
-            Draw = () =>
-            {
-                drawDistance(false);
-
-                drawContactStart();
-                drawContactEnd();
-            }
-        };
-
-        yield return new Step
-        {
-            Text = "Resulting contact information",
-            Draw = () =>
-            {
-                drawContactStart();
-                drawContactEnd();
-            }
-        };
+        step.RemoveLastDraw();
+        step.Text = "This is the 2nd contact point";
+        step.AddDraw(() => Coords.BodyExtentToBody(a, b, circleA.Radius).End.DrawContact(Theme.ContactEnd));
+        yield return step;
 
         var contact = new Contact();
 
