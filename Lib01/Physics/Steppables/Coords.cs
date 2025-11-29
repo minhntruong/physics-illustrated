@@ -143,9 +143,38 @@ public static class Coords
 
 public static class CoordsDraws
 {
-    public static void DrawVertex(this Vector2 v)
+    public static void DrawVertex(this Vector2 v, Color color = default, bool highlight = false)
     {
-        Graphics.DrawVertex(v);
+        if (color == default) { color = Color.White; }
+
+        if (highlight)
+        {
+            Graphics.Top.Rect()
+                .Center(v)
+                .Width(16)
+                .Height(16)
+                .SizeAbs()
+                .Color(color)
+                .Fill();
+
+            Graphics.Top.Rect()
+                .Center(v)
+                .Width(10)
+                .Height(10)
+                .SizeAbs()
+                .Color(Color.White)
+                .Fill();
+        }
+        else
+        {
+            Graphics.Top.Rect()
+                .Center(v)
+                .Width(6)
+                .Height(6)
+                .SizeAbs()
+                .Color(color)
+                .Fill();
+        }
     }
 
     public static void DrawContact(this Vector2 v, Color color)
@@ -265,8 +294,10 @@ public static class CoordsDraws
         return Vector2.Dot(data.v1, data.v2);
     }
 
-    public static void DrawProjection(this (Vector2 Start, Vector2 V1, Vector2 V2) data, float transitionFactor = 1, float threshold = 0)
+    public static float DrawProjection(this (Vector2 Start, Vector2 V1, Vector2 V2) data, float transitionFactor = 1, float threshold = 0)
     {
+        // Returns projection length
+
         var projection = Vector2.Dot(data.V1, data.V2);
         
         var nV1 = data.Start;
@@ -290,7 +321,7 @@ public static class CoordsDraws
             .Stroke();
 
         // Don't show length if transition isn't complete
-        if (transitionFactor < 1) { return; }
+        if (transitionFactor < 1) { return projection; }
 
         var formatted = projection >= 0 ? projection.ToString("0.0") : $"({projection:0.0})";
 
@@ -299,5 +330,7 @@ public static class CoordsDraws
             .Scale(Theme.LabelScale)
             .TextLengthOf(nV1, nV2, false)
             .Text(formatted);
+
+        return projection;
     }
 }
